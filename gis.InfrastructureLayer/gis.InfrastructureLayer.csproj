@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\gis.ApplicationLayer\gis.ApplicationLayer.csproj" />
+      <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
+    </ItemGroup>
+
 </Project>
