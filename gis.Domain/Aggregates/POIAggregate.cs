@@ -1,0 +1,106 @@
+﻿using gis.Domain.Common;
+using gis.Domain.Entities.Coord;
+using gis.Domain.Entities.Events;
+using gis.Domain.Entities.IDs;
+using gis.Domain.Entities.Information;
+using gis.Domain.ResultPattern;
+using gis.Domain.ResultPattern.Errors;
+
+namespace gis.Domain.Aggregates;
+
+public class POIAggregate : AggregateRoot<PointID>
+{
+    public Coordinates Coordinates { get; private set; }
+    public PointDescription? PointDesc { get; private set; }
+    public PointName PointName { get; private set; }
+    public POIStatus Status { get; private set; } = POIStatus.ACTIVE;
+
+    #region Factory Method and private constructor
+
+    internal static Result<POIAggregate> createFromPointId(
+        Coordinates coords,
+        PointDescription pointDesc, PointName pointName, PointID id)
+    {
+        var aggregate = new POIAggregate
+        (
+            id,coords,
+            pointDesc, pointName
+        );
+        aggregate.AddDomainEvent(PointOfInterestCreatedEvent.Create(id));
+        return Result<POIAggregate>.Success(aggregate);
+    }
+
+    private POIAggregate(PointID id, Coordinates coordinates, PointDescription? pointDesc, PointName pointName) :
+        base(id)
+    {
+        Coordinates = coordinates;
+        PointDesc = pointDesc ?? PointDescription.FromString(null).Value;
+        PointName = pointName;
+    }
+
+    internal static Result<POIAggregate> create(
+        Coordinates coordinates,
+        PointDescription? pointDesc,
+        PointName pointName
+    )
+    {
+        var aggregate = new POIAggregate(
+            PointID.New(),
+            coordinates, pointDesc, pointName);
+
+        aggregate.AddDomainEvent(PointOfInterestCreatedEvent.Create(aggregate.Id));
+
+        return Result<POIAggregate>.Success(aggregate);
+    }
+
+    #endregion
+
+    public Coordinates GetCoordinates() => Coordinates;
+    public PointDescription GetPointDesc() => PointDesc;
+    public PointName GetPointName() => PointName;
+
+    internal void ChangePointDesc(PointDescription newPointDesc)
+    {
+        var prevPointDesc = PointDesc;
+        PointDesc = newPointDesc;
+        AddDomainEvent(POIPointDescChangedEvent.Create(this.Id, prevPointDesc, newPointDesc));
+    }
+
+    internal Result ChangePointName(PointName newPointName)
+    {
+        var prevPointName = GetPointName();
+        PointName = newPointName;
+        AddDomainEvent(POIPointNameChangedEvent.Create(this.Id, prevPointName, newPointName));
+        return Result.Success();
+    }
+
+    internal Result ChangeCoordinates(Coordinates newCoordinates)
+    {
+        if (Coordinates.Equals(newCoordinates))
+        {
+            return Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.SAME_VALUE_PROVIDED);
+        }
+
+        if (newCoordinates == null)
+        {
+            return Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.BAD_CREDENTIALS_FOR_COORDINATES);
+        }
+
+        var prevCoordinates = GetCoordinates();
+        Coordinates = newCoordinates;
+        AddDomainEvent(POICoordinatesChangedEvent.Create(this.Id, prevCoordinates, newCoordinates));
+        return Result.Success();
+    }
+
+    internal void ChangeStatus(POIStatus newStatus)
+    {
+        AddDomainEvent(POIStatusChangedEvent.Create(this.Id, Status, newStatus));
+        Status = newStatus;
+    }
+
+    internal void SoftDelete()
+    {
+        AddDomainEvent(POISoftDeletedEvent.Create(Id));
+        Status = POIStatus.SOFT_DELETED;
+    }
+}
