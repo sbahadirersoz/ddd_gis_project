@@ -1,4 +1,5 @@
 ﻿using gis.Domain.Aggregates;
+using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.IDs;
 using gis.Domain.Entities.Information;
@@ -11,10 +12,12 @@ namespace gis.Domain.Services;
 public class POIDomainService
 {
     private readonly IPointRepository _pointRepository;
+    private readonly ITopologySuitePointContract _topologyContract;
 
-    public POIDomainService(IPointRepository pointRepository)
+    public POIDomainService(IPointRepository pointRepository, ITopologySuitePointContract topologyContract)
     {
         _pointRepository = pointRepository;
+        _topologyContract = topologyContract;
     }
     public async Task<Result<POIAggregate>> UpdatePoiAggregate(POIAggregate poi, Coordinates? newCoordinates,
         PointDescription? newPointDesc, PointName? newPointName, POIStatus? newStatus)
@@ -75,6 +78,7 @@ public class POIDomainService
     public async Task<Result> ChangePointCoordinatesAsync(POIAggregate poi, Coordinates newCoordinates)
     {
         var validateChangePointCoordinatesAsync = await ValidateChangePointCoordinatesAsync(poi,newCoordinates);
+        
          if (validateChangePointCoordinatesAsync.IsFailure)
          {
              return Result.Failure(validateChangePointCoordinatesAsync.Error);
@@ -97,16 +101,32 @@ public class POIDomainService
     {
         if (aggregate.PointName.Equals(pointName))
         {
-            return Result.Failure(DomainErrors.PointOfInterestErrors.PointNameErrors.SAME_VALUE_PROVIDED);
+            return Result.Failure(DomainErrors.POIErrors.PointNameErrors.SAME_VALUE_PROVIDED);
         }
         var isPointNameExist = await _pointRepository.IsPointNameExistsAsync(pointName);
         return isPointNameExist ? Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB) : Result.Success();
     }
+    
+    
+    /// <summary>
+    /// Buraya  conditionları kararlaştırıp ekleme çıkarma yapılabilir business rules  bittikten sonra tekrar kontrol et
+    /// </summary>
+    /// <param name="poi"></param>
+    /// <param name="newCoordinates"></param>
+    /// <returns></returns>
     private async Task<Result> ValidateChangePointCoordinatesAsync(POIAggregate poi, Coordinates newCoordinates)
     {
         var isCoordinatesExistsAsync = await _pointRepository.IsCoordinatesExistsAsync(newCoordinates);
-        return isCoordinatesExistsAsync ? 
-            Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB): Result.Success();
+         if (isCoordinatesExistsAsync)
+         {
+             return Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB);
+         }
+         if (_topologyContract.CheckDistanceBetweenPoints(poi.Coordinates, newCoordinates) < HardCodedParameters
+                 .HardCodedPropertities.BusinessRuleParameters.MinDistanceBetweenPoints)
+         {
+             return Result.Failure(BusinessRules.POIRules.DistanceBellowMin);
+         }
+         return Result.Success();
     }
     #endregion
     

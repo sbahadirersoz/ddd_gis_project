@@ -48,8 +48,8 @@ public record Coordinates
     {
         return latitude switch
         {
-            < HardCodedPropertities.CoordinatePropertities.MinLatitude => Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.LATITUDE_CORDINATE_IS_UNDER_MIN_VALUE_ERROR),
-            > HardCodedPropertities.CoordinatePropertities.MaxLatitude => Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.LATITUDE_CORDINATE_IS_OVER_MAX_VALUE_ERROR),
+            < HardCodedPropertities.CoordinatePropertities.MinLatitude => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.LATITUDE_COORDINATE_IS_UNDER_MIN_VALUE_ERROR),
+            > HardCodedPropertities.CoordinatePropertities.MaxLatitude => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.ALTITUDE_COORDINATE_IS_OVER_MAX_VALUE_ERROR),
             _ => Result.Success()
         };
     }
@@ -59,10 +59,10 @@ public record Coordinates
         {
             < HardCodedPropertities.CoordinatePropertities.MinLongitude
                 => Result.Failure(DomainErrors
-                .PointOfInterestErrors.CoordinateErrors.LONGITUDE_CORDINATE_IS_UNDER_MIN_VALUE_ERROR),
+                .POIErrors.CoordinateErrors.LONGITUDE_COORDINATE_IS_UNDER_MIN_VALUE_ERROR),
             > HardCodedPropertities.CoordinatePropertities.MaxLongitude 
                 => Result.Failure(DomainErrors
-                .PointOfInterestErrors.CoordinateErrors.LONGITUDE_CORDINATE_IS_OVER_MAX_VALUE_ERROR),
+                .POIErrors.CoordinateErrors.LONGITUDE_COORDINATE_IS_OVER_MAX_VALUE_ERROR),
             _ => Result.Success()
         };
     }private static Result altitudeValidation(double altitude)
@@ -70,9 +70,9 @@ public record Coordinates
         return altitude switch
         {
             < HardCodedPropertities.CoordinatePropertities.MinAltitude 
-                => Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.ALTIDUTE_CORDINATE_IS_UNDER_MIN_VALUE_ERROR),
+                => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.LATITUDE_COORDINATE_IS_UNDER_MIN_VALUE_ERROR),
             > HardCodedPropertities.CoordinatePropertities.MaxAltitude 
-                => Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.ALTIDUTE_CORDINATE_IS_OVER_MAX_VALUE_ERROR),
+                => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.ALTITUDE_COORDINATE_IS_OVER_MAX_VALUE_ERROR),
             _ =>
                 Result.Success()
         };

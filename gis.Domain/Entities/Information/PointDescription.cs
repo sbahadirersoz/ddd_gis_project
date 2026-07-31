@@ -30,6 +30,6 @@ public record PointDescription
     }
     private static  Result validateLength(string value)
     {
-        return value.Length > HardCodedPropertities.PointDescriptionPropertities.MaxLength ? Result.Failure(DomainErrors.PointOfInterestErrors.PointDescErrors.LENGTH_REACHED_MAX_VALUE) : Result.Success();
+        return value.Length > HardCodedPropertities.PointDescriptionPropertities.MaxLength ? Result.Failure(DomainErrors.POIErrors.PointDescErrors.LENGTH_REACHED_MAX_VALUE) : Result.Success();
     }
 }
