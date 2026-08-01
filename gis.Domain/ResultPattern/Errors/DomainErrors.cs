@@ -4,7 +4,7 @@ public static class DomainErrors
 {
     public static class POIErrors
     {
-        public static class CoordinateErrors
+        public static class Coordinate
         {
             public static readonly Error SAME_VALUE_PROVIDED =
                 new Error("POI.Coordinates.SameValue", "The provided coordinates are the same as the current ones.");
@@ -34,13 +34,13 @@ public static class DomainErrors
                 new Error("POI.Coordinates.InvalidAltitude", "The provided altitude coordinate is invalid.");
         }
 
-        public static class PointDescErrors
+        public static class PointDesc
         {
             public static readonly Error LENGTH_REACHED_MAX_VALUE =
                 new Error("POI.Description.MaxLengthExceeded", "Point description length reached the maximum allowed limit.");
         }
 
-        public static class PointNameErrors
+        public static class PointName
         {
             public static readonly Error BAD_CREDENTIALS_FOR_POINT_NAME =
                 new Error("POI.Name.BadCredentials", "Invalid point name credentials provided.");
@@ -55,10 +55,16 @@ public static class DomainErrors
                 new Error("POI.Name.SameValue", "The provided point name is the same as the current one.");
         }
 
-        public static class PointIDErrors
+        public static class PointID
         {
             public static readonly Error EMPTY_ID_FORMAT =
                 new Error("POI.Id.Empty", "Given ID is empty.");
         }
+
+        public static class WKT
+        {
+            public static readonly Error INVALID_WKT_FORMAT =
+                new Error("POI.WKT.FormatInvalid", "Given WKT Format is invalid.");
+        }   
+        }
     }
-}

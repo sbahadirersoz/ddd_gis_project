@@ -38,9 +38,9 @@ public record PointName
         return value.Length switch
         {
             > HardCodedPropertities.PointNamePropertities.MaxLength
-                => Result.Failure(DomainErrors.POIErrors.PointNameErrors.LENGTH_REACHED_MAX_VALUE),
+                => Result.Failure(DomainErrors.POIErrors.PointName.LENGTH_REACHED_MAX_VALUE),
             < HardCodedPropertities.PointNamePropertities.MinLength
-                => Result.Failure(DomainErrors.POIErrors.PointNameErrors.LENGTH_UNDER_MIN_VALUE),
+                => Result.Failure(DomainErrors.POIErrors.PointName.LENGTH_UNDER_MIN_VALUE),
             _ => Result.Success()
         };
     }
@@ -49,7 +49,7 @@ public record PointName
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return Result.Failure(DomainErrors.POIErrors.PointNameErrors.BAD_CREDENTIALS_FOR_POINT_NAME);
+            return Result.Failure(DomainErrors.POIErrors.PointName.BAD_CREDENTIALS_FOR_POINT_NAME);
         }
 
         return Result.Success();
