@@ -4,5 +4,5 @@ namespace gis.Domain.Contracts;
 
 public interface ITopologySuitePointContract
 {
-    double CheckDistanceBetweenPoints(Coordinates point1, Coordinates point2);
+    string CreateWktStringFromLatLon(Latitude latitude, Longitude longitude);
 }

@@ -1,4 +1,5 @@
-﻿using gis.Domain.HardCodedParameters;
+﻿using gis.Domain.Entities.WKT;
+using gis.Domain.HardCodedParameters;
 using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
 
@@ -9,75 +10,35 @@ namespace gis.Domain.Entities.Coord;
 
 public record Coordinates
 {
-    public double Latitude { get; init; }
-    public double Longitude { get; init; }
-    public double? Altitude { get; init; }
-
-    private Coordinates(double latitude, double longitude, double? altitude)
+    public Latitude Latitude { get; }
+    public Longitude Longitude { get;  }
+    public double? Altitude { get;  }
+    public WellKnownText WKT { get; private set; }
+    private Coordinates(Latitude latitude, Longitude longitude, double? altitude, WellKnownText wkt)
     {
         Latitude = latitude;
         Longitude = longitude;
+        WKT = wkt;
         Altitude  = altitude ?? null;
     }
-    public static Result<Coordinates> FromLatLon(double latitude, double longitude)
+    public static Result<Coordinates> FromLatLon(Latitude latitude, Longitude longitude,WellKnownText wkt)
     {
-        var validation = validateCoords(latitude, longitude ,null);
-        return validation.IsFailure ? Result<Coordinates>.Failure(validation.Error) : Result<Coordinates>.Success(new Coordinates(latitude, longitude  , null));
+        return Result<Coordinates>.Success(new Coordinates(latitude, longitude  , null,wkt));
     }
-    public static Result<Coordinates> FromLatLonAlt(double latitude, double longitude, double altitude)
+    public static Result<Coordinates> FromLatLonAlt(Latitude latitude, Longitude longitude, double altitude , WellKnownText wkt)
     {
-        var validation = validateCoords(latitude, longitude, altitude);
-        return validation.IsFailure ? Result<Coordinates>.Failure(validation.Error) : Result<Coordinates>.Success(new Coordinates(latitude, longitude, altitude));
-    }
-    
-    
-    private static Result validateCoords(double latitude, double longitude, double? altitude)
-    {
-        var latVal = latitudeValidation(latitude);
-        var longVal = longitudeValidation(longitude);
-        if (latVal.IsFailure)
-        {
-            return Result.Failure(latVal.Error);
-        }
-        if (longVal.IsFailure)
-        {
-            return Result.Failure(longVal.Error);
-        }
-
-        if (!altitude.HasValue) return Result.Success();
-        var validation = altitudeValidation(altitude.Value);
-        return validation.IsFailure ? Result.Failure(validation.Error) : Result.Success();
+        var validation = AltitudeValidation(altitude);
+        return validation.IsFailure ? Result<Coordinates>.Failure(validation.Error) : Result<Coordinates>.Success(new Coordinates(latitude, longitude, altitude,wkt));
     }
 
-    private static Result latitudeValidation(double latitude)
-    {
-        return latitude switch
-        {
-            < HardCodedPropertities.CoordinatePropertities.MinLatitude => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.LATITUDE_COORDINATE_IS_UNDER_MIN_VALUE_ERROR),
-            > HardCodedPropertities.CoordinatePropertities.MaxLatitude => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.ALTITUDE_COORDINATE_IS_OVER_MAX_VALUE_ERROR),
-            _ => Result.Success()
-        };
-    }
-    private static Result longitudeValidation(double longitude)
-    {
-        return longitude switch
-        {
-            < HardCodedPropertities.CoordinatePropertities.MinLongitude
-                => Result.Failure(DomainErrors
-                .POIErrors.CoordinateErrors.LONGITUDE_COORDINATE_IS_UNDER_MIN_VALUE_ERROR),
-            > HardCodedPropertities.CoordinatePropertities.MaxLongitude 
-                => Result.Failure(DomainErrors
-                .POIErrors.CoordinateErrors.LONGITUDE_COORDINATE_IS_OVER_MAX_VALUE_ERROR),
-            _ => Result.Success()
-        };
-    }private static Result altitudeValidation(double altitude)
+    private static Result AltitudeValidation(double altitude)
     {
         return altitude switch
         {
             < HardCodedPropertities.CoordinatePropertities.MinAltitude 
-                => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.LATITUDE_COORDINATE_IS_UNDER_MIN_VALUE_ERROR),
+                => Result.Failure(DomainErrors.POIErrors.Coordinate.ALTITUDE_COORDINATE_IS_UNDER_MIN_VALUE_ERROR),
             > HardCodedPropertities.CoordinatePropertities.MaxAltitude 
-                => Result.Failure(DomainErrors.POIErrors.CoordinateErrors.ALTITUDE_COORDINATE_IS_OVER_MAX_VALUE_ERROR),
+                => Result.Failure(DomainErrors.POIErrors.Coordinate.LONGITUDE_COORDINATE_IS_OVER_MAX_VALUE_ERROR),
             _ =>
                 Result.Success()
         };
