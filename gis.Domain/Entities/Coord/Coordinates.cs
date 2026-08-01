@@ -19,7 +19,12 @@ public record Coordinates
         Longitude = longitude;
         Altitude  = altitude ?? null;
     }
-    public static Result<Coordinates> FromLatLon(double latitude, double longitude, double? altitude)
+    public static Result<Coordinates> FromLatLon(double latitude, double longitude)
+    {
+        var validation = validateCoords(latitude, longitude ,null);
+        return validation.IsFailure ? Result<Coordinates>.Failure(validation.Error) : Result<Coordinates>.Success(new Coordinates(latitude, longitude  , null));
+    }
+    public static Result<Coordinates> FromLatLonAlt(double latitude, double longitude, double altitude)
     {
         var validation = validateCoords(latitude, longitude, altitude);
         return validation.IsFailure ? Result<Coordinates>.Failure(validation.Error) : Result<Coordinates>.Success(new Coordinates(latitude, longitude, altitude));
