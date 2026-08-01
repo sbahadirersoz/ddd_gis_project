@@ -97,7 +97,7 @@ public class POIDomainService
     {
         if (aggregate.PointName.Equals(pointName))
         {
-            return Result.Failure(DomainErrors.PointOfInterestErrors.PointNameErrors.SAME_VALUE_PROVIDED);
+            return Result.Failure(DomainErrors.POIErrors.PointNameErrors.SAME_VALUE_PROVIDED);
         }
         var isPointNameExist = await _pointRepository.IsPointNameExistsAsync(pointName);
         return isPointNameExist ? Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB) : Result.Success();

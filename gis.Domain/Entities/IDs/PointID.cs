@@ -15,6 +15,6 @@ public record PointID : EntityId
 
     public static Result<PointID> FromGuid(Guid value)
     {
-        return value == Guid.Empty ? Result<PointID>.Failure(DomainErrors.PointOfInterestErrors.PointIDErrors.EMPTY_ID_FORMAT) : Result<PointID>.Success(new PointID(value));
+        return value == Guid.Empty ? Result<PointID>.Failure(DomainErrors.POIErrors.PointIDErrors.EMPTY_ID_FORMAT) : Result<PointID>.Success(new PointID(value));
     }
 }

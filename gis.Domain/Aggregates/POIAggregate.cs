@@ -78,12 +78,12 @@ public class POIAggregate : AggregateRoot<PointID>
     {
         if (Coordinates.Equals(newCoordinates))
         {
-            return Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.SAME_VALUE_PROVIDED);
+            return Result.Failure(DomainErrors.POIErrors.CoordinateErrors.SAME_VALUE_PROVIDED);
         }
 
         if (newCoordinates == null)
         {
-            return Result.Failure(DomainErrors.PointOfInterestErrors.CoordinateErrors.BAD_CREDENTIALS_FOR_COORDINATES);
+            return Result.Failure(DomainErrors.POIErrors.CoordinateErrors.BAD_CREDENTIALS_FOR_COORDINATES);
         }
 
         var prevCoordinates = GetCoordinates();
