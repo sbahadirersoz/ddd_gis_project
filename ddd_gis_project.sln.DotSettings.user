@@ -1,7 +1,18 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ALateBoundTestFramework_002Ecs_002Fl_003AC_0021_003FUsers_003Fsmhbh_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FSourcesCache_003Fcffa676d9bfc6c7a1c9d0d25ead15b3b0c9e12e3187bf397eaa52260e5fd91_003FLateBoundTestFramework_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=dfcaa52d_002Dc2e0_002D4a60_002Dab77_002De08a6c01761b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CreatePoi" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ANullReferenceException_002Ecs_002Fl_003AC_0021_003FUsers_003Fsmhbh_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FSourcesCache_003F99614b3e285a2a04903b8468e786bb72d429ae852db105725272970af8a23_003FNullReferenceException_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestProjectMapping/=5E35691C_002DDBE2_002D4B80_002DB835_002D7BD62CD75502/@EntryIndexedValue">748E235D-27BD-48E8-AC1A-F9BE8387C3A2</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestTemplateMapping/=xUnit/@EntryIndexedValue">33ff99d8-b1ad-4ed5-a4fd-376b97c2c841</s:String>
+	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8a2c6fa5_002D0074_002D443c_002Daa16_002D323b0755de1c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="METHOD" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Domain.PoiTests.PoiDomainServiceTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.Entities.Information.PointNameTest.METHOD&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Domain.Services.PoiTests.PoiDomainServiceTest.CreatePoi_NameNull_Case&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=dfcaa52d_002Dc2e0_002D4a60_002Dab77_002De08a6c01761b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreatePoi" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Domain.Services.PoiTests.PoiDomainServiceTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.Entities.Information.PointNameTest.METHOD&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
