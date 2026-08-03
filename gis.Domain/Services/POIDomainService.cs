@@ -24,14 +24,20 @@ public class POIDomainService
     {
         
         ///Coordinate Domain Method
-        if (!poi.Coordinates.Latitude.Equals(latitude) || !poi.Coordinates.Longitude.Equals(longitude))
+
+        if (latitude != null || longitude != null)
         {
-            var changePointCoordinatesResult =  await ChangePointCoordinatesAsync(poi, latitude,longitude);
-            if (changePointCoordinatesResult.IsFailure)
+
+            if (!poi.Coordinates.Latitude.Equals(latitude) || !poi.Coordinates.Longitude.Equals(longitude))
             {
-                return Result<POIAggregate>.Failure(changePointCoordinatesResult.Error);
+                var changePointCoordinatesResult = await ChangePointCoordinatesAsync(poi, latitude, longitude);
+                if (changePointCoordinatesResult.IsFailure)
+                {
+                    return Result<POIAggregate>.Failure(changePointCoordinatesResult.Error);
+                }
             }
         }
+
         ///PointName Domain Method
         if (newPointName!= null && !poi.PointName.Equals(newPointName))
         {
