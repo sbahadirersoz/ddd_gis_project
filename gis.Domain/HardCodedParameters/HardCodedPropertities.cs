@@ -29,6 +29,6 @@ public static class HardCodedPropertities
     public static class PointNamePropertities
     {
         public const int MinLength = 3;
-        public const int MaxLength = 12;
+        public const int MaxLength = 21;
     }
 }

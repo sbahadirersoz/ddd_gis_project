@@ -25,21 +25,27 @@ public record PointName
     {
         var isNullOrWhiteSpaced = valueIsNullOrWhiteSpaced(value);
         var validatePointNameLen = PointName.validatePointNameLen(value);
-        if (valueIsNullOrWhiteSpaced(value).IsFailure)
+        
+        if (isNullOrWhiteSpaced.IsFailure)
         {
             return Result.Failure(isNullOrWhiteSpaced.Error);
         }
+        if (validatePointNameLen.IsFailure)
+        {
+            return Result.Failure(validatePointNameLen.Error);
+        }
 
-        return validatePointNameLen.IsFailure ? Result.Failure(validatePointNameLen.Error) : Result.Success();
+
+        return  Result.Success();
     }
 
     private static Result validatePointNameLen(string value)
     {
         return value.Length switch
         {
-            > HardCodedPropertities.PointNamePropertities.MaxLength
+            >= HardCodedPropertities.PointNamePropertities.MaxLength
                 => Result.Failure(DomainErrors.POIErrors.PointName.LENGTH_REACHED_MAX_VALUE),
-            < HardCodedPropertities.PointNamePropertities.MinLength
+            <= HardCodedPropertities.PointNamePropertities.MinLength
                 => Result.Failure(DomainErrors.POIErrors.PointName.LENGTH_UNDER_MIN_VALUE),
             _ => Result.Success()
         };
@@ -50,6 +56,11 @@ public record PointName
         if (string.IsNullOrWhiteSpace(value))
         {
             return Result.Failure(DomainErrors.POIErrors.PointName.BAD_CREDENTIALS_FOR_POINT_NAME);
+        }
+        if (value.Contains(" "))
+        {
+            return Result.Failure(DomainErrors.POIErrors.PointName.BAD_CREDENTIALS_FOR_POINT_NAME);
+            
         }
 
         return Result.Success();
