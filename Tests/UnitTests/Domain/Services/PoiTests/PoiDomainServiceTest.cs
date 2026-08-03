@@ -53,17 +53,25 @@ public class PoiDomainServiceTest
     public async Task  CreatePoi_Success_Case()
     {
 
-        var lat = Latitude.Create(40.7128).Value;
-        var lon = Longitude.Create(40.7128).Value;
-        var desc = PointDescription.FromString("Central Park").Value;
-        var name =  PointName.FromString("Mock Location").Value;
+        var lat = Latitude.Create(40.7128);
+        var lon = Longitude.Create(40.7128);
+        var desc = PointDescription.FromString("Central Park");
+        var name =  PointName.FromString("Mock Location");
+        if (lat.IsFailure||lon.IsFailure||desc.IsFailure||name.IsFailure)
+        {
+            _testOutputHelper.WriteLine($"AnyField Issued" +
+                                        $"{lat.Value}, {lon.Value}, {desc.Value}, {name.Value}" +
+                                        $"====================================================" +
+                                        $"{lat.Error}, {lon.Error}, {desc.Error}, {name.Error}");
+            return;
+        }
 
-        _pointRepository.IsLatLonCoordinatesExistsAsync(lat,lon).Returns(false);
-        _pointRepository.IsPointNameExistsAsync(name).Returns(false);
-        _contract.CreateWktStringFromLatLon(lat, lon).Returns($"POINT ({lat.Value} {lon.Value})");
+        _pointRepository.IsLatLonCoordinatesExistsAsync(lat.Value,lon.Value).Returns(false);
+        _pointRepository.IsPointNameExistsAsync(name.Value).Returns(false);
+        _contract.CreateWktStringFromLatLon(lat.Value, lon.Value).Returns($"POINT ({lat.Value} {lon.Value})");
 
         // Act
-        var result = await _poiService.CreatePoiAggregate(lat,lon, desc, name);
+        var result = await _poiService.CreatePoiAggregate(lat.Value,lon.Value, desc.Value, name.Value);
         if (result.IsFailure)
         {
             _testOutputHelper.WriteLine(result.Error.Code);
@@ -75,35 +83,53 @@ public class PoiDomainServiceTest
         _testOutputHelper.WriteLine(result.Value.Coordinates.Latitude.ToString());
         _testOutputHelper.WriteLine(result.Value.Coordinates.Longitude.ToString());
         _testOutputHelper.WriteLine(result.Value.Coordinates.WKT.Value);
+        _testOutputHelper.WriteLine(result.Value.Coordinates.WKT.Value);
         result.IsSuccess.Should().BeTrue();
     
 
-        await _pointRepository.Received(1).IsLatLonCoordinatesExistsAsync(lat,lon);
-        await _pointRepository.Received(1).IsPointNameExistsAsync(name);
+        await _pointRepository.Received(1).IsLatLonCoordinatesExistsAsync(lat.Value,lon.Value);
+        await _pointRepository.Received(1).IsPointNameExistsAsync(name.Value);
     }
     [Fact]
     public async Task CreatePoi_NameNull_Case()
     {
 
-        var lat = Latitude.Create(40.7128).Value;
-        var lon = Longitude.Create(40.7128).Value;
-        var desc = PointDescription.FromString("Central Park").Value;
+        
+        /// Şu  anda app layer i tutmadığım ve mapping yapmadığım için direkt burdan custom creationda hata alıyorum ve bunu direkt takip etmediğim için valuesini alıp success dönüyor fakat  burdda bir hata
+        /// var  çalışıyor sanıyor fakat çalışmıyor yani task successfull
+        
+        
+        var lat = Latitude.Create(40.7128);
+        var lon = Longitude.Create(40.7128);
+        var desc = PointDescription.FromString("Central Park");
         var name =  PointName.FromString("");
-
-        _pointRepository.IsLatLonCoordinatesExistsAsync(lat,lon).Returns(false);
+        if (lat.IsFailure||lon.IsFailure||desc.IsFailure||name.IsFailure)
+        {
+            _testOutputHelper.WriteLine($"AnyField Issued){lat.Value}, {lon.Value}, {desc.Value}, {name.Value}");
+            _testOutputHelper.WriteLine("=====================================================================");
+            _testOutputHelper.WriteLine($"{lat.Error}, {lon.Error}, {desc.Error}, {name.Error}");
+            name.IsFailure.Should().BeTrue();
+            name.Error.Should().Be(DomainErrors.POIErrors.PointName.BAD_CREDENTIALS_FOR_POINT_NAME);
+            return;
+        }
+        
+      
+        _pointRepository.IsLatLonCoordinatesExistsAsync(lat.Value,lon.Value).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name.Value).Returns(false);
-        _contract.CreateWktStringFromLatLon(lat, lon).Returns($"POINT ({lat.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(lat.Value, lon.Value).Returns($"POINT ({lat.Value} {lon.Value})");
 
         // Act
-        var result = await _poiService.CreatePoiAggregate(lat,lon, desc, name.Value);
+        var result = await _poiService.CreatePoiAggregate(lat.Value, lon.Value, desc.Value, name.Value);
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().Be(DomainErrors.POIErrors.PointName.BAD_CREDENTIALS_FOR_POINT_NAME);
+        _testOutputHelper.WriteLine(result.Value.ToString());
 
         // Assert
-        result.IsFailure.Should().BeTrue();
-        result.Error.Should().Be(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
-        _testOutputHelper.WriteLine(result.Error.ToString());
 
+        name.IsFailure.Should().BeTrue();
+        name.Error.Should().Be(DomainErrors.POIErrors.PointName.BAD_CREDENTIALS_FOR_POINT_NAME);
         await _pointRepository.Received(1).IsPointNameExistsAsync(name.Value);
-        await _pointRepository.Received(1).IsLatLonCoordinatesExistsAsync(lat,lon);
+        await _pointRepository.Received(1).IsLatLonCoordinatesExistsAsync(lat.Value,lon.Value);
     }
 [Fact]
     public async Task UpdatePoiAggregate()

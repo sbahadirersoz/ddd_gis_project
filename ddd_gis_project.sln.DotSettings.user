@@ -8,6 +8,8 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.Entities.Information.PointNameTest.METHOD&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Domain.Services.PoiTests.PoiDomainServiceTest.CreatePoi_NameNull_Case&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Domain.Services.PoiTests.PoiDomainServiceTest.CreatePoi_CoordExist_Case&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Domain.Services.PoiTests.PoiDomainServiceTest.CreatePoi_Success_Case&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=dfcaa52d_002Dc2e0_002D4a60_002Dab77_002De08a6c01761b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreatePoi" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
