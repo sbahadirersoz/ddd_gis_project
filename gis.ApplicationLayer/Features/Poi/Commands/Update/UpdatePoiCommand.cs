@@ -1,0 +1,3 @@
+﻿namespace gis.ApplicationLayer.Features.Poi.Commands;
+
+public record UpdatePoiCommand();
