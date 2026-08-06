@@ -32,7 +32,7 @@ public class PoiDomainServiceTest
         var lat = Latitude.Create(40.7128).Value;
         var lon = Longitude.Create(40.7128).Value;
         var desc = PointDescription.FromString("Central Park").Value;
-        var name =  PointName.FromString("Mock Location").Value;
+        var name =  PointName.FromString("MockLocation").Value;
 
         // Koordinatın olmadığını (false) fakat ismin veritabanında olduğunu (true) simüle ediyoruz
         _pointRepository.IsLatLonCoordinatesExistsAsync(lat,lon).Returns(false);

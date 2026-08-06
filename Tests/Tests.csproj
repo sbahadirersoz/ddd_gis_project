@@ -25,11 +25,11 @@
       <Folder Include="Integration\Infrastructure\" />
       <Folder Include="Integration\Setup\" />
       <Folder Include="Integration\Web\" />
-      <Folder Include="UnitTests\Application\" />
       <Folder Include="UnitTests\Common\" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\gis.ApplicationLayer\gis.ApplicationLayer.csproj" />
       <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
     </ItemGroup>
 
