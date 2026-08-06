@@ -15,29 +15,31 @@ public class POIDomainService
     private readonly IPointRepository _pointRepository;
     private readonly ITopologySuitePointContract _contract;
 
-    public POIDomainService(IPointRepository pointRepository)
+    public POIDomainService(IPointRepository pointRepository, ITopologySuitePointContract contract)
     {
         _pointRepository = pointRepository;
+        _contract = contract;
     }
-    public async Task<Result<POIAggregate>> UpdatePoiAggregate(POIAggregate poi, Latitude? latitude,Longitude? longitude, 
+    public async Task<Result<POIAggregate>> UpdatePoiAggregate(POIAggregate poi, Latitude? newLatitude,Longitude? newLongitude, 
         PointDescription? newPointDesc, PointName? newPointName, POIStatus? newStatus)
     {
         
-        ///Coordinate Domain Method
+        var hasLatitudeChanged = newLatitude != null && !poi.Coordinates.Latitude.Equals(newLatitude);
+        var hasLongitudeChanged = newLongitude != null && !poi.Coordinates.Longitude.Equals(newLongitude);
 
-        if (latitude != null || longitude != null)
+        if (hasLatitudeChanged || hasLongitudeChanged)
         {
+            // Eğer ikisinden biri null gönderildiyse, mevcut koordinatın değerini koru (Fallback)
+            var targetLatitude = newLatitude ?? poi.Coordinates.Latitude;
+            var targetLongitude = newLongitude ?? poi.Coordinates.Longitude;
 
-            if (!poi.Coordinates.Latitude.Equals(latitude) || !poi.Coordinates.Longitude.Equals(longitude))
+            // Domain servisindeki mevcut koordinat değiştirme iş akışını tetikle
+            var changePointCoordinatesResult = await ChangePointCoordinatesAsync(poi, targetLatitude, targetLongitude);
+            if (changePointCoordinatesResult.IsFailure)
             {
-                var changePointCoordinatesResult = await ChangePointCoordinatesAsync(poi, latitude, longitude);
-                if (changePointCoordinatesResult.IsFailure)
-                {
-                    return Result<POIAggregate>.Failure(changePointCoordinatesResult.Error);
-                }
+                return Result<POIAggregate>.Failure(changePointCoordinatesResult.Error);
             }
         }
-
         ///PointName Domain Method
         if (newPointName!= null && !poi.PointName.Equals(newPointName))
         {
@@ -142,7 +144,7 @@ public class POIDomainService
         var isCoordinatesExistsAsync = await _pointRepository.IsLatLonCoordinatesExistsAsync(lat,lon);
         return isCoordinatesExistsAsync ? 
             Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB): Result.Success();
-    }    private async Task<Result> IsPointNameExists(PointName pointName  )
+    }    private async Task<Result> IsPointNameExists(PointName pointName)
     {
         var isPointNameExistsAsync = await _pointRepository.IsPointNameExistsAsync(pointName);
         return isPointNameExistsAsync ? 
@@ -169,6 +171,12 @@ public class POIDomainService
         {
             return Result.Failure(validateChangePointCoordinatesAsync.Error);
         }
+        if (pointDesc != null && pointDesc.Value.Length>HardCodedParameters.HardCodedPropertities.PointDescriptionPropertities.MaxLength )
+        {
+            return Result.Failure(DomainErrors.POIErrors.PointDesc.LENGTH_REACHED_MAX_VALUE);
+        }
+        
+        
 
         var isPointNameExists = await IsPointNameExists(pointName);
         if (isPointNameExists.IsFailure)

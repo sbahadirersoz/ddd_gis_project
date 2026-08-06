@@ -9,6 +9,4 @@ public interface IPointRepository
 
     Task<bool> IsLatLonCoordinatesExistsAsync(Latitude lat, Longitude lon, CancellationToken cancellationToken = default);
     Task<bool> IsPointNameExistsAsync(PointName pointName, CancellationToken cancellationToken = default);
-
-    void SaveAsync(POIAggregate poiAggregate);
 }

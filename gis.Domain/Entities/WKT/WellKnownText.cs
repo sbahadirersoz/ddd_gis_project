@@ -13,7 +13,7 @@ public record WellKnownText
         Value = value;
     }
 
-    internal static Result<WellKnownText> Create(string value)
+    public static Result<WellKnownText> Create(string value)
     {
         if (!value.StartsWith("POINT", StringComparison.OrdinalIgnoreCase) && 
             !value.StartsWith("POLYGON", StringComparison.OrdinalIgnoreCase))
