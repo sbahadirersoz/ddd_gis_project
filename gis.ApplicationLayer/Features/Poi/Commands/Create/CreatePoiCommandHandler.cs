@@ -15,31 +15,56 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
     private readonly ITopologySuitePointContract _contract;
     private readonly ILogger<CreatePoiCommandHandler> _logger;
     private readonly POIDomainService _service;
+
+    public CreatePoiCommandHandler(POIDomainService service, ITopologySuitePointContract contract, IPointRepository pointRepository, ILogger<CreatePoiCommandHandler> logger)
+    {
+        _service = service;
+        _contract = contract;
+        _pointRepository = pointRepository;
+        _logger = logger;
+    }
+
     public async Task<Result<CreatePoiCommandResponse>> Handle(CreatePoiCommand request, CancellationToken cancellationToken)
     {
         var latLonFromPrimitives = PointAggregateVOMapper.CreateLatLonFromPrimitives(request.Latitude, request.Longitude);
         var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc );
         var pointNameFromPrimitives = PointAggregateVOMapper.CreatePointNameFromPrimitives(request.PoiName);
+        _logger.LogInformation("All Primitives Converted To VO's");
+        _logger.LogInformation("Check LatLon Creation");
+        
         if (latLonFromPrimitives.IsFailure)
         {
-            Result<CreatePoiCommandResponse>.Failure(latLonFromPrimitives.Error);
+            return Result<CreatePoiCommandResponse>.Failure(latLonFromPrimitives.Error);
         }
+        _logger.LogInformation("Check Point  Desc Creation");
+        
         if (pointDescFromPrimitives.IsFailure)
         {
-            Result<CreatePoiCommandResponse>.Failure(pointDescFromPrimitives.Error);
+            return Result<CreatePoiCommandResponse>.Failure(pointDescFromPrimitives.Error);
         }
+        _logger.LogInformation("Check PointName Creation");
+        
         if (pointNameFromPrimitives.IsFailure)
         {
-            Result<CreatePoiCommandResponse>.Failure(pointNameFromPrimitives.Error);
+         return    Result<CreatePoiCommandResponse>.Failure(pointNameFromPrimitives.Error);
         }
+        
+        _logger.LogInformation("All  VO Created Successfully");
+        
 
+        
         Latitude lat = latLonFromPrimitives.Value.Item1;
         Longitude lon = latLonFromPrimitives.Value.Item2;
+        _logger.LogInformation("All  Lan Lon Refferances Addded Successfully");
+        _logger.LogInformation("Attempting to Create Poi With  DomainService");
         var createResult = await _service.CreatePoiAggregate(lat,lon,pointDescFromPrimitives.Value,pointNameFromPrimitives.Value);
+        _logger.LogInformation("Checking  Failure");
         if (createResult.IsFailure)
         {
-            Result<CreatePoiCommandResponse>.Failure(createResult.Error);
+          return  Result<CreatePoiCommandResponse>.Failure(createResult.Error);
         }
-        return Result<CreatePoiCommandResponse>.Success(CreatePoiCommandResponse.CreateFromAgg(createResult.Value));
+        _logger.LogInformation("Created Successfully Returning");
+        var result = CreatePoiCommandResponse.CreateFromAgg(createResult.Value);
+        return Result<CreatePoiCommandResponse>.Success(result);
     }
 }
