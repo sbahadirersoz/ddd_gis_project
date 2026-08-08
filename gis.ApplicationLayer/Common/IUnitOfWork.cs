@@ -1,7 +1,16 @@
-﻿namespace gis.ApplicationLayer.Common;
+﻿using gis.Domain.Common;
+using gis.Domain.Repositories;
 
-public interface IUnitOfWork
+namespace gis.ApplicationLayer.Common;
+
+public interface IUnitOfWork:IDisposable,IAsyncDisposable
 {
-    
-    
+ public IPointRepository PointRepository { get; }
+ Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+ int SaveChanges();
+ Task BeginTransactionAsync(CancellationToken cancellationToken);
+ Task CommitTransactionAsync(CancellationToken cancellationToken);
+ Task RollbackTransactionAsync(CancellationToken cancellationToken);
+ 
+ public void Save();
 }
