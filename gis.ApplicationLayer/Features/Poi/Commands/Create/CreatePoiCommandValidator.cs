@@ -1,10 +1,8 @@
-﻿using System.Data;
-using FluentValidation;
-using gis.ApplicationLayer.Features.Poi.Commands.Create;
+﻿using FluentValidation;
 
-namespace gis.ApplicationLayer.Features.Poi.Commands;
+namespace gis.ApplicationLayer.Features.Poi.Commands.Create;
 
-public class CreatePoiCommandValidator:AbstractValidator<CreatePoiCommand>
+public class CreatePoiCommandValidator : AbstractValidator<CreatePoiCommand>
 {
     public CreatePoiCommandValidator()
     {
