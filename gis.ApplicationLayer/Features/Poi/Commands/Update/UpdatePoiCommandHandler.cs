@@ -1,15 +1,16 @@
 ﻿using gis.ApplicationLayer.Common;
-using gis.Domain.Aggregates;
+using gis.ApplicationLayer.Mapper.PoiAggregate;
 using gis.Domain.Contracts;
-using gis.Domain.Entities.IDs;
 using gis.Domain.Repositories;
+using gis.Domain.ResultPattern;
+using gis.Domain.ResultPattern.Errors;
 using gis.Domain.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace gis.ApplicationLayer.Features.Poi.Commands.Update;
 
-public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,UpdatePoiCommandResponse>
+public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<UpdatePoiCommandResponse>>
 {
     private readonly POIDomainService _service;
     private readonly IUnitOfWork _unitOfWork;
@@ -23,8 +24,37 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,UpdatePoiC
         _unitOfWork = unitOfWork;
     }
 
-    public Task<UpdatePoiCommandResponse> Handle(UpdatePoiCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UpdatePoiCommandResponse>> Handle(UpdatePoiCommand request, CancellationToken cancellationToken)
     {
-        
+        var findByEntityExpression = await _unitOfWork.PointRepository.FindByEntityExpression(x=> x.Id.Equals(request.id));
+        if (findByEntityExpression == null)
+        {
+            return Result<UpdatePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+        }
+        var latLonFromPrimitives = PointAggregateVOMapper.CreateLatLonFromPrimitives(request.Latitude.Value, request.Longitude.Value);
+        var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc);
+        var pointNameFromPrimitives = PointAggregateVOMapper.CreatePointNameFromPrimitives(request.PoiName);
+        if (latLonFromPrimitives.IsFailure)
+        {
+            return Result<UpdatePoiCommandResponse>.Failure(latLonFromPrimitives.Error);
+        }
+        if (pointNameFromPrimitives.IsFailure)
+        {
+            return Result<UpdatePoiCommandResponse>.Failure(pointNameFromPrimitives.Error);
+        }
+        if (pointDescFromPrimitives.IsFailure)
+        {
+            return Result<UpdatePoiCommandResponse>.Failure(pointDescFromPrimitives.Error);
+        }
+        var latitude = latLonFromPrimitives.Value.Item1;
+        var longitude = latLonFromPrimitives.Value.Item2;
+        var updatedPoiAgg = await _service.UpdatePoiAggregate(findByEntityExpression,latitude,longitude,pointDescFromPrimitives.Value,pointNameFromPrimitives.Value,request.Status);
+        if (updatedPoiAgg.IsFailure)
+        {
+            return Result<UpdatePoiCommandResponse>.Failure(updatedPoiAgg.Error);
+        }
+        await _unitOfWork.PointRepository.UpdateEntityAsync(updatedPoiAgg.Value);
+        await _unitOfWork.SaveChangesAsync();
+        return Result<UpdatePoiCommandResponse>.Success(UpdatePoiCommandResponse.CreateFromAggregate(updatedPoiAgg.Value));
     }
 }
