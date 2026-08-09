@@ -4,6 +4,10 @@ public static class DomainErrors
 {
     public static class POIErrors
     {
+        
+        public static readonly Error INVALID_PARAMETER_FOR_CLONING =
+            new Error("POI.Cloning.InvalidParameter", "The provided coordinates are the same as the current ones.");
+
         public static class Coordinate
         {
             public static readonly Error SAME_VALUE_PROVIDED =

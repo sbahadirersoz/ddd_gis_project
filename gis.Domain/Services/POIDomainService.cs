@@ -4,6 +4,7 @@ using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.IDs;
 using gis.Domain.Entities.Information;
 using gis.Domain.Entities.WKT;
+using gis.Domain.HardCodedParameters;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
@@ -20,120 +21,124 @@ public class POIDomainService
         _pointRepository = pointRepository;
         _contract = contract;
     }
-    public async Task<Result<POIAggregate>> UpdatePoiAggregate(POIAggregate poi, Latitude? newLatitude,Longitude? newLongitude, 
+
+    public async Task<Result<POIAggregate>> UpdatePoiAggregate(POIAggregate poi, Latitude? newLatitude,
+        Longitude? newLongitude,
         PointDescription? newPointDesc, PointName? newPointName, POIStatus? newStatus)
     {
-        
-        var hasLatitudeChanged = newLatitude != null && !poi.Coordinates.Latitude.Equals(newLatitude);
-        var hasLongitudeChanged = newLongitude != null && !poi.Coordinates.Longitude.Equals(newLongitude);
+        var isLatChanged = newLatitude is not  null && newLatitude.Equals(poi.Coordinates.Latitude);
+        var isLonChanged = newLongitude is not  null && newLongitude.Equals(poi.Coordinates.Longitude);
+        var isDescChanged = newPointDesc is not  null && newPointDesc.Equals(poi.PointDesc);
+        var isNameChanged = newPointName is not  null && newPointName.Equals(poi.PointName);
+        var isStatusChanged = newStatus is not  null && newStatus.Equals(poi.Status);
 
-        if (hasLatitudeChanged || hasLongitudeChanged)
+        var isAnyChangeOccured = (isDescChanged || isLatChanged || isLonChanged || isNameChanged || isStatusChanged);
+        if (!isAnyChangeOccured)
         {
-            // Eğer ikisinden biri null gönderildiyse, mevcut koordinatın değerini koru (Fallback)
-            var targetLatitude = newLatitude ?? poi.Coordinates.Latitude;
-            var targetLongitude = newLongitude ?? poi.Coordinates.Longitude;
+            return Result<POIAggregate>.Failure(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
+        }
 
-            // Domain servisindeki mevcut koordinat değiştirme iş akışını tetikle
-            var changePointCoordinatesResult = await ChangePointCoordinatesAsync(poi, targetLatitude, targetLongitude);
-            if (changePointCoordinatesResult.IsFailure)
-            {
-                return Result<POIAggregate>.Failure(changePointCoordinatesResult.Error);
-            }
-        }
-        ///PointName Domain Method
-        if (newPointName!= null && !poi.PointName.Equals(newPointName))
+        if (isLatChanged || isLonChanged)
         {
-            var changePointNameAsync = await ChangePointNameAsync(poi, newPointName);
-            if (changePointNameAsync.IsFailure)
-            {
-                return Result<POIAggregate>.Failure(changePointNameAsync.Error);
-            }
+            
+            var targetLatitude = newLatitude ??  poi.Coordinates.Latitude  ; 
+            var targetLongitude = newLongitude ??  poi.Coordinates. Longitude  ; 
+            var changePointCoordinatesAsync = await ChangePointCoordinatesAsync(poi, targetLatitude, targetLongitude);
+            if (changePointCoordinatesAsync.IsFailure)
+                return Result<POIAggregate>.Failure(changePointCoordinatesAsync.Error);
         }
-        /// Unique ya da db den kontrol edilmesi gereken bir yapı olmadığı için direkt domainin içindeki methodu  işleyebiliriz
-        if (!object.Equals(poi.PointDesc, newPointDesc)&& newPointDesc != null)
+        if (isNameChanged)
         {
-            poi.ChangePointDesc(newPointDesc);
+            var changePointName = await ChangePointNameAsync(poi, newPointName!);
+            if (changePointName.IsFailure)
+                return Result<POIAggregate>.Failure(changePointName.Error);
         }
-        if (newStatus != null && !poi.Status.Equals(newStatus))
-        {
-            poi.ChangeStatus(newStatus.Value);
-        }
-        
+        if (isDescChanged)
+            poi.ChangePointDesc(newPointDesc!);
+        if (isStatusChanged)
+                poi.ChangeStatus(newStatus!.Value);
         return Result<POIAggregate>.Success(poi);
-        
     }
 
-    public async Task< Result<POIAggregate>> CreatePoiAggregate(Latitude latitude, Longitude longitude,
-         PointDescription pointDesc, PointName pointName)
+    public async Task<Result<POIAggregate>> CreatePoiAggregate(Latitude latitude, Longitude longitude,
+        PointDescription pointDesc, PointName pointName)
     {
-        var methodValidation =  await CreateMethodValidation(latitude, longitude, pointDesc, pointName);
+        var methodValidation = await CreateMethodValidation(latitude, longitude, pointDesc, pointName);
         if (methodValidation.IsFailure)
         {
             return Result<POIAggregate>.Failure(methodValidation.Error);
         }
+
         var coordinateFromLatLon = CreateCoordinateFromLatLon(latitude, longitude);
         if (coordinateFromLatLon.IsFailure)
         {
             return Result<POIAggregate>.Failure(coordinateFromLatLon.Error);
         }
 
-        var result = POIAggregate.create(coordinateFromLatLon.Value,pointDesc,pointName);
+        var result = POIAggregate.create(coordinateFromLatLon.Value, pointDesc, pointName);
 
-        return Result<POIAggregate>.Success( result.Value);
-        
+        return Result<POIAggregate>.Success(result.Value);
     }
-    public async Task< Result<POIAggregate>> CreatePoiAggregateWithId(Latitude latitude, Longitude longitude,
-         PointDescription pointDesc, PointName pointName,PointID id)
+
+    public async Task<Result<POIAggregate>> CreatePoiAggregateWithId(Latitude latitude, Longitude longitude,
+        PointDescription pointDesc, PointName pointName, PointID id)
     {
-        var methodValidation =  await CreateMethodValidation(latitude, longitude, pointDesc, pointName);
+        var methodValidation = await CreateMethodValidation(latitude, longitude, pointDesc, pointName);
         if (methodValidation.IsFailure)
         {
             return Result<POIAggregate>.Failure(methodValidation.Error);
         }
+
         var coordinateFromLatLon = CreateCoordinateFromLatLon(latitude, longitude);
         if (coordinateFromLatLon.IsFailure)
         {
             return Result<POIAggregate>.Failure(coordinateFromLatLon.Error);
         }
 
-        var fromPointId = POIAggregate.createFromPointId(coordinateFromLatLon.Value,pointDesc,pointName,id);
+        var fromPointId = POIAggregate.createFromPointId(coordinateFromLatLon.Value, pointDesc, pointName, id);
 
-        return Result<POIAggregate>.Success( fromPointId.Value);
+        return Result<POIAggregate>.Success(fromPointId.Value);
     }
-    public async Task<Result> ChangePointCoordinatesAsync(POIAggregate poi, Latitude lat,  Longitude lon)
+
+    public async Task<Result> ChangePointCoordinatesAsync(POIAggregate poi, Latitude lat, Longitude lon)
     {
-        var validateChangePointCoordinatesAsync = await IsCoordinatesExistsAsync(lat,lon);
-         if (validateChangePointCoordinatesAsync.IsFailure)
-         {
-             return Result.Failure(validateChangePointCoordinatesAsync.Error);
-         }
+        var validateChangePointCoordinatesAsync = await IsCoordinatesExistsAsync(lat, lon);
+        if (validateChangePointCoordinatesAsync.IsFailure)
+        {
+            return Result.Failure(validateChangePointCoordinatesAsync.Error);
+        }
 
-         var coordinateFromLatLon = CreateCoordinateFromLatLon(lat, lon);
-         if (coordinateFromLatLon.IsFailure)
-         {
-             return Result.Failure(coordinateFromLatLon.Error);
-         }
+        var coordinateFromLatLon = CreateCoordinateFromLatLon(lat, lon);
+        if (coordinateFromLatLon.IsFailure)
+        {
+            return Result.Failure(coordinateFromLatLon.Error);
+        }
 
-         if (coordinateFromLatLon.Value != null) poi.ChangeCoordinates(coordinateFromLatLon.Value);
-         return Result.Success();
+        if (coordinateFromLatLon.Value != null) poi.ChangeCoordinates(coordinateFromLatLon.Value);
+        return Result.Success();
     }
+
     public async Task<Result> ChangePointNameAsync(POIAggregate poiAggregate, PointName newPointName)
     {
         var validate = await ValidateChangePointNameAsync(poiAggregate, newPointName);
         if (validate.IsFailure)
         {
-            return  Result.Failure(validate.Error);
+            return Result.Failure(validate.Error);
         }
+
         poiAggregate.ChangePointName(newPointName);
         return Result.Success();
     }
-    #region Private   Methods 
-    private async  Task<Result> ValidateChangePointNameAsync(POIAggregate aggregate, PointName pointName)
+
+    #region Private   Methods
+
+    private async Task<Result> ValidateChangePointNameAsync(POIAggregate aggregate, PointName pointName)
     {
         if (aggregate.PointName.Equals(pointName))
         {
             return Result.Failure(DomainErrors.POIErrors.PointName.SAME_VALUE_PROVIDED);
         }
+
         var isPointNameExist = await _pointRepository.IsPointNameExistsAsync(pointName);
         return isPointNameExist ? Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB) : Result.Success();
     }
@@ -141,42 +146,45 @@ public class POIDomainService
 
     private async Task<Result> IsCoordinatesExistsAsync(Latitude lat, Longitude lon)
     {
-        var isCoordinatesExistsAsync = await _pointRepository.IsLatLonCoordinatesExistsAsync(lat,lon);
-        return isCoordinatesExistsAsync ? 
-            Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB): Result.Success();
-    }    private async Task<Result> IsPointNameExists(PointName pointName)
+        var isCoordinatesExistsAsync = await _pointRepository.IsLatLonCoordinatesExistsAsync(lat, lon);
+        return isCoordinatesExistsAsync ? Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB) : Result.Success();
+    }
+
+    private async Task<Result> IsPointNameExists(PointName pointName)
     {
         var isPointNameExistsAsync = await _pointRepository.IsPointNameExistsAsync(pointName);
-        return isPointNameExistsAsync ? 
-            Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB): Result.Success();
+        return isPointNameExistsAsync ? Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB) : Result.Success();
     }
 
     private Result<Coordinates> CreateCoordinateFromLatLon(Latitude latitude, Longitude longitude)
     {
-        var wktString = _contract.CreateWktStringFromLatLon(latitude,longitude);
+        var wktString = _contract.CreateWktStringFromLatLon(latitude, longitude);
         var wktFromContract = WellKnownText.Create(wktString);
         if (wktFromContract.IsFailure)
         {
             return Result<Coordinates>.Failure(wktFromContract.Error);
         }
+
         var fromLatLon = Coordinates.FromLatLon(latitude, longitude, wktFromContract.Value);
-        return fromLatLon.IsFailure ? Result<Coordinates>.Failure(fromLatLon.Error) : Result<Coordinates>.Success(fromLatLon.Value);
+        return fromLatLon.IsFailure
+            ? Result<Coordinates>.Failure(fromLatLon.Error)
+            : Result<Coordinates>.Success(fromLatLon.Value);
     }
 
     private async Task<Result> CreateMethodValidation(Latitude latitude, Longitude longitude,
         PointDescription pointDesc, PointName pointName)
     {
-        var validateChangePointCoordinatesAsync = await IsCoordinatesExistsAsync(latitude,longitude);
+        var validateChangePointCoordinatesAsync = await IsCoordinatesExistsAsync(latitude, longitude);
         if (validateChangePointCoordinatesAsync.IsFailure)
         {
             return Result.Failure(validateChangePointCoordinatesAsync.Error);
         }
-        if (pointDesc != null && pointDesc.Value.Length>HardCodedParameters.HardCodedPropertities.PointDescriptionPropertities.MaxLength )
+
+        if (pointDesc != null && pointDesc.Value.Length > HardCodedPropertities.PointDescriptionPropertities.MaxLength)
         {
             return Result.Failure(DomainErrors.POIErrors.PointDesc.LENGTH_REACHED_MAX_VALUE);
         }
-        
-        
+
 
         var isPointNameExists = await IsPointNameExists(pointName);
         if (isPointNameExists.IsFailure)
@@ -184,9 +192,9 @@ public class POIDomainService
             return Result.Failure(isPointNameExists.Error);
         }
 
-    
+
         return Result.Success();
     }
+
     #endregion
-    
 }
