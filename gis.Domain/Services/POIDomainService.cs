@@ -26,12 +26,12 @@ public class POIDomainService
         Longitude? newLongitude,
         PointDescription? newPointDesc, PointName? newPointName, POIStatus? newStatus)
     {
-        var isLatChanged = newLatitude is not  null && newLatitude.Equals(poi.Coordinates.Latitude);
-        var isLonChanged = newLongitude is not  null && newLongitude.Equals(poi.Coordinates.Longitude);
-        var isDescChanged = newPointDesc is not  null && newPointDesc.Equals(poi.PointDesc);
-        var isNameChanged = newPointName is not  null && newPointName.Equals(poi.PointName);
-        var isStatusChanged = newStatus is not  null && newStatus.Equals(poi.Status);
-
+        var isLatChanged = newLatitude is not  null && !newLatitude.Equals(poi.Coordinates.Latitude);
+        var isLonChanged = newLongitude is not  null && !newLongitude.Equals(poi.Coordinates.Longitude);
+        var isDescChanged = newPointDesc is not  null && !newPointDesc.Equals(poi.PointDesc);
+        var isNameChanged = newPointName is not  null && !newPointName.Equals(poi.PointName);
+        var isStatusChanged = newStatus is not  null && !newStatus.Equals(poi.Status);
+        
         var isAnyChangeOccured = (isDescChanged || isLatChanged || isLonChanged || isNameChanged || isStatusChanged);
         if (!isAnyChangeOccured)
         {
