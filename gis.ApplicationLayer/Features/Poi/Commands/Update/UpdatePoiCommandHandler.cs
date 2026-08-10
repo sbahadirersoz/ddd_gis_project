@@ -16,7 +16,7 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
     private readonly IUnitOfWork _unitOfWork;
     private readonly ITopologySuitePointContract _contract;
     private readonly ILogger<UpdatePoiCommandHandler> _logger;
-    public UpdatePoiCommandHandler(ILogger<UpdatePoiCommandHandler> logger, POIDomainService service, IPointRepository repo, ITopologySuitePointContract contract, IUnitOfWork unitOfWork)
+    public UpdatePoiCommandHandler(ILogger<UpdatePoiCommandHandler> logger, POIDomainService service, ITopologySuitePointContract contract, IUnitOfWork unitOfWork)
     {
         _logger = logger;
         _service = service;
@@ -24,7 +24,7 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<UpdatePoiCommandResponse>> Handle(UpdatePoiCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UpdatePoiCommandResponse>> Handle(UpdatePoiCommand request, CancellationToken cancellationToken = default)
     {
         var findByEntityExpression = await _unitOfWork.PointRepository.FindByEntityExpression(x=> x.Id.Equals(request.id));
         if (findByEntityExpression == null)
