@@ -104,10 +104,17 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
         Status = newStatus;
     }
 
-    internal void SoftDelete()
+    
+    
+    /// <summary>
+    /// Internal olduğu için encapsulation konusunda iyi fakat
+    /// rich domain model tarafında pointservice disinda  cagirilamadığı için kötü fakat okey bi tradeoff
+    /// </summary>
+    internal Result SoftDelete()
     {
         AddDomainEvent(POISoftDeletedEvent.Create(Id));
         Status = POIStatus.SOFT_DELETED;
+        return Result.Success();
     }
 
     public bool CompareEquality(POIAggregate obj)

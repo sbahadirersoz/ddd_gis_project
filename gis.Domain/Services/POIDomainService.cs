@@ -22,6 +22,8 @@ public class POIDomainService
         _contract = contract;
     }
 
+    #region Update-Create-CreateWithId -Delete
+
     public async Task<Result<POIAggregate>> UpdatePoiAggregate(POIAggregate poi, Latitude? newLatitude,
         Longitude? newLongitude,
         PointDescription? newPointDesc, PointName? newPointName, POIStatus? newStatus)
@@ -31,7 +33,7 @@ public class POIDomainService
         var isDescChanged = newPointDesc is not  null && !newPointDesc.Equals(poi.PointDesc);
         var isNameChanged = newPointName is not  null && !newPointName.Equals(poi.PointName);
         var isStatusChanged = newStatus is not  null && !newStatus.Equals(poi.Status);
-        
+
         var isAnyChangeOccured = (isDescChanged || isLatChanged || isLonChanged || isNameChanged || isStatusChanged);
         if (!isAnyChangeOccured)
         {
@@ -56,7 +58,7 @@ public class POIDomainService
         if (isDescChanged)
             poi.ChangePointDesc(newPointDesc!);
         if (isStatusChanged)
-                poi.ChangeStatus(newStatus!.Value);
+            poi.ChangeStatus(newStatus!.Value);
         return Result<POIAggregate>.Success(poi);
     }
 
@@ -100,6 +102,17 @@ public class POIDomainService
         return Result<POIAggregate>.Success(fromPointId.Value);
     }
 
+    public Result SoftDeletePoi(POIAggregate poiAggregate)
+    {
+        return poiAggregate.SoftDelete();
+    }
+
+
+    #endregion
+
+
+    #region AggregateFieldChanges
+
     public async Task<Result> ChangePointCoordinatesAsync(POIAggregate poi, Latitude lat, Longitude lon)
     {
         var validateChangePointCoordinatesAsync = await IsCoordinatesExistsAsync(lat, lon);
@@ -129,6 +142,8 @@ public class POIDomainService
         poiAggregate.ChangePointName(newPointName);
         return Result.Success();
     }
+
+    #endregion
 
     #region Private   Methods
 
