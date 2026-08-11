@@ -1,0 +1,1 @@
+i am building a backend service for my porfollio first goal to improve myself and become more consistent backend developer please dont give me a code or my solution talk with me about approaches 
