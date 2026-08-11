@@ -7,4 +7,9 @@ namespace gis.ApplicationLayer.Features.Poi.Queries.FindPoiByName;
 public record FindPoiByNameQuery:IRequest<Result<FindPoiByNameQueryResponse>>
 {
     public PointName PointName { get; }
+
+    public FindPoiByNameQuery(PointName pointName)
+    {
+        PointName = pointName;
+    }
 }

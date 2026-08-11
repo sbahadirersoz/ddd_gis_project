@@ -104,6 +104,8 @@ public class POIDomainService
 
     public Result SoftDeletePoi(POIAggregate poiAggregate)
     {
+        
+        ///Burası Business Rules'e göre customise edilebilir  ekstra bir şey eklemedim henüz
         return poiAggregate.SoftDelete();
     }
 

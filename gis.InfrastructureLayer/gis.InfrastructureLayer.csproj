@@ -10,4 +10,11 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="DB\Context\" />
+      <Folder Include="Entities\" />
+      <Folder Include="Repositories\" />
+      <Folder Include="Topology_Services\" />
+    </ItemGroup>
+
 </Project>

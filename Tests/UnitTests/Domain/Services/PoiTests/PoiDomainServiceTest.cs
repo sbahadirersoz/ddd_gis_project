@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Text.Json;
+using FluentAssertions;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.Information;
@@ -56,7 +57,7 @@ public class PoiDomainServiceTest
         var lat = Latitude.Create(40.7128);
         var lon = Longitude.Create(40.7128);
         var desc = PointDescription.FromString("Central Park");
-        var name =  PointName.FromString("Mock Location");
+        var name =  PointName.FromString("MockLocation");
         if (lat.IsFailure||lon.IsFailure||desc.IsFailure||name.IsFailure)
         {
             _testOutputHelper.WriteLine($"AnyField Issued" +
@@ -80,13 +81,9 @@ public class PoiDomainServiceTest
         
         // Assert
 
-        _testOutputHelper.WriteLine(result.Value.Coordinates.Latitude.ToString());
-        _testOutputHelper.WriteLine(result.Value.Coordinates.Longitude.ToString());
-        _testOutputHelper.WriteLine(result.Value.Coordinates.WKT.Value);
-        _testOutputHelper.WriteLine(result.Value.Coordinates.WKT.Value);
+        string toJson = JsonSerializer.Serialize(result);
+        _testOutputHelper.WriteLine(toJson);
         result.IsSuccess.Should().BeTrue();
-    
-
         await _pointRepository.Received(1).IsLatLonCoordinatesExistsAsync(lat.Value,lon.Value);
         await _pointRepository.Received(1).IsPointNameExistsAsync(name.Value);
     }
@@ -140,15 +137,9 @@ public class PoiDomainServiceTest
         var name =  PointName.FromString("MockLocation").Value;
         _pointRepository.IsLatLonCoordinatesExistsAsync(lat,lon).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name).Returns(false);
-
+        
         var result = await _poiService.CreatePoiAggregate(lat,lon, desc, name);
-        
-        _testOutputHelper.WriteLine(result.Value.Coordinates.Longitude.ToString());
-        _testOutputHelper.WriteLine(result.Value.Coordinates.Latitude.ToString());
-        _testOutputHelper.WriteLine(result.Value.Coordinates.WKT.ToString());
-        _testOutputHelper.WriteLine(result.Value.PointDesc.ToString());
-        _testOutputHelper.WriteLine(result.Value.PointName.ToString());
-        _testOutputHelper.WriteLine(result.Value.Status.ToString());
-        
+        string toJson = JsonSerializer.Serialize(result);
+        _testOutputHelper.WriteLine(toJson);
     }
     }

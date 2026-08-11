@@ -10,9 +10,9 @@ public class FindPoiByIdQueryHandler:IRequestHandler<FindPoiByIdQuery,Result<Fin
 {
 
     private readonly IUnitOfWork _UnitOfWork;
-    private readonly Logger<FindPoiByIdQueryHandler> _logger;
+    private readonly ILogger<FindPoiByIdQueryHandler> _logger;
 
-    public FindPoiByIdQueryHandler(IUnitOfWork unitOfWork, Logger<FindPoiByIdQueryHandler> logger)
+    public FindPoiByIdQueryHandler(IUnitOfWork unitOfWork, ILogger<FindPoiByIdQueryHandler> logger)
     {
         _UnitOfWork = unitOfWork;
         _logger = logger;

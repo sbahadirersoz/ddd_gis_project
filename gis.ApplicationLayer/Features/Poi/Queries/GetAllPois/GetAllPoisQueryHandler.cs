@@ -17,7 +17,7 @@ public class GetAllPoisQueryHandler:IRequestHandler<GetAllPoisQuery,Result<IRead
         _logger = logger;
     }
 
-    public async Task<Result<IReadOnlyList<GetAllPoisQueryResponse>>> Handle(GetAllPoisQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<GetAllPoisQueryResponse>>> Handle(GetAllPoisQuery request, CancellationToken cancellationToken = default)
     {
         var poiAggregates = await _UnitOfWork.PointRepository.GetAllEntities();
         if (poiAggregates == null)

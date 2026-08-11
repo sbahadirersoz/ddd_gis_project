@@ -19,7 +19,7 @@ public class DeletePoiCommandHandler:IRequestHandler<DeletePoiCommand,Result<Del
         _logger = logger;
         _service = service;
     }
-    public async Task<Result<DeletePoiCommandResponse>> Handle(DeletePoiCommand request, CancellationToken cancellationToken)
+    public async Task<Result<DeletePoiCommandResponse>> Handle(DeletePoiCommand request, CancellationToken cancellationToken =default)
     {
         var findEntityByIdAsync = await _unitOfWork.PointRepository.FindEntityByIdAsync(request.id);
         if (findEntityByIdAsync == null)
