@@ -8,7 +8,7 @@ using gis.Domain.ResultPattern.Errors;
 
 namespace gis.Domain.Aggregates;
 
-public class POIAggregate : AggregateRoot<PointID>
+public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
 {
     public Coordinates Coordinates { get; private set; }
     public PointDescription? PointDesc { get; private set; }
@@ -36,6 +36,12 @@ public class POIAggregate : AggregateRoot<PointID>
         Coordinates = coordinates;
         PointDesc = pointDesc ?? PointDescription.FromString(null).Value;
         PointName = pointName;
+    }  private POIAggregate(POIAggregate aggregate):base(aggregate.Id)
+    {
+        Coordinates = aggregate.Coordinates;
+        PointDesc = aggregate.PointDesc;
+        Status = aggregate.Status;
+        PointName = aggregate.PointName;
     }
 
     internal static Result<POIAggregate> create(
@@ -98,9 +104,50 @@ public class POIAggregate : AggregateRoot<PointID>
         Status = newStatus;
     }
 
-    internal void SoftDelete()
+    
+    
+    /// <summary>
+    /// Internal olduğu için encapsulation konusunda iyi fakat
+    /// rich domain model tarafında pointservice disinda  cagirilamadığı için kötü fakat okey bi tradeoff
+    /// </summary>
+    internal Result SoftDelete()
     {
         AddDomainEvent(POISoftDeletedEvent.Create(Id));
         Status = POIStatus.SOFT_DELETED;
+        return Result.Success();
+    }
+
+    public bool CompareEquality(POIAggregate obj)
+    {
+        return this.PointDesc.Equals(PointDesc);
+    }
+
+    public static Result<POIAggregate> Clone(POIAggregate aggregate)
+    {
+        if (aggregate == null)
+        {
+            Result<POIAggregate>.Failure(DomainErrors.POIErrors.INVALID_PARAMETER_FOR_CLONING);
+        }
+        return Result<POIAggregate>.Success(new POIAggregate(aggregate));
+    }
+
+    public bool Equals(POIAggregate? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Coordinates.Equals(other.Coordinates) && Equals(PointDesc, other.PointDesc) && PointName.Equals(other.PointName) && Status == other.Status;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+        if (ReferenceEquals(this, obj)) return true;
+        if (obj.GetType() != GetType()) return false;
+        return Equals((POIAggregate)obj);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Coordinates, PointDesc, PointName, (int)Status);
     }
 }

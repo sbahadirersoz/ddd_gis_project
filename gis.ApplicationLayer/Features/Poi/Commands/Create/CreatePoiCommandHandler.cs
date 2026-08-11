@@ -1,4 +1,5 @@
-﻿using gis.ApplicationLayer.Mapper.PoiAggregate;
+﻿using gis.ApplicationLayer.Common;
+using gis.ApplicationLayer.Mapper.PoiAggregate;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Repositories;
@@ -11,20 +12,20 @@ namespace gis.ApplicationLayer.Features.Poi.Commands.Create;
 
 public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<CreatePoiCommandResponse>>
 {
-    private readonly IPointRepository _pointRepository;
     private readonly ITopologySuitePointContract _contract;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreatePoiCommandHandler> _logger;
     private readonly POIDomainService _service;
 
-    public CreatePoiCommandHandler(POIDomainService service, ITopologySuitePointContract contract, IPointRepository pointRepository, ILogger<CreatePoiCommandHandler> logger)
+    public CreatePoiCommandHandler(POIDomainService service, ITopologySuitePointContract contract, IPointRepository pointRepository, ILogger<CreatePoiCommandHandler> logger, IUnitOfWork unitOfWork)
     {
         _service = service;
         _contract = contract;
-        _pointRepository = pointRepository;
         _logger = logger;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<CreatePoiCommandResponse>> Handle(CreatePoiCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CreatePoiCommandResponse>> Handle(CreatePoiCommand request, CancellationToken cancellationToken = default)
     {
         var latLonFromPrimitives = PointAggregateVOMapper.CreateLatLonFromPrimitives(request.Latitude, request.Longitude);
         var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc );

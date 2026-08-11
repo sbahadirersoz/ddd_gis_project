@@ -2,5 +2,5 @@
 
 public static class DomainResponseMessages
 {
-    public const string Success = "Success";
+    public const string Deleted = "Entity Deleted Successfully";
 }
