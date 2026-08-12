@@ -7,9 +7,9 @@ public static class HardCodedPropertities
     /// Clean code > fast code
     /// </summary>
     
-    public static class CustomDomainRegexes
+    public static class BusinessRuleParameters
     {
-             
+             public const double MinDistanceBetweenPoints = 0.1;
     }
 
     public static class CoordinatePropertities

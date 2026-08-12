@@ -17,7 +17,7 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
     private readonly ILogger<CreatePoiCommandHandler> _logger;
     private readonly POIDomainService _service;
 
-    public CreatePoiCommandHandler(POIDomainService service, ITopologySuitePointContract contract, IPointRepository pointRepository, ILogger<CreatePoiCommandHandler> logger, IUnitOfWork unitOfWork)
+    public CreatePoiCommandHandler(POIDomainService service, ITopologySuitePointContract contract,  ILogger<CreatePoiCommandHandler> logger, IUnitOfWork unitOfWork)
     {
         _service = service;
         _contract = contract;
@@ -25,7 +25,7 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Result<CreatePoiCommandResponse>> Handle(CreatePoiCommand request, CancellationToken cancellationToken)
+    public async Task<Result<CreatePoiCommandResponse>> Handle(CreatePoiCommand request, CancellationToken cancellationToken = default)
     {
         var latLonFromPrimitives = PointAggregateVOMapper.CreateLatLonFromPrimitives(request.Latitude, request.Longitude);
         var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc );

@@ -9,6 +9,7 @@ where TId:EntityId
 {
     Task<TEntity?> FindByEntityExpression(Expression<Func<TEntity, bool>> expression , bool tracking =true);
     Task<List<TEntity>?> FindEntitiesByExpression(Expression<Func<TEntity, bool>> expression , bool tracking =true);
-    Task<TEntity?>FindEntityExistByIdAsync(EntityId entityId);
+    Task<TEntity?>FindEntityByIdAsync(EntityId entityId);
+    Task<List<TEntity>>GetAllEntities();
     Task<bool> UpdateEntityAsync(TEntity entity,CancellationToken cancellationToken = default,bool tracking =true);
 }
