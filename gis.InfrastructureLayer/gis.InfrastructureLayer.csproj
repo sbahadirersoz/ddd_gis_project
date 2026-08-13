@@ -8,13 +8,18 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
+      <PackageReference Include="NetTopologySuite" Version="2.6.0" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="DB\Context\" />
       <Folder Include="Entities\" />
       <Folder Include="Repositories\" />
-      <Folder Include="Topology_Services\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\gis.ApplicationLayer\gis.ApplicationLayer.csproj" />
+      <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
     </ItemGroup>
 
 </Project>

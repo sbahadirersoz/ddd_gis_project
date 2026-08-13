@@ -176,12 +176,11 @@ public class POIDomainService
     private Result<Coordinates> CreateCoordinateFromLatLon(Latitude latitude, Longitude longitude)
     {
         var wktString = _contract.CreateWktStringFromLatLon(latitude, longitude);
-        var wktFromContract = WellKnownText.Create(wktString);
+         if (wktString.IsFailure)
+            return Result<Coordinates>.Failure(wktString.Error);
+        var wktFromContract = WellKnownText.Create(wktString.Value);
         if (wktFromContract.IsFailure)
-        {
             return Result<Coordinates>.Failure(wktFromContract.Error);
-        }
-
         var fromLatLon = Coordinates.FromLatLon(latitude, longitude, wktFromContract.Value);
         return fromLatLon.IsFailure
             ? Result<Coordinates>.Failure(fromLatLon.Error)

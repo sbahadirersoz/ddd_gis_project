@@ -1,9 +1,12 @@
-﻿using FluentAssertions;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using FluentAssertions;
 using gis.ApplicationLayer.Common;
 using gis.ApplicationLayer.Features.Poi.Commands.Create;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Repositories;
+using gis.Domain.ResultPattern;
 using gis.Domain.Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

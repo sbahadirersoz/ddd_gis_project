@@ -4,6 +4,7 @@ using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
+using gis.Domain.ResultPattern;
 using gis.Domain.Services;
 using NSubstitute;
 
@@ -35,7 +36,7 @@ public static class PoiHelperTestMethods
         var lon = Longitude.Create(mockCommand.Longitude).Value;
         var descFromString = PointDescription.FromString(mockCommand.PointDesc).Value;
         var nameFromString = PointName.FromString(mockCommand.PoiName).Value;
-        _contract.CreateWktStringFromLatLon(lat,lon).Returns($"POINT ({lat.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(lat,lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
         var poiAggregate = await _service.CreatePoiAggregate(lat, lon,descFromString, nameFromString);
         return poiAggregate.Value;
     }    

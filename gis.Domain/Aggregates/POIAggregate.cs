@@ -117,71 +117,9 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
         return Result.Success();
     }
 
-    public bool CompareEquality(POIAggregate obj)
-    {
-        return this.PointDesc.Equals(PointDesc);
-    }
-
-    public static Result<POIAggregate> Clone(POIAggregate aggregate)
-    {
-        if (aggregate == null)
-        {
-            Result<POIAggregate>.Failure(DomainErrors.POIErrors.INVALID_PARAMETER_FOR_CLONING);
-        }
-        return Result<POIAggregate>.Success(new POIAggregate(aggregate));
-    }
 
     public bool Equals(POIAggregate? other)
     {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return Coordinates.Equals(other.Coordinates) && Equals(PointDesc, other.PointDesc) && PointName.Equals(other.PointName) && Status == other.Status;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is null) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != GetType()) return false;
-        return Equals((POIAggregate)obj);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Coordinates, PointDesc, PointName, (int)Status);
-    }
-
-    public bool CompareEquality(POIAggregate obj)
-    {
-        return this.PointDesc.Equals(PointDesc);
-    }
-
-    public static Result<POIAggregate> Clone(POIAggregate aggregate)
-    {
-        if (aggregate == null)
-        {
-            Result<POIAggregate>.Failure(DomainErrors.POIErrors.INVALID_PARAMETER_FOR_CLONING);
-        }
-        return Result<POIAggregate>.Success(new POIAggregate(aggregate));
-    }
-
-    public bool Equals(POIAggregate? other)
-    {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return Coordinates.Equals(other.Coordinates) && Equals(PointDesc, other.PointDesc) && PointName.Equals(other.PointName) && Status == other.Status;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is null) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != GetType()) return false;
-        return Equals((POIAggregate)obj);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Coordinates, PointDesc, PointName, (int)Status);
+        throw new NotImplementedException();
     }
 }
