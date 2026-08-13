@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Linq.Expressions;
+using System.Text.Json;
 using FluentAssertions;
 using gis.ApplicationLayer.Common;
 using gis.ApplicationLayer.Features.Poi.Commands;
@@ -11,6 +12,7 @@ using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.IDs;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
+using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
 using gis.Domain.Services;
 using Microsoft.Extensions.Logging;
@@ -57,7 +59,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns($"POINT ({latitude.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
         _unitOfWork.PointRepository.FindByEntityExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
@@ -87,7 +89,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns($"POINT ({latitude.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
         _unitOfWork.PointRepository.FindByEntityExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
@@ -123,7 +125,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns($"POINT ({latitude.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
         _unitOfWork.PointRepository.FindByEntityExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
@@ -159,7 +161,8 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns($"POINT ({latitude.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(RepositoryErrors.ENTITY_NOT_FOUND);
         if (response.IsFailure)
@@ -173,9 +176,8 @@ public class UpdatePoiCommandHandlerTests
         if (response.IsSuccess)
         {
             _logger.LogInformation("Created Successfully");
-            _testOutputHelper.WriteLine(response.Value.NewDesc);
-            _testOutputHelper.WriteLine(response.Value.NewName);
-            _testOutputHelper.WriteLine(response.Value.NewWKT);
+            var json = JsonSerializer.Serialize( response.Value);
+            _testOutputHelper.WriteLine(json);
         }
             
         _logger.LogInformation($"Failed Reason {response.Error.Code}");

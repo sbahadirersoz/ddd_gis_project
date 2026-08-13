@@ -49,10 +49,11 @@ public class CreatePoiCommandHandlerTests
         
         var lat = Latitude.Create(mockCommand.Latitude).Value;
         var lon = Longitude.Create(mockCommand.Longitude).Value;
-        _contract.CreateWktStringFromLatLon(lat,lon).Returns($"POINT ({lat.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(lat,lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
         var result = await _handler.Handle(mockCommand, CancellationToken.None);
+        string  json = JsonSerializer.Serialize(result.Value);
+        _testOutputHelper.WriteLine(json);
         result.IsSuccess.Should().BeTrue();
-        _testOutputHelper.WriteLine("FOR TESTING ALIAS");
     }
          
       

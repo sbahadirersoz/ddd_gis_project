@@ -1,16 +1,6 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ACoordinate_002Ecs_002Fl_003AC_0021_003FUsers_003Fsmhbh_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FSourcesCache_003Fd0dcd69aa32cc9e1c4e89df11b745bfba11b8c1bfb0748cd6d994df351_003FCoordinate_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AEqualityComparer_002ECoreCLR_002Ecs_002Fl_003AC_0021_003FUsers_003Fsmhbh_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FSourcesCache_003F402d95cef26a612abd156edb19fa6a25f916bd53394225a44d61fda8446e_003FEqualityComparer_002ECoreCLR_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=47ef923c_002D288b_002D489a_002D9043_002D17ff1f55aa0f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="FindPoiByIdQueryHandler_SuccessCase" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Application.Features.Poi.Queries.FindPoiByName.FindPoiByNameQueryHandlerTests.FindPoiByIdQueryHandler_SuccessCase&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=dfcaa52d_002Dc2e0_002D4a60_002Dab77_002De08a6c01761b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CreatePoi" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Application.Features.Poi.Commands.Delete.DeletePoiCommandHandlerTests.DeletePoiCommandHandler_SuccessCase&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Application.Features.Poi.Queries.FindPoiById.FindPoiByIdQueryHandlerTests.FindPoiByIdQueryHandler_SuccessCase&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Application.Features.Poi.Queries.FindPoiByName.FindPoiByNameQueryHandlerTests.FindPoiByIdQueryHandler_SuccessCase&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Application.Features.Poi.Queries.FindPoiByName.GetAllPoisQueryHandlerTests.GetAllPoisQueryHandler_SuccessCase&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::748E235D-27BD-48E8-AC1A-F9BE8387C3A2::net9.0::Tests.UnitTests.Domain.Services.PoiTests.PoiDomainServiceTest.CreatePoi_Success_Case&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AGeometryFactory_002Ecs_002Fl_003AC_0021_003FUsers_003Fsmhbh_003FAppData_003FRoaming_003FJetBrains_003FRider2026_002E2_003Fresharper_002Dhost_003FSourcesCache_003F1afa799215ae543d7eb35081cddc7c66248d9206f53216b01a1c5269d0fa49_003FGeometryFactory_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	
+	</wpf:ResourceDictionary>

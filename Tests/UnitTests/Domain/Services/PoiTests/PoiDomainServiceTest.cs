@@ -4,6 +4,7 @@ using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
+using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
 using gis.Domain.Services;
 using NSubstitute;
@@ -69,7 +70,7 @@ public class PoiDomainServiceTest
 
         _pointRepository.IsLatLonCoordinatesExistsAsync(lat.Value,lon.Value).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name.Value).Returns(false);
-        _contract.CreateWktStringFromLatLon(lat.Value, lon.Value).Returns($"POINT ({lat.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(lat.Value,lon.Value).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
 
         // Act
         var result = await _poiService.CreatePoiAggregate(lat.Value,lon.Value, desc.Value, name.Value);
@@ -113,7 +114,7 @@ public class PoiDomainServiceTest
       
         _pointRepository.IsLatLonCoordinatesExistsAsync(lat.Value,lon.Value).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name.Value).Returns(false);
-        _contract.CreateWktStringFromLatLon(lat.Value, lon.Value).Returns($"POINT ({lat.Value} {lon.Value})");
+        _contract.CreateWktStringFromLatLon(lat.Value,lon.Value).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
 
         // Act
         var result = await _poiService.CreatePoiAggregate(lat.Value, lon.Value, desc.Value, name.Value);
