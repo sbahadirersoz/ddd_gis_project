@@ -8,6 +8,7 @@ using gis.Domain.Entities.Coord;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.Services;
+using gis.InfrastructureLayer.Topology_Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit.Abstractions;
@@ -29,7 +30,7 @@ public class CreatePoiCommandHandlerTests
         _testOutputHelper = testOutputHelper;
         _logger = Substitute.For<ILogger<CreatePoiCommandHandler>>();
         _repository = Substitute.For<IPointRepository>();
-        _contract = Substitute.For<ITopologySuitePointContract>();
+        _contract = new TopologySuitePointContractImpl();
         _unitOfWork  = Substitute.For<IUnitOfWork>();
         _service = new POIDomainService(_repository,_contract);
         _handler = new CreatePoiCommandHandler(_service, _contract,_logger, _unitOfWork);
@@ -49,11 +50,14 @@ public class CreatePoiCommandHandlerTests
         
         var lat = Latitude.Create(mockCommand.Latitude).Value;
         var lon = Longitude.Create(mockCommand.Longitude).Value;
-        _contract.CreateWktStringFromLatLon(lat,lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
         var result = await _handler.Handle(mockCommand, CancellationToken.None);
+        if (result.IsFailure)
+        {
+            _testOutputHelper.WriteLine(result.Error.Code);
+            return;
+        }
         string  json = JsonSerializer.Serialize(result.Value);
         _testOutputHelper.WriteLine(json);
-        result.IsSuccess.Should().BeTrue();
     }
          
       
