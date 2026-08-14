@@ -1,4 +1,5 @@
 ﻿using gis.ApplicationLayer.Common;
+using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
 using MediatR;
@@ -10,16 +11,18 @@ public class GetAllPoisQueryHandler:IRequestHandler<GetAllPoisQuery,Result<IRead
 {
     private readonly ILogger<GetAllPoisQueryHandler> _logger;
     private readonly IUnitOfWork _UnitOfWork;
+    private readonly IPointRepository _pointRepository;
 
-    public GetAllPoisQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllPoisQueryHandler> logger)
+    public GetAllPoisQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllPoisQueryHandler> logger, IPointRepository pointRepository)
     {
         _UnitOfWork = unitOfWork;
         _logger = logger;
+        _pointRepository = pointRepository;
     }
 
     public async Task<Result<IReadOnlyList<GetAllPoisQueryResponse>>> Handle(GetAllPoisQuery request, CancellationToken cancellationToken = default)
     {
-        var poiAggregates = await _UnitOfWork.PointRepository.GetAllEntities();
+        var poiAggregates = await _pointRepository.GetAllEntitiesAsync(cancellationToken: cancellationToken);
         if (poiAggregates == null)
             return Result<IReadOnlyList<GetAllPoisQueryResponse>>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
 

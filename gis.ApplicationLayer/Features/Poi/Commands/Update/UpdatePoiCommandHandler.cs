@@ -14,19 +14,21 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
 {
     private readonly POIDomainService _service;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPointRepository _pointRepository;
     private readonly ITopologySuitePointContract _contract;
     private readonly ILogger<UpdatePoiCommandHandler> _logger;
-    public UpdatePoiCommandHandler(ILogger<UpdatePoiCommandHandler> logger, POIDomainService service, ITopologySuitePointContract contract, IUnitOfWork unitOfWork)
+    public UpdatePoiCommandHandler(ILogger<UpdatePoiCommandHandler> logger, POIDomainService service, ITopologySuitePointContract contract, IUnitOfWork unitOfWork, IPointRepository pointRepository)
     {
         _logger = logger;
         _service = service;
         _contract = contract;
         _unitOfWork = unitOfWork;
+        _pointRepository = pointRepository;
     }
 
     public async Task<Result<UpdatePoiCommandResponse>> Handle(UpdatePoiCommand request, CancellationToken cancellationToken = default)
     {
-        var findByEntityExpression = await _unitOfWork.PointRepository.FindByEntityAsyncExpression(x=> x.Id.Equals(request.id));
+        var findByEntityExpression = await _pointRepository.FindByEntityExpressionAsync(x=> x.Id.Equals(request.id), cancellationToken: cancellationToken);
         if (findByEntityExpression == null)
         {
             return Result<UpdatePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
@@ -53,7 +55,7 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
         {
             return Result<UpdatePoiCommandResponse>.Failure(updatedPoiAgg.Error);
         }
-        await _unitOfWork.PointRepository.UpdateEntityAsync(updatedPoiAgg.Value);
+        _pointRepository.Update(updatedPoiAgg.Value);
         await _unitOfWork.SaveChangesAsync();
         return Result<UpdatePoiCommandResponse>.Success(UpdatePoiCommandResponse.CreateFromAggregate(updatedPoiAgg.Value));
     }

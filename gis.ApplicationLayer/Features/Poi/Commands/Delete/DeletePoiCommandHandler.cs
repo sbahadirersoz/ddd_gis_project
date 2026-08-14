@@ -1,5 +1,6 @@
 ﻿using gis.ApplicationLayer.Common;
 using gis.ApplicationLayer.Features.Poi.Commands.Create;
+using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
 using gis.Domain.Services;
@@ -11,6 +12,7 @@ namespace gis.ApplicationLayer.Features.Poi.Commands.Delete;
 public class DeletePoiCommandHandler:IRequestHandler<DeletePoiCommand,Result<DeletePoiCommandResponse>>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPointRepository _pointRepository;
     private readonly ILogger<CreatePoiCommandHandler> _logger;
     private readonly POIDomainService _service;
     public DeletePoiCommandHandler(IUnitOfWork unitOfWork, ILogger<CreatePoiCommandHandler> logger, POIDomainService service)
@@ -21,7 +23,7 @@ public class DeletePoiCommandHandler:IRequestHandler<DeletePoiCommand,Result<Del
     }
     public async Task<Result<DeletePoiCommandResponse>> Handle(DeletePoiCommand request, CancellationToken cancellationToken =default)
     {
-        var findEntityByIdAsync = await _unitOfWork.PointRepository.FindEntityByIdAsync(request.id);
+        var findEntityByIdAsync = await _pointRepository.FindEntityByIdAsync(request.id, cancellationToken: cancellationToken);
         if (findEntityByIdAsync == null)
             return Result<DeletePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         var softDeletePoi = _service.SoftDeletePoi(findEntityByIdAsync);
