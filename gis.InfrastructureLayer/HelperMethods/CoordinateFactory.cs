@@ -9,7 +9,6 @@ namespace gis.InfrastructureLayer.HelperMethods;
 public static class CoordinateFactory
 {
     private static readonly  GeometryFactory _geometryFactory =NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
-
     public static Result<Coordinate> FromLatLonToCoordinate(Latitude latitude, Longitude longitude)
     {
         var coordinate = new Coordinate(latitude.Value,longitude.Value);

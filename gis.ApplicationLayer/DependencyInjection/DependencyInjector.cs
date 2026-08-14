@@ -1,4 +1,5 @@
 ﻿using gis.ApplicationLayer.Features.Poi.Commands.Create;
+using gis.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace gis.ApplicationLayer.DependencyInjection;
@@ -14,19 +15,8 @@ public static class DependencyInjector
         );
         return services;
     }
-    public static IServiceCollection ServiceInjection(this IServiceCollection services)
-    {
-        
-        services.AddScoped(typeof(CreatePoiCommandHandler));
-        return services;
-    }
     
-    public static IServiceCollection FluentValidationInjection(this IServiceCollection services)
-    {
-        
-        ///MapperInjection
-        return services;
-    }
+
     
     
 }

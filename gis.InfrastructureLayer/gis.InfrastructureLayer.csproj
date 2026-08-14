@@ -9,12 +9,15 @@
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
       <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+      <PackageReference Include="Npgsql" Version="9.0.4" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="9.0.4" />
+      <PackageReference Include="Npgsql.NetTopologySuite" Version="9.0.4" />
+      <PackageReference Include="Scrutor" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="DB\Context\" />
       <Folder Include="Entities\" />
-      <Folder Include="Repositories\" />
     </ItemGroup>
 
     <ItemGroup>
