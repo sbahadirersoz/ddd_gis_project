@@ -12,22 +12,22 @@ namespace Tests.HelperMethods.Poi;
 
 public static class PoiHelperTestMethods
 {
-    private static readonly ITopologySuitePointContract _contract;
+    private static readonly ITopologySuiteWKTContract _contract;
     private static readonly POIDomainService _service;
     private static readonly IPointRepository _repository;
 
     static PoiHelperTestMethods()
     {
-    _contract = Substitute.For<ITopologySuitePointContract>();
+    _contract = Substitute.For<ITopologySuiteWKTContract>();
     _repository = Substitute.For<IPointRepository>();
     _service = new POIDomainService(_repository,_contract);
     }
-    public static async Task<POIAggregate> MockPrevPoiCreation(string taskName,string taskDesc,double latitude,double longitude)
+    public static async Task<POIAggregate> MockPrevPoiCreation(string mockName,string mockDesc,double latitude,double longitude)
     {
         var mockCommand = new CreatePoiCommand
         (
-            taskName,
-            taskDesc,
+            mockName,
+            mockDesc,
             latitude,
             longitude
         );
@@ -36,8 +36,20 @@ public static class PoiHelperTestMethods
         var lon = Longitude.Create(mockCommand.Longitude).Value;
         var descFromString = PointDescription.FromString(mockCommand.PointDesc).Value;
         var nameFromString = PointName.FromString(mockCommand.PoiName).Value;
-        _contract.CreateWktStringFromLatLon(lat,lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lat,lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
         var poiAggregate = await _service.CreatePoiAggregate(lat, lon,descFromString, nameFromString);
         return poiAggregate.Value;
     }    
+    public static async Task<List<POIAggregate>> mockList()
+    {
+        var unit1 =  await PoiHelperTestMethods.MockPrevPoiCreation("unit1","unit1desc",41,42);
+        var unit2 = await PoiHelperTestMethods.MockPrevPoiCreation("unit2","unit2desc",41,43);
+        var unit3 = await PoiHelperTestMethods.MockPrevPoiCreation("unit3","unit3desc",41,44);
+        List<POIAggregate> l = new List<POIAggregate>();
+        l.Add(unit1);
+        l.Add(unit2);
+        l.Add(unit3);
+        return l;
+    }
+
 }

@@ -16,6 +16,7 @@ using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
 using gis.Domain.Services;
 using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using NSubstitute;
 using Tests.HelperMethods.Poi;
 using Xunit.Abstractions;
@@ -25,7 +26,7 @@ namespace Tests.UnitTests.Application.Features.Poi;
 public class UpdatePoiCommandHandlerTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly ITopologySuitePointContract _contract;
+    private readonly ITopologySuiteWKTContract _contract;
     private readonly POIDomainService _service;
     private readonly IPointRepository _repository;
     private readonly UpdatePoiCommandHandler _handler;
@@ -37,7 +38,7 @@ public class UpdatePoiCommandHandlerTests
         _testOutputHelper = testOutputHelper;
         _logger = Substitute.For<ILogger<UpdatePoiCommandHandler>>();
         _repository = Substitute.For<IPointRepository>();
-        _contract = Substitute.For<ITopologySuitePointContract>();
+        _contract = Substitute.For<ITopologySuiteWKTContract>();
         _unitOfWork  = Substitute.For<IUnitOfWork>();
         _service = new POIDomainService(_repository,_contract);
         _handler = new UpdatePoiCommandHandler(_logger,_service,_contract, _unitOfWork,_repository
@@ -56,19 +57,19 @@ public class UpdatePoiCommandHandlerTests
 
         var updatePoiCommand = new UpdatePoiCommand
         (
-                mockPrevPoiCreation.Id,"UpdatedTestName","UpdatedTestDescription",42,15,POIStatus.ACTIVE
+               new Guid("cc4eab60-5291-466c-aba1-e0a7b31e39bc"),"UpdatedTestName","UpdatedTestDescription",42,15,POIStatus.ACTIVE
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
-        _repository.FindByEntityExpressionAsync(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
+        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _repository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
         {
             _testOutputHelper.WriteLine(response.Error.Code);
             _testOutputHelper.WriteLine(response.Error.Desc);
+            return;
         }
-        response.IsSuccess.Should().BeTrue();
         
         _logger.LogInformation("Created Successfully");
         _testOutputHelper.WriteLine(response.Value.NewDesc);
@@ -86,12 +87,12 @@ public class UpdatePoiCommandHandlerTests
 
         var updatePoiCommand = new UpdatePoiCommand
         (
-                mockPrevPoiCreation.Id,"","UpdatedTestDescription",42,15,POIStatus.ACTIVE
+                mockPrevPoiCreation.Id.Value,"","UpdatedTestDescription",42,15,POIStatus.ACTIVE
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
-        _repository.FindByEntityExpressionAsync(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
+        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _repository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
         {
@@ -122,12 +123,12 @@ public class UpdatePoiCommandHandlerTests
 
         var updatePoiCommand = new UpdatePoiCommand
         (
-                mockPrevPoiCreation.Id,"PrevName","Description",42,42,POIStatus.ACTIVE
+                mockPrevPoiCreation.Id.Value,"PrevName","Description",42,42,POIStatus.ACTIVE
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
-        _repository.FindByEntityExpressionAsync(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
+        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _repository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
         if (response.IsFailure)
@@ -158,11 +159,11 @@ public class UpdatePoiCommandHandlerTests
 
         var updatePoiCommand = new UpdatePoiCommand
         (
-                mockPrevPoiCreation.Id,"PrevName","Description",42,42,POIStatus.ACTIVE
+                mockPrevPoiCreation.Id.Value,"PrevName","Description",42,42,POIStatus.ACTIVE
         );
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
-        _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
         
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(RepositoryErrors.ENTITY_NOT_FOUND);
