@@ -25,6 +25,6 @@ public record DeletePoiCommandResponse
     }
 
     public static DeletePoiCommandResponse CreateFromAgg(POIAggregate agg) =>
-        new DeletePoiCommandResponse(agg.Coordinates.WKT.Value, agg.PointName.Value, agg.PointDesc.Value,
+        new DeletePoiCommandResponse(agg.CoordinateValueObject.WKT.Value, agg.PointName.Value, agg.PointDesc.Value,
             agg.Status.ToString());
 }

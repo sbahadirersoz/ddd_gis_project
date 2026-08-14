@@ -33,7 +33,7 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
         {
             return Result<UpdatePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         }
-        var latLonFromPrimitives = PointAggregateVOMapper.CreateLatLonFromPrimitives(request.Latitude.Value, request.Longitude.Value);
+        var latLonFromPrimitives = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.Latitude.Value, request.Longitude.Value);
         var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc);
         var pointNameFromPrimitives = PointAggregateVOMapper.CreatePointNameFromPrimitives(request.PoiName);
         if (latLonFromPrimitives.IsFailure)
@@ -48,8 +48,8 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
         {
             return Result<UpdatePoiCommandResponse>.Failure(pointDescFromPrimitives.Error);
         }
-        var latitude = latLonFromPrimitives.Value.Item1;
-        var longitude = latLonFromPrimitives.Value.Item2;
+        var longitude = latLonFromPrimitives.Value.Item1;
+        var latitude = latLonFromPrimitives.Value.Item2;
         var updatedPoiAgg = await _service.UpdatePoiAggregate(findByEntityExpression,latitude,longitude,pointDescFromPrimitives.Value,pointNameFromPrimitives.Value,request.Status);
         if (updatedPoiAgg.IsFailure)
         {

@@ -8,17 +8,17 @@ namespace gis.ApplicationLayer.Features.Poi.Commands;
 
 public record CreatePoiCommandResponse
 {
-    private CreatePoiCommandResponse(WellKnownText wkt, Coordinates coordinates, PointDescription description, POIStatus status)
+    private CreatePoiCommandResponse(WellKnownText wkt, CoordinateValueObject coordinateValueObject, PointDescription description, POIStatus status)
     {
         WKT = wkt;
-        Coordinates = coordinates;
+        CoordinateValueObject = coordinateValueObject;
         Description = description;
         Status = status;
     }
 
     public WellKnownText WKT { get; }
 
-    public Coordinates Coordinates { get; }
+    public CoordinateValueObject CoordinateValueObject { get; }
     public PointDescription Description { get; }
     public POIStatus Status { get; }
     
@@ -26,8 +26,8 @@ public record CreatePoiCommandResponse
     {
         return new CreatePoiCommandResponse
         (
-            aggregate.Coordinates.WKT,
-            aggregate.Coordinates,
+            aggregate.CoordinateValueObject.WKT,
+            aggregate.CoordinateValueObject,
             aggregate.PointDesc,
             aggregate.Status
         );

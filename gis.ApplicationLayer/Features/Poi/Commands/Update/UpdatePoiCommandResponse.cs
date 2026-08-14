@@ -17,7 +17,7 @@ public record UpdatePoiCommandResponse
 
     public static UpdatePoiCommandResponse CreateFromAggregate(POIAggregate agg)
     {
-        return new UpdatePoiCommandResponse(agg.PointName.Value, agg.PointDesc.Value, agg.Coordinates.WKT.Value);
+        return new UpdatePoiCommandResponse(agg.PointName.Value, agg.PointDesc.Value, agg.CoordinateValueObject.WKT.Value);
     }
     
 }

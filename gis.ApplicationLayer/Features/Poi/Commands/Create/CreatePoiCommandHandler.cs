@@ -27,15 +27,15 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
 
     public async Task<Result<CreatePoiCommandResponse>> Handle(CreatePoiCommand request, CancellationToken cancellationToken = default)
     {
-        var latLonFromPrimitives = PointAggregateVOMapper.CreateLatLonFromPrimitives(request.Latitude, request.Longitude);
+        var lonLatFromPrimitives = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.Latitude, request.Longitude);
         var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc );
         var pointNameFromPrimitives = PointAggregateVOMapper.CreatePointNameFromPrimitives(request.PoiName);
         _logger.LogInformation("All Primitives Converted To VO's");
         _logger.LogInformation("Check LatLon Creation");
         
-        if (latLonFromPrimitives.IsFailure)
+        if (lonLatFromPrimitives.IsFailure)
         {
-            return Result<CreatePoiCommandResponse>.Failure(latLonFromPrimitives.Error);
+            return Result<CreatePoiCommandResponse>.Failure(lonLatFromPrimitives.Error);
         }
         _logger.LogInformation("Check Point  Desc Creation");
         
@@ -54,8 +54,8 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
         
 
         
-        Latitude lat = latLonFromPrimitives.Value.Item1;
-        Longitude lon = latLonFromPrimitives.Value.Item2;
+        Longitude lon = lonLatFromPrimitives.Value.Item1;
+        Latitude lat = lonLatFromPrimitives.Value.Item2;
         _logger.LogInformation("All  Lan Lon Refferances Addded Successfully");
         _logger.LogInformation("Attempting to Create Poi With  DomainService");
         var createResult = await _service.CreatePoiAggregate(lat,lon,pointDescFromPrimitives.Value,pointNameFromPrimitives.Value);

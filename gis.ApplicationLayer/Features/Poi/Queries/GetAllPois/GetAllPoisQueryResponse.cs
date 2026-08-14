@@ -22,7 +22,7 @@ public record GetAllPoisQueryResponse
     public static GetAllPoisQueryResponse CreateFromAgg(POIAggregate agg)
         => new GetAllPoisQueryResponse
         (
-            agg.Coordinates.WKT,
+            agg.CoordinateValueObject.WKT,
             agg.PointDesc, agg.PointName,
             agg.Status
         );

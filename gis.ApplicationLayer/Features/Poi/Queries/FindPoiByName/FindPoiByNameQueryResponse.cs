@@ -20,5 +20,5 @@ public record FindPoiByNameQueryResponse
     }
     
     public static FindPoiByNameQueryResponse CreateFromAgg(POIAggregate aggregate)
-    => new FindPoiByNameQueryResponse(aggregate.Coordinates.WKT,aggregate.PointDesc,aggregate.PointName,aggregate.Status);
+    => new FindPoiByNameQueryResponse(aggregate.CoordinateValueObject.WKT,aggregate.PointDesc,aggregate.PointName,aggregate.Status);
 };

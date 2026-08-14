@@ -21,7 +21,7 @@ public record FindPoiByIdQueryResponse
     public static FindPoiByIdQueryResponse CreateFromAgg(POIAggregate agg)
         => new FindPoiByIdQueryResponse
         (
-            agg.Coordinates.WKT,
+            agg.CoordinateValueObject.WKT,
             agg.PointDesc, agg.PointName,
             agg.Status
         );
