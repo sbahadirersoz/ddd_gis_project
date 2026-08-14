@@ -7,9 +7,10 @@ namespace gis.InfrastructureLayer.Topology_Services;
 
 public class TopologySuitePointContractImpl : ITopologySuitePointContract
 {
-    public Result<string> CreateWktStringFromLatLon(Latitude latitude, Longitude longitude)
+    public Result<string> CreateWktStringFromLonLat(Latitude latitude, Longitude longitude)
     {
-        var result = CommonGeometryHelpers.FromLatLonCoordinatesToWKTString(latitude, longitude);
+        var result = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString(latitude, longitude);
         return result.IsFailure ? Result<string>.Failure(result.Error) : Result<string>.Success(result.Value);
     }
+    
 }

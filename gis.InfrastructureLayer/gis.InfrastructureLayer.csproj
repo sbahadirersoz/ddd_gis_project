@@ -17,10 +17,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Entities\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\gis.ApplicationLayer\gis.ApplicationLayer.csproj" />
       <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
     </ItemGroup>

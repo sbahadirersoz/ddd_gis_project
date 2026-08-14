@@ -13,7 +13,7 @@ public class PointRepository:RepositoryImpl<POIAggregate,PointID>,IPointReposito
     {
     }
 
-    public Task<bool> IsLatLonCoordinatesExistsAsync(Latitude lat, Longitude lon, CancellationToken cancellationToken = default)
+    public Task<bool> IsLonLatCoordinatesExistsAsync(Latitude lat, Longitude lon, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

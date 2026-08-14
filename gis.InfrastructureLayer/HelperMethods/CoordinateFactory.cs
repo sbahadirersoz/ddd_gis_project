@@ -9,11 +9,21 @@ namespace gis.InfrastructureLayer.HelperMethods;
 public static class CoordinateFactory
 {
     private static readonly  GeometryFactory _geometryFactory =NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
-    public static Result<Coordinate> FromLatLonToCoordinate(Latitude latitude, Longitude longitude)
+    public static Result<Point> FromLonLatToPoint(Latitude latitude, Longitude longitude)
     {
-        var coordinate = new Coordinate(latitude.Value,longitude.Value);
-        return !coordinate.IsValid
-            ? Result<Coordinate>.Failure(DomainErrors.POIErrors.Coordinate.BAD_CREDENTIALS_FOR_COORDINATES)
-            : Result<Coordinate>.Success(coordinate);
+        var point = new Point(longitude.Value,latitude.Value);
+        return !point.IsValid
+            ? Result<Point>.Failure(DomainErrors.POIErrors.Coordinate.BAD_CREDENTIALS_FOR_COORDINATES)
+            : Result<Point>.Success(point);
     }
+    public static Result<Coordinate> FromLonLatToCoordinate(Latitude latitude, Longitude longitude)
+    {
+        var point = new Coordinate(longitude.Value,latitude.Value);
+        return !point.IsValid
+            ? Result<Coordinate>.Failure(DomainErrors.POIErrors.Coordinate.BAD_CREDENTIALS_FOR_COORDINATES)
+            : Result<Coordinate>.Success(point);
+    }
+    
+    
+    
 }
