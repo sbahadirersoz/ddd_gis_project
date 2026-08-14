@@ -60,7 +60,7 @@ public class UpdatePoiCommandHandlerTests
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
         _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
-        _unitOfWork.PointRepository.FindByEntityExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
+        _unitOfWork.PointRepository.FindByEntityAsyncExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
         {
@@ -90,7 +90,7 @@ public class UpdatePoiCommandHandlerTests
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
         _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
-        _unitOfWork.PointRepository.FindByEntityExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
+        _unitOfWork.PointRepository.FindByEntityAsyncExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
         {
@@ -126,7 +126,7 @@ public class UpdatePoiCommandHandlerTests
         var latitude = Latitude.Create(updatePoiCommand.Latitude.Value);
         var lon = Longitude.Create(updatePoiCommand.Longitude.Value);
         _contract.CreateWktStringFromLatLon(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
-        _unitOfWork.PointRepository.FindByEntityExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
+        _unitOfWork.PointRepository.FindByEntityAsyncExpression(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
         if (response.IsFailure)
