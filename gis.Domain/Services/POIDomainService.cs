@@ -176,6 +176,7 @@ public class POIDomainService
     private Result<Coordinates> CreateCoordinateFromLatLon(Latitude latitude, Longitude longitude)
     {
         var wktString = _contract.CreateWktStringFromLatLon(latitude, longitude);
+        
          if (wktString.IsFailure)
             return Result<Coordinates>.Failure(wktString.Error);
         var wktFromContract = WellKnownText.Create(wktString.Value);
