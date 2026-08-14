@@ -10,7 +10,7 @@ namespace gis.Domain.Aggregates;
 
 public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
 {
-    public Coordinates Coordinates { get; private set; }
+    public CoordinateValueObject CoordinateValueObject { get; private set; }
     public PointDescription? PointDesc { get; private set; }
     public PointName PointName { get; private set; }
     public POIStatus Status { get; private set; } = POIStatus.ACTIVE;
@@ -18,7 +18,7 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
     #region Factory Method and private constructor
 
     internal static Result<POIAggregate> createFromPointId(
-        Coordinates coords,
+        CoordinateValueObject coords,
         PointDescription pointDesc, PointName pointName, PointID id)
     {
         var aggregate = new POIAggregate
@@ -30,29 +30,29 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
         return Result<POIAggregate>.Success(aggregate);
     }
 
-    private POIAggregate(PointID id, Coordinates coordinates, PointDescription? pointDesc, PointName pointName) :
+    private POIAggregate(PointID id, CoordinateValueObject coordinateValueObject, PointDescription? pointDesc, PointName pointName) :
         base(id)
     {
-        Coordinates = coordinates;
+        CoordinateValueObject = coordinateValueObject;
         PointDesc = pointDesc ?? PointDescription.FromString(null).Value;
         PointName = pointName;
     }  private POIAggregate(POIAggregate aggregate):base(aggregate.Id)
     {
-        Coordinates = aggregate.Coordinates;
+        CoordinateValueObject = aggregate.CoordinateValueObject;
         PointDesc = aggregate.PointDesc;
         Status = aggregate.Status;
         PointName = aggregate.PointName;
     }
 
     internal static Result<POIAggregate> create(
-        Coordinates coordinates,
+        CoordinateValueObject coordinateValueObject,
         PointDescription? pointDesc,
         PointName pointName
     )
     {
         var aggregate = new POIAggregate(
             PointID.New(),
-            coordinates, pointDesc, pointName);
+            coordinateValueObject, pointDesc, pointName);
 
         aggregate.AddDomainEvent(PointOfInterestCreatedEvent.Create(aggregate.Id));
 
@@ -61,7 +61,7 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
 
     #endregion
 
-    public Coordinates GetCoordinates() => Coordinates;
+    public CoordinateValueObject GetCoordinates() => CoordinateValueObject;
     public PointDescription GetPointDesc() => PointDesc;
     public PointName GetPointName() => PointName;
 
@@ -80,21 +80,21 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
         return Result.Success();
     }
 
-    internal Result ChangeCoordinates(Coordinates newCoordinates)
+    internal Result ChangeCoordinates(CoordinateValueObject newCoordinateValueObject)
     {
-        if (Coordinates.Equals(newCoordinates))
+        if (CoordinateValueObject.Equals(newCoordinateValueObject))
         {
             return Result.Failure(DomainErrors.POIErrors.Coordinate.SAME_VALUE_PROVIDED);
         }
 
-        if (newCoordinates == null)
+        if (newCoordinateValueObject == null)
         {
             return Result.Failure(DomainErrors.POIErrors.Coordinate.BAD_CREDENTIALS_FOR_COORDINATES);
         }
 
         var prevCoordinates = GetCoordinates();
-        Coordinates = newCoordinates;
-        AddDomainEvent(POICoordinatesChangedEvent.Create(this.Id, prevCoordinates, newCoordinates));
+        CoordinateValueObject = newCoordinateValueObject;
+        AddDomainEvent(POICoordinatesChangedEvent.Create(this.Id, prevCoordinates, newCoordinateValueObject));
         return Result.Success();
     }
 

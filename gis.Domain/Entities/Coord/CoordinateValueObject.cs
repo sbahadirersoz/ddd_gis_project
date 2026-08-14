@@ -8,27 +8,27 @@ namespace gis.Domain.Entities.Coord;
 /// Longitude X Latitude Y
 /// 
 
-public record Coordinates
+public record CoordinateValueObject
 {
-    public Latitude Latitude { get; }
     public Longitude Longitude { get;  }
+    public Latitude Latitude { get; }
     public double? Altitude { get;  }
     public WellKnownText WKT { get; private set; }
-    private Coordinates(Latitude latitude, Longitude longitude, double? altitude, WellKnownText wkt)
+    private CoordinateValueObject( Longitude longitude,Latitude latitude, double? altitude, WellKnownText wkt)
     {
         Latitude = latitude;
         Longitude = longitude;
         WKT = wkt;
         Altitude  = altitude ?? null;
     }
-    public static Result<Coordinates> FromLatLon(Latitude latitude, Longitude longitude,WellKnownText wkt)
+    public static Result<CoordinateValueObject> FromLonLat(Latitude latitude, Longitude longitude,WellKnownText wkt)
     {
-        return Result<Coordinates>.Success(new Coordinates(latitude, longitude  , null,wkt));
+        return Result<CoordinateValueObject>.Success(new CoordinateValueObject( longitude  ,latitude, null,wkt));
     }
-    public static Result<Coordinates> FromLatLonAlt(Latitude latitude, Longitude longitude, double altitude , WellKnownText wkt)
+    public static Result<CoordinateValueObject> FromLonLatAlt(Latitude latitude, Longitude longitude, double altitude , WellKnownText wkt)
     {
         var validation = AltitudeValidation(altitude);
-        return validation.IsFailure ? Result<Coordinates>.Failure(validation.Error) : Result<Coordinates>.Success(new Coordinates(latitude, longitude, altitude,wkt));
+        return validation.IsFailure ? Result<CoordinateValueObject>.Failure(validation.Error) : Result<CoordinateValueObject>.Success(new CoordinateValueObject( longitude,latitude, altitude,wkt));
     }
 
     private static Result AltitudeValidation(double altitude)

@@ -2,7 +2,7 @@
 
 public enum POIStatus
 {
-    ACTIVE,
-    INACTIVE,
-    SOFT_DELETED
+    ACTIVE =0,
+    INACTIVE =1,
+    SOFT_DELETED =2
 }

@@ -28,8 +28,8 @@ public class POIDomainService
         Longitude? newLongitude,
         PointDescription? newPointDesc, PointName? newPointName, POIStatus? newStatus)
     {
-        var isLatChanged = newLatitude is not  null && !newLatitude.Equals(poi.Coordinates.Latitude);
-        var isLonChanged = newLongitude is not  null && !newLongitude.Equals(poi.Coordinates.Longitude);
+        var isLatChanged = newLatitude is not  null && !newLatitude.Equals(poi.CoordinateValueObject.Latitude);
+        var isLonChanged = newLongitude is not  null && !newLongitude.Equals(poi.CoordinateValueObject.Longitude);
         var isDescChanged = newPointDesc is not  null && !newPointDesc.Equals(poi.PointDesc);
         var isNameChanged = newPointName is not  null && !newPointName.Equals(poi.PointName);
         var isStatusChanged = newStatus is not  null && !newStatus.Equals(poi.Status);
@@ -43,8 +43,8 @@ public class POIDomainService
         if (isLatChanged || isLonChanged)
         {
             
-            var targetLatitude = newLatitude ??  poi.Coordinates.Latitude  ; 
-            var targetLongitude = newLongitude ??  poi.Coordinates. Longitude  ; 
+            var targetLatitude = newLatitude ??  poi.CoordinateValueObject.Latitude  ; 
+            var targetLongitude = newLongitude ??  poi.CoordinateValueObject. Longitude  ; 
             var changePointCoordinatesAsync = await ChangePointCoordinatesAsync(poi, targetLatitude, targetLongitude);
             if (changePointCoordinatesAsync.IsFailure)
                 return Result<POIAggregate>.Failure(changePointCoordinatesAsync.Error);
@@ -71,7 +71,7 @@ public class POIDomainService
             return Result<POIAggregate>.Failure(methodValidation.Error);
         }
 
-        var coordinateFromLatLon = CreateCoordinateFromLatLon(latitude, longitude);
+        var coordinateFromLatLon = CreateCoordinateFromLonLat(latitude, longitude);
         if (coordinateFromLatLon.IsFailure)
         {
             return Result<POIAggregate>.Failure(coordinateFromLatLon.Error);
@@ -91,7 +91,7 @@ public class POIDomainService
             return Result<POIAggregate>.Failure(methodValidation.Error);
         }
 
-        var coordinateFromLatLon = CreateCoordinateFromLatLon(latitude, longitude);
+        var coordinateFromLatLon = CreateCoordinateFromLonLat(latitude, longitude);
         if (coordinateFromLatLon.IsFailure)
         {
             return Result<POIAggregate>.Failure(coordinateFromLatLon.Error);
@@ -123,7 +123,7 @@ public class POIDomainService
             return Result.Failure(validateChangePointCoordinatesAsync.Error);
         }
 
-        var coordinateFromLatLon = CreateCoordinateFromLatLon(lat, lon);
+        var coordinateFromLatLon = CreateCoordinateFromLonLat(lat, lon);
         if (coordinateFromLatLon.IsFailure)
         {
             return Result.Failure(coordinateFromLatLon.Error);
@@ -163,7 +163,7 @@ public class POIDomainService
 
     private async Task<Result> IsCoordinatesExistsAsync(Latitude lat, Longitude lon)
     {
-        var isCoordinatesExistsAsync = await _pointRepository.IsLatLonCoordinatesExistsAsync(lat, lon);
+        var isCoordinatesExistsAsync = await _pointRepository.IsLonLatCoordinatesExistsAsync(lat, lon);
         return isCoordinatesExistsAsync ? Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB) : Result.Success();
     }
 
@@ -173,19 +173,19 @@ public class POIDomainService
         return isPointNameExistsAsync ? Result.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB) : Result.Success();
     }
 
-    private Result<Coordinates> CreateCoordinateFromLatLon(Latitude latitude, Longitude longitude)
+    private Result<CoordinateValueObject> CreateCoordinateFromLonLat(Latitude latitude, Longitude longitude)
     {
-        var wktString = _contract.CreateWktStringFromLatLon(latitude, longitude);
+        var wktString = _contract.CreateWktStringFromLonLat(latitude, longitude);
         
          if (wktString.IsFailure)
-            return Result<Coordinates>.Failure(wktString.Error);
+            return Result<CoordinateValueObject>.Failure(wktString.Error);
         var wktFromContract = WellKnownText.Create(wktString.Value);
         if (wktFromContract.IsFailure)
-            return Result<Coordinates>.Failure(wktFromContract.Error);
-        var fromLatLon = Coordinates.FromLatLon(latitude, longitude, wktFromContract.Value);
+            return Result<CoordinateValueObject>.Failure(wktFromContract.Error);
+        var fromLatLon = CoordinateValueObject.FromLonLat(latitude, longitude, wktFromContract.Value);
         return fromLatLon.IsFailure
-            ? Result<Coordinates>.Failure(fromLatLon.Error)
-            : Result<Coordinates>.Success(fromLatLon.Value);
+            ? Result<CoordinateValueObject>.Failure(fromLatLon.Error)
+            : Result<CoordinateValueObject>.Success(fromLatLon.Value);
     }
 
     private async Task<Result> CreateMethodValidation(Latitude latitude, Longitude longitude,

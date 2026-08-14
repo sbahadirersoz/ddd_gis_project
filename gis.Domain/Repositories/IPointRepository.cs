@@ -8,7 +8,7 @@ namespace gis.Domain.Repositories;
 public interface IPointRepository:IRepository<POIAggregate,PointID>
 {
 
-    Task<bool> IsLatLonCoordinatesExistsAsync(Latitude lat, Longitude lon, CancellationToken cancellationToken = default);
+    Task<bool> IsLonLatCoordinatesExistsAsync(Latitude lat, Longitude lon, CancellationToken cancellationToken = default);
     Task<bool> IsPointNameExistsAsync(PointName pointName, CancellationToken cancellationToken = default);
     Task<bool> IsPointExists(PointName pointName, CancellationToken cancellationToken = default);
 }

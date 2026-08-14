@@ -8,19 +8,19 @@ namespace gis.Domain.Entities.Events;
 public record POICoordinatesChangedEvent:IDomainEvent
 {
     public EntityId Id { get; init; }
-    public Coordinates PrevCoordinates { get; init; }
-    public Coordinates NewCoordinates { get; init; }
+    public CoordinateValueObject PrevCoordinateValueObject { get; init; }
+    public CoordinateValueObject NewCoordinateValueObject { get; init; }
     
-    private  POICoordinatesChangedEvent(EntityId id,Coordinates prevCoordinates,Coordinates newCoordinates)
+    private  POICoordinatesChangedEvent(EntityId id,CoordinateValueObject prevCoordinateValueObject,CoordinateValueObject newCoordinateValueObject)
     {
         this.Id = id;
-        this.PrevCoordinates = prevCoordinates;
-        this.NewCoordinates = newCoordinates;
+        this.PrevCoordinateValueObject = prevCoordinateValueObject;
+        this.NewCoordinateValueObject = newCoordinateValueObject;
     }
 
-    public static POICoordinatesChangedEvent Create(EntityId id,Coordinates prevCoordinates,Coordinates newCoordinates)
+    public static POICoordinatesChangedEvent Create(EntityId id,CoordinateValueObject prevCoordinateValueObject,CoordinateValueObject newCoordinateValueObject)
     {
-        return new POICoordinatesChangedEvent(id,prevCoordinates, newCoordinates);
+        return new POICoordinatesChangedEvent(id,prevCoordinateValueObject, newCoordinateValueObject);
     }
     public DateTime OccurredOn { get; }
 }

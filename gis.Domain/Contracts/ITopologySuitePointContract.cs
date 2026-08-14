@@ -5,5 +5,5 @@ namespace gis.Domain.Contracts;
 
 public interface ITopologySuitePointContract
 {
-    Result<string> CreateWktStringFromLatLon(Latitude latitude, Longitude longitude);
+    Result<string> CreateWktStringFromLonLat(Latitude latitude, Longitude longitude);
 }
