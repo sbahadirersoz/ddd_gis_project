@@ -19,7 +19,7 @@ public class FindPoiByNameQueryHandler:IRequestHandler<FindPoiByNameQuery,Result
 
     public async Task<Result<FindPoiByNameQueryResponse>> Handle(FindPoiByNameQuery request, CancellationToken cancellationToken = default)
     {
-        var findByEntityExpression = await _unitOfWork.PointRepository.FindByEntityExpression(x=> x.PointName.Equals(request.PointName));
+        var findByEntityExpression = await _unitOfWork.PointRepository.FindByEntityAsyncExpression(x=> x.PointName.Equals(request.PointName));
         return (findByEntityExpression == null) ?
             Result<FindPoiByNameQueryResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND)
             : Result<FindPoiByNameQueryResponse>.Success(FindPoiByNameQueryResponse.CreateFromAgg(findByEntityExpression));

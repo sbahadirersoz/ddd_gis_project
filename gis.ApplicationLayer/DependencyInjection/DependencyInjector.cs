@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using gis.ApplicationLayer.Features.Poi.Commands.Create;
+﻿using gis.ApplicationLayer.Features.Poi.Commands.Create;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace gis.ApplicationLayer.DependencyInjection;

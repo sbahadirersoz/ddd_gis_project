@@ -26,7 +26,7 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
 
     public async Task<Result<UpdatePoiCommandResponse>> Handle(UpdatePoiCommand request, CancellationToken cancellationToken = default)
     {
-        var findByEntityExpression = await _unitOfWork.PointRepository.FindByEntityExpression(x=> x.Id.Equals(request.id));
+        var findByEntityExpression = await _unitOfWork.PointRepository.FindByEntityAsyncExpression(x=> x.Id.Equals(request.id));
         if (findByEntityExpression == null)
         {
             return Result<UpdatePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
