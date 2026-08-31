@@ -25,7 +25,7 @@ public class GetAllPoisQueryHandlerTests
         _logger = Substitute.For<ILogger<GetAllPoisQueryHandler>>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
         _pointRepository = Substitute.For<IPointRepository>();
-        _handler = new GetAllPoisQueryHandler( _unitOfWork,_logger,_pointRepository);
+        _handler = new GetAllPoisQueryHandler( _logger,_pointRepository);
     }
 
     [Fact]

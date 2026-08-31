@@ -2,6 +2,7 @@
 using gis.ApplicationLayer.Common;
 using gis.ApplicationLayer.Features.Poi.Queries.FindPoiByName;
 using gis.Domain.Aggregates;
+using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
 using gis.InfrastructureLayer.Repositories;
 using Microsoft.Extensions.Logging;
@@ -35,7 +36,7 @@ public class FindPoiByNameQueryHandlerTests
 
         var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName", "Description", 42, 42);
         var request = new FindPoiByNameQuery(mockPrevPoiCreation.PointName);
-        _pointRepository.FindByEntityExpressionAsync(Arg.Any<Expression<Func<POIAggregate,bool>>>()).Returns(mockPrevPoiCreation);
+        _pointRepository.FindPointByPointNameAsync(Arg.Any<PointName>()).Returns(mockPrevPoiCreation);
         var result = await _handler.Handle(request);
         if (result.IsFailure)
         {

@@ -14,7 +14,7 @@ namespace Tests.UnitTests.Application.Features.Poi.Commands.Delete;
 public class DeletePoiCommandHandlerTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly ITopologySuitePointContract _contract;
+    private readonly ITopologySuiteWKTContract _contract;
     private readonly POIDomainService _service;
     private readonly IPointRepository _repository;
     private readonly DeletePoiCommandHandler _handler;
@@ -27,9 +27,9 @@ public class DeletePoiCommandHandlerTests
         _logger = Substitute.For<ILogger<CreatePoiCommandHandler>>();
         _unitOfWork  = Substitute.For<IUnitOfWork>();
         _repository = Substitute.For<IPointRepository>();
-        _contract = Substitute.For<ITopologySuitePointContract>();
+        _contract = Substitute.For<ITopologySuiteWKTContract>();
         _service = new POIDomainService(_repository,_contract);
-        _handler = new DeletePoiCommandHandler( _unitOfWork,_logger,_service);
+        _handler = new DeletePoiCommandHandler(_unitOfWork, _repository, _logger, _service);
     }
     [Fact]
     public async void DeletePoiCommandHandler_SuccessCase()
@@ -41,7 +41,7 @@ public class DeletePoiCommandHandlerTests
         //     42,
         //     42
         var request = new DeletePoiCommand(mockPrevPoiCreation.Id);
-        _repository.FindEntityByIdAsync(request.id).Returns(mockPrevPoiCreation);
+        _repository.FindPointByIdAsync(request.id).Returns(mockPrevPoiCreation);
         var result = await _handler.Handle(request);
         if (result.IsFailure)
         {

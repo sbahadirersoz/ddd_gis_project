@@ -11,6 +11,7 @@ using gis.Domain.Services;
 using gis.InfrastructureLayer.Topology_Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using gis.Domain.Entities.Information;
 using Xunit.Abstractions;
 
 namespace Tests.UnitTests.Application.Features.Poi;
@@ -18,7 +19,7 @@ namespace Tests.UnitTests.Application.Features.Poi;
 public class CreatePoiCommandHandlerTests
 {
     private readonly ITestOutputHelper _testOutputHelper;
-    private readonly ITopologySuitePointContract _contract;
+    private readonly ITopologySuiteWKTContract _contract;
     private readonly POIDomainService _service;
     private readonly IPointRepository _repository;
     private readonly CreatePoiCommandHandler _handler;
@@ -30,10 +31,10 @@ public class CreatePoiCommandHandlerTests
         _testOutputHelper = testOutputHelper;
         _logger = Substitute.For<ILogger<CreatePoiCommandHandler>>();
         _repository = Substitute.For<IPointRepository>();
-        _contract = new TopologySuitePointContractImpl();
+        _contract = Substitute.For<ITopologySuiteWKTContract>();
         _unitOfWork  = Substitute.For<IUnitOfWork>();
         _service = new POIDomainService(_repository,_contract);
-        _handler = new CreatePoiCommandHandler(_service, _contract,_logger, _unitOfWork);
+        _handler = new CreatePoiCommandHandler(_service, _contract,_logger, _unitOfWork,_repository);
     }
 
     [Fact]
@@ -50,6 +51,9 @@ public class CreatePoiCommandHandlerTests
         
         var lat = Latitude.Create(mockCommand.Latitude).Value;
         var lon = Longitude.Create(mockCommand.Longitude).Value;
+        _repository.IsLonLatCoordinatesExistsAsync(lat, lon).Returns(false);
+        _repository.IsPointNameExistsAsync(Arg.Any<PointName>()).Returns(false);
+        _contract.CreateWktStringFromLonLat(lat, lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
         var result = await _handler.Handle(mockCommand, CancellationToken.None);
         if (result.IsFailure)
         {

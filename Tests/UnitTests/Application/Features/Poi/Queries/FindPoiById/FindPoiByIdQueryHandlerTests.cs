@@ -21,8 +21,8 @@ public class FindPoiByIdQueryHandlerTests
     public FindPoiByIdQueryHandlerTests(ITestOutputHelper testOutputHelper)
     {
         this._testOutputHelper = testOutputHelper;
-        _logger = Substitute.For<ILogger<FindPoiByIdQueryHandler>>();
         _unitOfWork  = Substitute.For<IUnitOfWork>();
+        _logger = Substitute.For<ILogger<FindPoiByIdQueryHandler>>();
         _pointRepository =  Substitute.For<IPointRepository>();
         _handler = new FindPoiByIdQueryHandler( _unitOfWork,_logger,_pointRepository);
     }
@@ -32,7 +32,7 @@ public class FindPoiByIdQueryHandlerTests
         
         var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",42,42);
         var request = new FindPoiByIdQuery(mockPrevPoiCreation.Id);
-        _pointRepository.FindEntityByIdAsync(request.id).Returns(mockPrevPoiCreation);
+        _pointRepository.FindPointByIdAsync(request.id).Returns(mockPrevPoiCreation);
         var result = await _handler.Handle(request);
         if (result.IsFailure)
         {
