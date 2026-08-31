@@ -15,18 +15,30 @@ public class DeletePoiCommandHandler:IRequestHandler<DeletePoiCommand,Result<Del
     private readonly IPointRepository _pointRepository;
     private readonly ILogger<CreatePoiCommandHandler> _logger;
     private readonly POIDomainService _service;
-    public DeletePoiCommandHandler(IUnitOfWork unitOfWork, ILogger<CreatePoiCommandHandler> logger, POIDomainService service)
+    public DeletePoiCommandHandler(IUnitOfWork unitOfWork, IPointRepository pointRepository, ILogger<CreatePoiCommandHandler> logger, POIDomainService service)
     {
         _unitOfWork = unitOfWork;
+        _pointRepository = pointRepository;
         _logger = logger;
         _service = service;
     }
-    public async Task<Result<DeletePoiCommandResponse>> Handle(DeletePoiCommand request, CancellationToken cancellationToken =default)
+
+    public async Task<Result<DeletePoiCommandResponse>> Handle(DeletePoiCommand request,
+        CancellationToken cancellationToken = default)
     {
-        var findEntityByIdAsync = await _pointRepository.FindEntityByIdAsync(request.id, cancellationToken: cancellationToken);
+        var findEntityByIdAsync =await _pointRepository.FindPointByIdAsync(request.id, true,cancellationToken: cancellationToken);
         if (findEntityByIdAsync == null)
             return Result<DeletePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+        
         var softDeletePoi = _service.SoftDeletePoi(findEntityByIdAsync);
-        return softDeletePoi.IsFailure ? Result<DeletePoiCommandResponse>.Failure(softDeletePoi.Error) : Result<DeletePoiCommandResponse>.Success(DeletePoiCommandResponse.CreateFromAgg(findEntityByIdAsync));
+        if (softDeletePoi.IsFailure)
+            return Result<DeletePoiCommandResponse>.Failure(softDeletePoi.Error);
+        
+        await _pointRepository.UpdateAsync(findEntityByIdAsync, cancellationToken);
+        var affectedRows = await _unitOfWork.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Affected rows on SoftDelete: {Rows}", affectedRows);
+        return softDeletePoi.IsFailure
+            ? Result<DeletePoiCommandResponse>.Failure(softDeletePoi.Error)
+            : Result<DeletePoiCommandResponse>.Success(DeletePoiCommandResponse.CreateFromAgg(findEntityByIdAsync));
     }
 }

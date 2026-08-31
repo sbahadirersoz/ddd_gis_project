@@ -4,6 +4,7 @@ using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
+using gis.Domain.ResultPattern.Errors;
 using gis.Domain.Services;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -12,22 +13,35 @@ namespace gis.ApplicationLayer.Features.Poi.Commands.Create;
 
 public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<CreatePoiCommandResponse>>
 {
-    private readonly ITopologySuitePointContract _contract;
+    private readonly ITopologySuiteWKTContract _contract;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CreatePoiCommandHandler> _logger;
     private readonly POIDomainService _service;
-
-    public CreatePoiCommandHandler(POIDomainService service, ITopologySuitePointContract contract,  ILogger<CreatePoiCommandHandler> logger, IUnitOfWork unitOfWork)
+    private readonly IPointRepository _repository;
+    
+    public CreatePoiCommandHandler(POIDomainService service, ITopologySuiteWKTContract contract,  ILogger<CreatePoiCommandHandler> logger, IUnitOfWork unitOfWork, IPointRepository repository)
     {
         _service = service;
         _contract = contract;
         _logger = logger;
         _unitOfWork = unitOfWork;
+        _repository = repository;
     }
 
     public async Task<Result<CreatePoiCommandResponse>> Handle(CreatePoiCommand request, CancellationToken cancellationToken = default)
     {
+        
+        
         var lonLatFromPrimitives = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.Latitude, request.Longitude);
+        if (lonLatFromPrimitives.IsFailure) return Result<CreatePoiCommandResponse>.Failure(lonLatFromPrimitives.Error);
+       
+        var lon = lonLatFromPrimitives.Value.Item1;
+        var lat = lonLatFromPrimitives.Value.Item2;
+        var exists = await _repository.IsLonLatCoordinatesExistsAsync(lat,lon, cancellationToken);
+        if (exists)
+        {
+            return Result<CreatePoiCommandResponse>.Failure(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB);
+        }
         var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc );
         var pointNameFromPrimitives = PointAggregateVOMapper.CreatePointNameFromPrimitives(request.PoiName);
         _logger.LogInformation("All Primitives Converted To VO's");
@@ -54,8 +68,6 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
         
 
         
-        Longitude lon = lonLatFromPrimitives.Value.Item1;
-        Latitude lat = lonLatFromPrimitives.Value.Item2;
         _logger.LogInformation("All  Lan Lon Refferances Addded Successfully");
         _logger.LogInformation("Attempting to Create Poi With  DomainService");
         var createResult = await _service.CreatePoiAggregate(lat,lon,pointDescFromPrimitives.Value,pointNameFromPrimitives.Value);
@@ -66,6 +78,8 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
         }
         _logger.LogInformation("Created Successfully Returning");
         var result = CreatePoiCommandResponse.CreateFromAgg(createResult.Value);
+        await _repository.AddAsync(createResult.Value, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Result<CreatePoiCommandResponse>.Success(result);
     }
 }

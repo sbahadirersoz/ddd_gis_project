@@ -8,6 +8,6 @@ using MediatR;
 namespace gis.ApplicationLayer.Features.Poi.Commands;
 
 public record UpdatePoiCommand
-    (PointID id,
+    (Guid id,
         string? PoiName, string? PointDesc, double? Latitude, double? Longitude,POIStatus? Status)
     :IRequest<Result<UpdatePoiCommandResponse>>;
