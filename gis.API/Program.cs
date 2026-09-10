@@ -8,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.InjectServicesFromInfrastructure();
 builder.Services.MediatRInjection();
 builder.Services.InjectDB(builder.Configuration);
+builder.Services.FluentValidationInjection();
 var app = builder.Build();
 app.MapControllers();
 if (app.Environment.IsDevelopment())

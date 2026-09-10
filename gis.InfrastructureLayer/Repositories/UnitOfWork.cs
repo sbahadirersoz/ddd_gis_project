@@ -1,41 +1,119 @@
 ﻿using gis.ApplicationLayer.Common;
+using gis.InfrastructureLayer.DB.Context; // Adjust to your DbContext namespace
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace gis.InfrastructureLayer.Repositories;
 
-public class UnitOfWork:IUnitOfWork
+public class UnitOfWork : IUnitOfWork
 {
-    public void Dispose()
-    {
-        // TODO release managed resources here
-    }
+    private readonly AppDbContext _context;
+    private IDbContextTransaction? _currentTransaction;
+    private bool _disposed;
 
-    public async ValueTask DisposeAsync()
+    public UnitOfWork(AppDbContext context)
     {
-        // TODO release managed resources here
-    }
-
-    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
+        _context = context;
     }
 
     public int SaveChanges()
     {
-        throw new NotImplementedException();
+        return _context.SaveChanges();
     }
 
-    public Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (_currentTransaction is not null)
+        {
+            throw new InvalidOperationException("A transaction is already in progress.");
+        }
+
+        _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
     }
 
-    public Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        try
+        {
+            await SaveChangesAsync(cancellationToken);
+
+            if (_currentTransaction is not null)
+            {
+                await _currentTransaction.CommitAsync(cancellationToken);
+            }
+        }
+        catch
+        {
+            await RollbackTransactionAsync(cancellationToken);
+            throw;
+        }
+        finally
+        {
+            if (_currentTransaction is not null)
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
+        }
+    }
+
+    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (_currentTransaction is not null)
+            {
+                await _currentTransaction.RollbackAsync(cancellationToken);
+            }
+        }
+        finally
+        {
+            if (_currentTransaction is not null)
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _currentTransaction?.Dispose();
+                _context.Dispose();
+            }
+
+            _disposed = true;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (!_disposed)
+        {
+            if (_currentTransaction is not null)
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
+
+            await _context.DisposeAsync();
+            _disposed = true;
+        }
+
+        GC.SuppressFinalize(this);
     }
 }

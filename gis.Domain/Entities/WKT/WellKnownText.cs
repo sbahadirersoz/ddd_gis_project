@@ -15,8 +15,15 @@ public record WellKnownText
 
     public static Result<WellKnownText> Create(string value)
     {
-        if (!value.StartsWith("POINT", StringComparison.OrdinalIgnoreCase) && 
-            !value.StartsWith("POLYGON", StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(value))
+            return Result<WellKnownText>.Failure(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
+
+        if 
+            (
+            !value.StartsWith("POINT", StringComparison.OrdinalIgnoreCase) && 
+            !value.StartsWith("LINESTRING ", StringComparison.OrdinalIgnoreCase) && 
+            !value.StartsWith("POLYGON", StringComparison.OrdinalIgnoreCase)
+            )
         {
             return Result<WellKnownText>.Failure(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
         }

@@ -18,8 +18,9 @@ public record FindPoiByIdQueryResponse
         Name = name;
         Status = status;
     }
+
     public static FindPoiByIdQueryResponse CreateFromAgg(POIAggregate agg)
-        => new FindPoiByIdQueryResponse
+        => new
         (
             agg.CoordinateValueObject.WKT,
             agg.PointDesc, agg.PointName,

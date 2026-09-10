@@ -10,12 +10,10 @@ namespace gis.ApplicationLayer.Features.Poi.Queries.GetAllPois;
 public class GetAllPoisQueryHandler:IRequestHandler<GetAllPoisQuery,Result<IReadOnlyList<GetAllPoisQueryResponse>>>
 {
     private readonly ILogger<GetAllPoisQueryHandler> _logger;
-    private readonly IUnitOfWork _UnitOfWork;
     private readonly IPointRepository _pointRepository;
 
-    public GetAllPoisQueryHandler(IUnitOfWork unitOfWork, ILogger<GetAllPoisQueryHandler> logger, IPointRepository pointRepository)
+    public GetAllPoisQueryHandler( ILogger<GetAllPoisQueryHandler> logger, IPointRepository pointRepository)
     {
-        _UnitOfWork = unitOfWork;
         _logger = logger;
         _pointRepository = pointRepository;
     }

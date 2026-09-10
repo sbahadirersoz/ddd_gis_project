@@ -1,4 +1,5 @@
 ﻿using gis.ApplicationLayer.Common;
+using gis.ApplicationLayer.Dtos;
 using gis.ApplicationLayer.Features.Poi.Commands.Create;
 using gis.ApplicationLayer.Features.Poi.Commands.Delete;
 using gis.Domain.Contracts;
@@ -35,7 +36,7 @@ public class DeletePoiCommandHandlerTests
     public async void DeletePoiCommandHandler_SuccessCase()
     {
         
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",42,42);
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,42) );
         //     "TestName",
         //     "Description",
         //     42,

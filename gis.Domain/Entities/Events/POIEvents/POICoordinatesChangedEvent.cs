@@ -1,7 +1,6 @@
 ﻿using gis.Domain.Common;
 using gis.Domain.Entities.Coord;
-using gis.Domain.Entities.IDs;
-using gis.Domain.Entities.Information;
+
 
 namespace gis.Domain.Entities.Events;
 

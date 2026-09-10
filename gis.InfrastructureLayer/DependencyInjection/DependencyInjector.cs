@@ -18,24 +18,27 @@ public  static class DependencyInjector
     {
         services.Scan(scan => scan
             .FromAssembliesOf(typeof(PointRepository))
-            .AddClasses(classes => classes.Where(c => c.Name.EndsWith("Repository") || c.Name.EndsWith("Service") || c.Name.EndsWith("Contract")))
+            .AddClasses(classes => classes.Where(c => c.Name.EndsWith("Repository") || c.Name.EndsWith("Service") || c.Name.EndsWith("Contract") || c.Name.EndsWith("Factory")))
             .AsImplementedInterfaces()
             .WithScopedLifetime());
         
         
         services.AddScoped<POIDomainService>();
         services.AddScoped<IUnitOfWork,UnitOfWork>();
+        services.AddScoped<ILineDomainServiceContract, LineDomainServiceContract>();
         services.AddSingleton<GeometryFactory>(provider => NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
-        services.AddSingleton<ITopologySuitePointContract, TopologySuitePointContractImpl>();
+        services.AddSingleton<ITopologySuiteWKTContract, TopologySuiteWktContractImpl>();
         return services;
     }
 
     public static IServiceCollection InjectDB(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<AppDbContext>
-        (opt => opt.UseNpgsql(configuration.GetConnectionString("Default"),
-            x => x.UseNetTopologySuite()
-        ));
+        var envConn = Environment.GetEnvironmentVariable("DEFAULT_CONNECTION") ?? Environment.GetEnvironmentVariable("CONNECTION_STRING");
+        var connString = !string.IsNullOrWhiteSpace(envConn) ? envConn : configuration.GetConnectionString("DefaultConnection");
+
+        services.AddDbContext<AppDbContext>(opt =>
+            opt.UseNpgsql(connString, x => x.UseNetTopologySuite())
+        );
         return services;
     }
 }

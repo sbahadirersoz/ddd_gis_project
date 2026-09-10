@@ -34,7 +34,7 @@ public class UpdatePoiCommandHandler:IRequestHandler<UpdatePoiCommand,Result<Upd
         {
             return Result<UpdatePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         }
-        var latLonFromPrimitives = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.Latitude.Value, request.Longitude.Value);
+        var latLonFromPrimitives = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.CoordinateDto.Latitude,request.CoordinateDto.Longitude);
         var pointDescFromPrimitives = PointAggregateVOMapper.CreatePointDescFromPrimitives(request.PointDesc);
         var pointNameFromPrimitives = PointAggregateVOMapper.CreatePointNameFromPrimitives(request.PoiName);
         if (latLonFromPrimitives.IsFailure)

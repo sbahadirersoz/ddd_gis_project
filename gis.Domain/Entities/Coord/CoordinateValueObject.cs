@@ -24,6 +24,12 @@ public record CoordinateValueObject
     public static Result<CoordinateValueObject> FromLonLat(Latitude latitude, Longitude longitude,WellKnownText wkt)
     {
         return Result<CoordinateValueObject>.Success(new CoordinateValueObject( longitude  ,latitude, null,wkt));
+    }   public static Result<CoordinateValueObject> ForLineCoordCreation(Latitude latitude, Longitude longitude)
+    {
+        return Result<CoordinateValueObject>.Success(new CoordinateValueObject( longitude  ,latitude, null,null));
+    }   public static Result<CoordinateValueObject> ForPolygonCoordCreation(Latitude latitude, Longitude longitude)
+    {
+        return Result<CoordinateValueObject>.Success(new CoordinateValueObject( longitude  ,latitude, null,null));
     }
     public static Result<CoordinateValueObject> FromLonLatAlt(Latitude latitude, Longitude longitude, double altitude , WellKnownText wkt)
     {

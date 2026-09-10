@@ -1,4 +1,5 @@
-﻿using gis.ApplicationLayer.Features.Poi.Commands.Update;
+﻿using gis.ApplicationLayer.Dtos;
+using gis.ApplicationLayer.Features.Poi.Commands.Update;
 using gis.Domain.Entities.IDs;
 using gis.Domain.Entities.Information;
 using gis.Domain.ResultPattern;
@@ -9,5 +10,5 @@ namespace gis.ApplicationLayer.Features.Poi.Commands;
 
 public record UpdatePoiCommand
     (Guid id,
-        string? PoiName, string? PointDesc, double? Latitude, double? Longitude,POIStatus? Status)
+        string? PoiName = null, string? PointDesc = null, CoordinateDto? CoordinateDto = null,POIStatus? Status = null)
     :IRequest<Result<UpdatePoiCommandResponse>>;

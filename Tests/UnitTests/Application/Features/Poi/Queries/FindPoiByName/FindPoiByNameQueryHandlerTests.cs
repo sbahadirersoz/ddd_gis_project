@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using gis.ApplicationLayer.Common;
+using gis.ApplicationLayer.Dtos;
 using gis.ApplicationLayer.Features.Poi.Queries.FindPoiByName;
 using gis.Domain.Aggregates;
 using gis.Domain.Entities.Information;
@@ -34,7 +35,7 @@ public class FindPoiByNameQueryHandlerTests
     public async Task FindPoiByIdQueryHandler_SuccessCase()
     {
 
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName", "Description", 42, 42);
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName", "Description", new CoordinateDto(42,41));
         var request = new FindPoiByNameQuery(mockPrevPoiCreation.PointName);
         _pointRepository.FindPointByPointNameAsync(Arg.Any<PointName>()).Returns(mockPrevPoiCreation);
         var result = await _handler.Handle(request);

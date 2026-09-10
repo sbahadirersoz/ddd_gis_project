@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using gis.ApplicationLayer.Common;
+using gis.ApplicationLayer.Dtos;
 using gis.ApplicationLayer.Features.Poi.Commands.Create;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
@@ -45,12 +46,11 @@ public class CreatePoiCommandHandlerTests
         (
             "TestName",
             "Description",
-            42,
-            42
+           new CoordinateDto(42,35)
         );
         
-        var lat = Latitude.Create(mockCommand.Latitude).Value;
-        var lon = Longitude.Create(mockCommand.Longitude).Value;
+        var lat = Latitude.Create(mockCommand.CoordinateDto.Latitude).Value;
+        var lon = Longitude.Create(mockCommand.CoordinateDto.Longitude).Value;
         _repository.IsLonLatCoordinatesExistsAsync(lat, lon).Returns(false);
         _repository.IsPointNameExistsAsync(Arg.Any<PointName>()).Returns(false);
         _contract.CreateWktStringFromLonLat(lat, lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));

@@ -1,4 +1,6 @@
-﻿using gis.Domain.Common;
+﻿using gis.Domain.BusinessRules.PointRules;
+using gis.Domain.BusinessRules.PointRules.Name;
+using gis.Domain.Common;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.Events;
 using gis.Domain.Entities.IDs;
@@ -26,7 +28,7 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
             id,coords,
             pointDesc, pointName
         );
-        aggregate.AddDomainEvent(PointOfInterestCreatedEvent.Create(id));
+        aggregate.AddDomainEvent(POICreatedEvent.Create(id));
         return Result<POIAggregate>.Success(aggregate);
     }
 
@@ -54,9 +56,40 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
             PointID.New(),
             coordinateValueObject, pointDesc, pointName);
 
-        aggregate.AddDomainEvent(PointOfInterestCreatedEvent.Create(aggregate.Id));
+        aggregate.AddDomainEvent(POICreatedEvent.Create(aggregate.Id));
 
         return Result<POIAggregate>.Success(aggregate);
+    }
+    
+    /// <summary>
+    /// Burası korumasız olduğu için sorun
+    /// Ama mapping için başka bir approach yok sanırım
+    /// 
+    /// </summary>
+    /// <param name="poi"></param>
+    /// <returns></returns>
+
+    public static POIAggregate Reconstitute(
+        PointID id,
+        CoordinateValueObject coordinateValueObject,
+        PointDescription? pointDesc,
+         PointName pointName,
+        POIStatus status)
+    {
+        return new POIAggregate(id, coordinateValueObject, pointDesc, pointName, status);
+    }
+
+    private POIAggregate(
+        PointID id,
+        CoordinateValueObject coordinateValueObject,
+        PointDescription? pointDesc,
+        PointName pointName,
+        POIStatus status) : base(id)
+    {
+        CoordinateValueObject = coordinateValueObject;
+        PointDesc = pointDesc;
+        PointName = pointName;
+        Status = status;
     }
 
     #endregion
@@ -69,14 +102,16 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
     {
         var prevPointDesc = PointDesc;
         PointDesc = newPointDesc;
-        AddDomainEvent(POIPointDescChangedEvent.Create(this.Id, prevPointDesc, newPointDesc));
+        AddDomainEvent(POIDescChangedEvent.Create(this.Id, prevPointDesc, newPointDesc));
     }
 
     internal Result ChangePointName(PointName newPointName)
     {
+        var checkRule = CheckRule(new PoiNameMustBeUniqueRule(newPointName));
+        if (checkRule.IsFailure) return Result.Failure(checkRule.Error);
         var prevPointName = GetPointName();
         PointName = newPointName;
-        AddDomainEvent(POIPointNameChangedEvent.Create(this.Id, prevPointName, newPointName));
+        AddDomainEvent(POINameChangedEvent.Create(Id, prevPointName, newPointName));
         return Result.Success();
     }
 
@@ -98,10 +133,15 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
         return Result.Success();
     }
 
-    internal void ChangeStatus(POIStatus newStatus)
+    internal Result ChangeStatus(POIStatus newStatus)
     {
-        AddDomainEvent(POIStatusChangedEvent.Create(this.Id, Status, newStatus));
+        var checkRule = CheckRule(new PoiMustNotBeSameStatus(newStatus));
+        if (checkRule.IsFailure) return Result.Failure(checkRule.Error);
+ 
+
+        AddDomainEvent(POIStatusChangedEvent.Create(Id, Status, newStatus));
         Status = newStatus;
+        return Result.Success();
     }
 
     
@@ -112,11 +152,20 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
     /// </summary>
     internal Result SoftDelete()
     {
+        var notDeleted = CheckRule(new PoiMustNotBeDeletedRule());
+        
+        if (notDeleted.IsFailure) return Result.Failure(notDeleted.Error);
+        
         AddDomainEvent(POISoftDeletedEvent.Create(Id));
-        Status = POIStatus.SOFT_DELETED;
         return Result.Success();
     }
 
+
+    private Result CheckRule(IPointRule rule)
+    {
+        var result = rule.Execute(this);
+        return result.IsFailure ?  Result.Failure(result.Error) : Result.Success();
+    }
 
     public bool Equals(POIAggregate? other)
     {

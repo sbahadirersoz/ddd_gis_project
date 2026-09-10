@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using gis.ApplicationLayer.Common;
+using gis.ApplicationLayer.Dtos;
 using gis.ApplicationLayer.Features.Poi.Queries.GetAllPois;
 using gis.Domain.Aggregates;
 using gis.Domain.Repositories;
@@ -32,8 +33,8 @@ public class GetAllPoisQueryHandlerTests
     public async Task GetAllPoisQueryHandler_SuccessCase()
     {
 
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName", "Description", 42, 42);
-        var mockPrevPoiCreation1 = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName1", "Description", 42, 42);
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName", "Description", new CoordinateDto(40,39));
+        var mockPrevPoiCreation1 = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName1", "Description", new CoordinateDto(28,35));
         List<POIAggregate> mockList = new List<POIAggregate>();
         mockList.Add(mockPrevPoiCreation);
         mockList.Add(mockPrevPoiCreation1);

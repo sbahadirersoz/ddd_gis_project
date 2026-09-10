@@ -32,7 +32,7 @@ public class CreatePoiCommandHandler:IRequestHandler<CreatePoiCommand,Result<Cre
     {
         
         
-        var lonLatFromPrimitives = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.Latitude, request.Longitude);
+        var lonLatFromPrimitives = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.CoordinateDto.Latitude, request.CoordinateDto.Longitude);
         if (lonLatFromPrimitives.IsFailure) return Result<CreatePoiCommandResponse>.Failure(lonLatFromPrimitives.Error);
        
         var lon = lonLatFromPrimitives.Value.Item1;

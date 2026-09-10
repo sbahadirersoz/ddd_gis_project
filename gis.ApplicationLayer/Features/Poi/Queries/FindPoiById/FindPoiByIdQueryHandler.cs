@@ -23,7 +23,7 @@ public class FindPoiByIdQueryHandler:IRequestHandler<FindPoiByIdQuery,Result<Fin
     public async Task<Result<FindPoiByIdQueryResponse>> Handle(FindPoiByIdQuery request, CancellationToken cancellationToken =default)
     {
         _logger.LogInformation("Attempting to find poi by id: {id}", request.id);
-        var findEntityByIdAsync = await _pointRepository.FindEntityByIdAsync(request.id, cancellationToken: cancellationToken);
+        var findEntityByIdAsync = await _pointRepository.FindPointByIdAsync(request.id, cancellationToken: cancellationToken);
         _logger.LogInformation("Validation For Poi Is Exist");
         return (findEntityByIdAsync == null) ?
             Result<FindPoiByIdQueryResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND):

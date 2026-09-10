@@ -7,14 +7,11 @@ public interface IRepository<TEntity,TId>
 where TEntity:AggregateRoot<TId>
 where TId:EntityId
 {
-    Task<TEntity?> FindByEntityExpressionAsync(Expression<Func<TEntity, bool>> expression , bool tracking =true  , CancellationToken cancellationToken = default );
-    Task<List<TEntity>> FindEntitiesByExpressionAsync(Expression<Func<TEntity, bool>> expression, bool tracking = true,
-        CancellationToken cancellationToken = default);
-    Task<TEntity?>FindEntityByIdAsync(TId entityId,bool tracking = true,CancellationToken cancellationToken = default);
-    Task<List<TEntity>>GetAllEntitiesAsync(bool tracking = true , CancellationToken cancellationToken = default);
     Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
     void Add(TEntity entity);
     void Update(TEntity entity);
     void Delete(TEntity entity);
     Task DeleteByIdAsync(TId entityId, CancellationToken cancellationToken = default);
+    Task<List<TEntity>>GetAllEntitiesAsync(bool tracking = true , CancellationToken cancellationToken = default);
+    
 }
