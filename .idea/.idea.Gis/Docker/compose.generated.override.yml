@@ -1,0 +1,20 @@
+# This is a generated file. Not intended for manual editing.
+services:
+  api:
+    build:
+      context: "D:\\dotnet9\\ddd-project\\ddd_gis_project"
+      dockerfile: "gis.API/Dockerfile"
+      target: "base"
+    command: []
+    entrypoint:
+    - "dotnet"
+    - "/app/bin/Debug/net9.0/gis.API.dll"
+    environment:
+      DOTNET_USE_POLLING_FILE_WATCHER: "true"
+    image: "gis.api:dev"
+    ports: []
+    volumes:
+    - "D:\\dotnet9\\ddd-project\\ddd_gis_project\\gis.API:/app:rw"
+    - "D:\\dotnet9\\ddd-project\\ddd_gis_project:/src:rw"
+    - "C:\\Users\\smhbh\\.nuget\\packages:/home/app/.nuget/packages"
+    working_dir: "/app"

@@ -1,12 +1,12 @@
 ﻿using gis.API.EndPoints;
-using gis.ApplicationLayer.Features.Line.Commands.Create;
-using gis.ApplicationLayer.Features.Line.Commands.Update;
-using gis.ApplicationLayer.Features.Line.Queries.Distance.ID.FindClosestByIdQuery;
-using gis.ApplicationLayer.Features.Line.Queries.Distance.ID.FindInRangeByIdQuery;
+using Gis.Application.Features.Line.Commands.Create;
+using Gis.Application.Features.Line.Commands.Update;
+using Gis.Application.Features.Line.Queries.Distance.ID.FindClosestByIdQuery;
+using Gis.Application.Features.Line.Queries.Distance.ID.FindInRangeByIdQuery;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using FindMostClosesCountByIdQuery =
-    gis.ApplicationLayer.Features.Line.Queries.Distance.ID.FindMostClosesCountByIdQuery.FindMostClosesCountByIdQuery;
+    Gis.Application.Features.Line.Queries.Distance.ID.FindMostClosesCountByIdQuery.FindMostClosesCountByIdQuery;
 
 namespace gis.API.Controllers;
 

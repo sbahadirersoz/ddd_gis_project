@@ -1,9 +1,9 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
 using FluentAssertions;
-using gis.ApplicationLayer.Common;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Line.Commands.Create;
-using gis.ApplicationLayer.Features.Line.Commands.Delete;
+using Gis.Application.Common;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Line.Commands.Create;
+using Gis.Application.Features.Line.Commands.Delete;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.IDs;

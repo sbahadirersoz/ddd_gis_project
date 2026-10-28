@@ -22,9 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\gis.ApplicationLayer\gis.ApplicationLayer.csproj" />
+      <ProjectReference Include="..\Gis.Application\Gis.Application.csproj" />
       <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
-      <ProjectReference Include="..\gis.InfrastructureLayer\gis.InfrastructureLayer.csproj" />
+      <ProjectReference Include="..\Gis.Infrastructure\Gis.Infrastructure.csproj" />
       <ProjectReference Include="..\Tests\Tests.csproj" />
     </ItemGroup>
 

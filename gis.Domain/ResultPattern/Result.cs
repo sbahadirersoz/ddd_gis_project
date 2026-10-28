@@ -28,10 +28,3 @@ public class Result<T> : Result
     public static Result<T> Success(T value) => new(true, value, Error.None);
     public new static Result<T> Failure(Error error) => new(false, default, error);
 }
-public sealed record Error(string Code, string Desc, string? StackTrace = null)
-{
-    public static readonly Error None = new(string.Empty, string.Empty);
-    public static Error UnExpected(string code, string desc)
-        => new(code, desc, Environment.StackTrace);
-
-}

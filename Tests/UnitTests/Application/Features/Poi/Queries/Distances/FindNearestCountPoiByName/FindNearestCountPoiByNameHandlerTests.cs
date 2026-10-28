@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Poi.Queries.Distance.FindNearestCountPoiByName;
-using gis.ApplicationLayer.Features.Poi.Queries.FindPoisInGivenRange;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Poi.Queries.Distance.FindNearestCountPoiByName;
+using Gis.Application.Features.Poi.Queries.FindPoisInGivenRange;
 using gis.Domain.Aggregates;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;

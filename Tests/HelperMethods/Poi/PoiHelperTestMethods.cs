@@ -1,5 +1,5 @@
-﻿using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Poi.Commands.Create;
+﻿using Gis.Application.Dtos;
+using Gis.Application.Features.Poi.Commands.Create;
 using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;

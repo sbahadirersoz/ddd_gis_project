@@ -1,8 +1,8 @@
 ﻿using System.Globalization;
 using System.Runtime.InteropServices.JavaScript;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Poi.Queries.FindPoiById;
-using gis.ApplicationLayer.Features.Poi.Queries.FindPoisInGivenRange;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Poi.Queries.FindPoiById;
+using Gis.Application.Features.Poi.Queries.FindPoisInGivenRange;
 using gis.Domain.Aggregates;
 using gis.Domain.Common;
 using gis.Domain.Entities.IDs;

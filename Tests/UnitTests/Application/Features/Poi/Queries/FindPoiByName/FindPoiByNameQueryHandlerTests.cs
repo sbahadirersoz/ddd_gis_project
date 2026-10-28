@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
-using gis.ApplicationLayer.Common;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Poi.Queries.FindPoiByName;
+using Gis.Application.Common;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Poi.Queries.FindPoiByName;
 using gis.Domain.Aggregates;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
-using gis.InfrastructureLayer.Repositories;
+using Gis.Infrastructure.Repositories;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Tests.HelperMethods.Poi;

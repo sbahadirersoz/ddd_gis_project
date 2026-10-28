@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using gis.ApplicationLayer.Common;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Poi.Queries.FindPoiById;
+using Gis.Application.Common;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Poi.Queries.FindPoiById;
 using gis.Domain.Repositories;
 using Microsoft.Extensions.Logging;
 using NSubstitute;

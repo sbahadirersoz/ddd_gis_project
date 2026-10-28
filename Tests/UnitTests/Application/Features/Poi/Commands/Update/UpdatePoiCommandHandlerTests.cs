@@ -2,11 +2,11 @@
 using System.Linq.Expressions;
 using System.Text.Json;
 using FluentAssertions;
-using gis.ApplicationLayer.Common;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Poi.Commands;
-using gis.ApplicationLayer.Features.Poi.Commands.Create;
-using gis.ApplicationLayer.Features.Poi.Commands.Update;
+using Gis.Application.Common;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Poi.Commands;
+using Gis.Application.Features.Poi.Commands.Create;
+using Gis.Application.Features.Poi.Commands.Update;
 using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;

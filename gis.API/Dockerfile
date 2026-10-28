@@ -2,22 +2,20 @@
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["gis.API/gis.API.csproj", "gis.API/"]
-RUN dotnet restore "gis.API/gis.API.csproj"
-COPY . .
-WORKDIR "/src/gis.API"
-RUN dotnet build "./gis.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+# Copy only project files first so the restore layer is cached
+COPY gis.API/gis.API.csproj gis.API/
+COPY Gis.Application/Gis.Application.csproj Gis.Application/
+COPY Gis.Infrastructure/Gis.Infrastructure.csproj Gis.Infrastructure/
+COPY gis.Domain/gis.Domain.csproj gis.Domain/
+RUN dotnet restore gis.API/gis.API.csproj
+COPY  . .
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./gis.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
+RUN dotnet publish gis.API/gis.API.csproj -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "gis.API.dll"]

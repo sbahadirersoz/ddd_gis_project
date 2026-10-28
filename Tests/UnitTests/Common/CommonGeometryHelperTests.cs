@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
-using gis.ApplicationLayer.Mapper.LineMapper;
-using gis.InfrastructureLayer.HelperMethods;
+using Gis.Application.Mapper.LineMapper;
+using Gis.Infrastructure.HelperMethods;
 using Xunit.Abstractions;
 
 namespace Tests.UnitTests.Common;

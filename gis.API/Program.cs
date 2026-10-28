@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
-using gis.ApplicationLayer.DependencyInjection;
-using gis.InfrastructureLayer.DependencyInjection;
+using Gis.Application.DependencyInjection;
+using Gis.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();

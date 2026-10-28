@@ -1,7 +1,7 @@
-﻿using gis.ApplicationLayer.Common;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Poi.Commands.Create;
-using gis.ApplicationLayer.Features.Poi.Commands.Delete;
+﻿using Gis.Application.Common;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Poi.Commands.Create;
+using Gis.Application.Features.Poi.Commands.Delete;
 using gis.Domain.Contracts;
 using gis.Domain.Repositories;
 using gis.Domain.Services;

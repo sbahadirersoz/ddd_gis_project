@@ -1,6 +1,6 @@
-﻿using gis.ApplicationLayer.Common;
-using gis.ApplicationLayer.Features.Line.Commands.Delete;
-using gis.ApplicationLayer.Features.Line.Commands.Update;
+﻿using Gis.Application.Common;
+using Gis.Application.Features.Line.Commands.Delete;
+using Gis.Application.Features.Line.Commands.Update;
 using gis.Domain.Contracts;
 using gis.Domain.Repositories;
 using gis.Domain.Services;

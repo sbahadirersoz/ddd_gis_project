@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
-using gis.ApplicationLayer.Common;
-using gis.ApplicationLayer.Dtos;
-using gis.ApplicationLayer.Features.Polygon.Commands;
+using Gis.Application.Common;
+using Gis.Application.Dtos;
+using Gis.Application.Features.Polygon.Commands;
 using gis.Domain.BusinessRules.PolygonRules.Abstract;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
