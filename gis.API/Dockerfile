@@ -7,6 +7,7 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 # Copy only project files first so the restore layer is cached
+COPY Directory.Build.props ./
 COPY gis.API/gis.API.csproj gis.API/
 COPY Gis.Application/Gis.Application.csproj Gis.Application/
 COPY Gis.Infrastructure/Gis.Infrastructure.csproj Gis.Infrastructure/
