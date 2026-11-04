@@ -1,14 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.15"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.19">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
@@ -18,9 +15,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\gis.ApplicationLayer\gis.ApplicationLayer.csproj" />
+      <ProjectReference Include="..\Gis.Application\Gis.Application.csproj" />
       <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
-      <ProjectReference Include="..\gis.InfrastructureLayer\gis.InfrastructureLayer.csproj" />
+      <ProjectReference Include="..\Gis.Infrastructure\Gis.Infrastructure.csproj" />
+      <ProjectReference Include="..\Tests\Tests.csproj" />
     </ItemGroup>
 
 </Project>

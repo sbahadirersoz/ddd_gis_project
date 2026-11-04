@@ -1,0 +1,26 @@
+[
+  {
+    "id": "TASK_4",
+    "priority": "MEDIUM",
+    "tags": [
+      "InfLayer"
+    ],
+    "title": "Inherit InettopologyContract",
+    "description": "Before them you should create a GeometryService also you can split them like  PoiGeometryService bla bla",
+    "status": "IN_PROGRESS",
+    "date": {
+      "date": {
+        "year": 2026,
+        "month": 8,
+        "day": 12
+      },
+      "time": {
+        "hour": 1,
+        "minute": 26,
+        "second": 28,
+        "nano": 159730300
+      }
+    },
+    "isImported": false
+  }
+]
