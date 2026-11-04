@@ -10,7 +10,7 @@ using gis.Domain.ResultPattern.Errors;
 
 namespace gis.Domain.Aggregates;
 
-public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
+public class POIAggregate : AggregateRoot<PointID>
 {
     public CoordinateValueObject CoordinateValueObject { get; private set; }
     public PointDescription? PointDesc { get; private set; }
@@ -169,8 +169,5 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
         return result.IsFailure ?  Result.Failure(result.Error) : Result.Success();
     }
 
-    public bool Equals(POIAggregate? other)
-    {
-        throw new NotImplementedException();
-    }
+
 }
