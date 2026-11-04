@@ -1,0 +1,12 @@
+﻿Point Ruleset:
+
+
+
+Line Ruleset:
+
+
+
+Polygon Ruleset
+
+
+Ring  Ruleset

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+      <Folder Include="Features\Poi\Queries\Distance\Name\" />
+      <Folder Include="Notification\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FluentValidation" Version="12.1.1" />
+      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+      <PackageReference Include="MediatR" Version="12.5.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
