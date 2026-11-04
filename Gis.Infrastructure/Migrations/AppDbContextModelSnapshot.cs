@@ -28,28 +28,43 @@ namespace Gis.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id");
 
                     b.Property<string>("Desc")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Desc");
 
                     b.Property<LineString>("LineString")
                         .IsRequired()
-                        .HasColumnType("geometry");
+                        .HasColumnType("geography(LineString, 4326)")
+                        .HasColumnName("Location");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("status")
+                        .HasComment("   ACTIVE =0,\n    INACTIVE =1,\n    SOFT_DELETED =2");
 
                     b.Property<string>("Wkt")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("Wkt");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LineString");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("LineString"), "GIST");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Line_Table");
                 });
