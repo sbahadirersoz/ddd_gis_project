@@ -1,6 +1,8 @@
 ﻿using Gis.Application.Mapper.LineMapper;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
+using gis.Domain.ResultPattern.Errors;
+
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +30,15 @@ public class FindClosestLineByLonLatHandler:IRequestHandler<FindClosestLineByLon
         
         
         var findClosestByLonLatAsync = await _repository.FindClosestByLonLatAsync(lon,lat, cancellationToken: cancellationToken);
-        var response = FindClosestLineByLonLatResponse.FromAgg(findClosestByLonLatAsync.agg, findClosestByLonLatAsync.distance);
+
+        if (!findClosestByLonLatAsync.HasValue)
+        {
+            return Result<FindClosestLineByLonLatResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+        }
+        
+        
+        var unit = findClosestByLonLatAsync.Value;
+        var response = FindClosestLineByLonLatResponse.FromAgg(unit.agg, unit.distance);
         return Result<FindClosestLineByLonLatResponse>.Success(response);
     }
 }

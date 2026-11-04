@@ -4,11 +4,14 @@ using gis.Domain.Entities.IDs;
 using gis.Domain.Entities.Information.Line;
 using gis.Domain.Entities.WKT;
 using gis.Domain.Repositories;
-using gis.Domain.ResultPattern;
+
 using Gis.Infrastructure.DB.Context;
 using Gis.Infrastructure.Entity;
 using Gis.Infrastructure.Mapper;
+
 using Microsoft.EntityFrameworkCore;
+
+using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 
@@ -18,6 +21,7 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
 {
     #region Common Methods
     public WKTReader reader = new();
+    private static readonly  GeometryFactory _geometryFactory =NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
 
     public async Task<LineAggregate?> FindByIdAsync(LineID id, bool tracking = true, CancellationToken cancellationToken = default)
     {
@@ -55,7 +59,9 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
 
     #endregion
 
+ 
     #region Distance Methods
+    
 
     
 
@@ -240,38 +246,52 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
     
     
     
+
     
-    
-    
-    /// <summary>
-    /// Lonlat
-    /// </summary>
-    /// <param name="lon"></param>
-    /// <param name="lat"></param>
-    /// <param name="count"></param>
-    /// <param name="tracking"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    
-    public async Task<List<LineAggregate>> FindLineStringsIncludingThisLonLat(Longitude lon, Latitude lat, int count, bool tracking = true,
+    public async Task<List<LineAggregate>> FindLineStringsIncludingThisLonLat(Longitude lon, Latitude lat, bool tracking = true,
         CancellationToken cancellationToken = default)
     {
         var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        var coordinate = new Coordinate(lon.Value, lat.Value);
-        var listAsync = await query.Where(x=> x.LineString.Coordinates.Contains(coordinate)).Select(x=> new {entity = x}).ToListAsync(cancellationToken: cancellationToken);
+        var point = _geometryFactory.CreatePoint(new Coordinate(lon.Value, lat.Value));
+        var listAsync = await query.Where(x=> x.LineString.IsWithinDistance(point,0.1)).Select(x=> new {entity = x}).ToListAsync(cancellationToken: cancellationToken);
         return listAsync.Select(x=> ToDomain(x.entity)).ToList();
     }
+
+ 
+
 
     public async Task<List<(LineAggregate agg ,double distance )>> FindMostClosesCountByLonLatAsync(Longitude lon, Latitude lat, int count, bool tracking = true,
         CancellationToken cancellationToken = default)
     {
         var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        var coordinate = new Coordinate(lon.Value, lat.Value);
         
-        var listAsync = await query.Select(x=> new {entity = x, distance = coordinate.Distance(x.LineString.Coordinate)}).OrderBy(x=> x.distance).Take(count).ToListAsync(cancellationToken: cancellationToken);
+        var targetPoint = _geometryFactory.CreatePoint(new Coordinate(lon.Value, lat.Value));
+
+        
+        var listAsync = await query.Select(x=> new {entity = x, distance = x.LineString.Distance(targetPoint)}).OrderBy(x=> x.distance).Take(count).ToListAsync(cancellationToken: cancellationToken);
         return listAsync.Select(x => (ToDomain(x.entity), x.distance)).ToList();
 
 
+    }
+    
+    
+    public async Task<(LineAggregate agg, double distance)?> FindClosestByLonLatAsync(Longitude lon, Latitude lat, bool tracking = true,
+        CancellationToken cancellationToken = default)
+    {
+        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
+    
+        var targetPoint = _geometryFactory.CreatePoint(new Coordinate(lon.Value, lat.Value));
+ 
+        var unit = await query
+            .Select(x => new
+            {
+                Entity = x,
+                Distance = x.LineString.Distance(targetPoint)
+            })
+            .OrderBy(x => x.Distance) 
+            .FirstOrDefaultAsync(cancellationToken);
+        return unit==null  ? null:(ToDomain(unit.Entity), unit.Distance);
+        
     }
 
     public async Task<List<(LineAggregate agg ,double distance )>> FindInRangeLinesByLonLatAsync(Longitude lon, Latitude lat, double distance, bool tracking = true,
@@ -279,38 +299,15 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
     {
         var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
     
-        var targetPoint = new Point(lon.Value, lat.Value) { SRID = 4326 };
+        var targetPoint = _geometryFactory.CreatePoint(new Coordinate(lon.Value, lat.Value));
 
         var entities = await query
-                .Select(x => new
-        {
-            Entity = x,
-            Distance = x.LineString.Distance(targetPoint)
-        })
+            .Select(x => new { Entity = x, Distance = x.LineString.Distance(targetPoint) })
             .Where(x => x.Entity.LineString.IsWithinDistance(targetPoint, distance))
-            .OrderBy(x => x.Distance) //
+            .OrderBy(x => x.Distance) 
             .ToListAsync(cancellationToken);
+        return entities.Select(x => (ToDomain(x.Entity), x.Distance)).ToList();
 
-        return entities.Select(x=> (ToDomain(x.Entity),x.Distance)).ToList();
-    }
-
-    public async Task<(LineAggregate agg, double distance)> FindClosestByLonLatAsync(Longitude lon, Latitude lat, bool tracking = true,
-        CancellationToken cancellationToken = default)
-    {
-        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-    
-        var targetPoint = new Point(lon.Value, lat.Value) { SRID = 4326 };
-        
-        var unit = await query
-            .Select(x => new
-            {
-                Entity = x,
-                Distance = x.LineString.Distance(targetPoint)
-            })
-            .OrderBy(x => x.Distance) //
-            .FirstOrDefaultAsync(cancellationToken);
-        return (ToDomain(unit.Entity), unit.Distance);
-        
     }
 
     #endregion
