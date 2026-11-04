@@ -1,7 +1,10 @@
 ﻿using System.Text.Json;
 using FluentAssertions;
+
+using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
+using gis.Domain.Entities.Events;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
@@ -144,4 +147,59 @@ public class PoiDomainServiceTest
         string toJson = JsonSerializer.Serialize(result);
         _testOutputHelper.WriteLine(toJson);
     }
+    
+    
+    
+    [Fact]
+    public async Task SoftDeletePoi_AlreadyDeleted_ReturnsFailure()
+    {
+        var poi = await CreateActivePoiAsync();
+        _poiService.SoftDeletePoi(poi);              // ilk silme
+
+        var result = _poiService.SoftDeletePoi(poi); // ikinci silme
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be(BusinessRuleErrors.ENTITY_ALREADY_SOFT_DELETED);
     }
+    
+    [Fact]
+    public async Task SoftDeletePoi_ActivePoi_SetsStatusToSoftDeleted()
+    {
+
+        var createdPoi = await CreateActivePoiAsync();
+        
+        
+        var result = _poiService.SoftDeletePoi(createdPoi);
+
+        result.IsSuccess.Should().BeTrue();
+        createdPoi.Status.Should().Be(POIStatus.SOFT_DELETED);
+    }
+    
+  
+    
+    [Fact]
+    public async Task SoftDeletePoi_ActivePoi_RaisesSoftDeletedEvent()
+    {
+        var poi = await CreateActivePoiAsync();
+        
+         _poiService.SoftDeletePoi(poi);
+
+        poi.DomainEvents.Should().ContainSingle(e => e is POISoftDeletedEvent);
+    }
+    private async Task<POIAggregate> CreateActivePoiAsync()
+    {
+        var lat = Latitude.Create(41.0082).Value;
+        var lon = Longitude.Create(28.9784).Value;
+        var desc = PointDescription.FromString("Sultanahmet").Value;
+        var name = PointName.FromString("Ayasofya").Value;
+
+        _pointRepository.IsLonLatCoordinatesExistsAsync(lat, lon).Returns(false);
+        _pointRepository.IsPointNameExistsAsync(name).Returns(false);
+        _contract.CreateWktStringFromLonLat(lat, lon)
+            .Returns(Result<string>.Success($"POINT ({lon.Value} {lat.Value})"));
+
+        return (await _poiService.CreatePoiAggregate(lat, lon, desc, name)).Value;
+    }
+    }
+
+

@@ -155,6 +155,8 @@ public class POIAggregate : AggregateRoot<PointID>,IEquatable<POIAggregate>
         var notDeleted = CheckRule(new PoiMustNotBeDeletedRule());
         
         if (notDeleted.IsFailure) return Result.Failure(notDeleted.Error);
+
+        Status = POIStatus.SOFT_DELETED;
         
         AddDomainEvent(POISoftDeletedEvent.Create(Id));
         return Result.Success();
