@@ -1,8 +1,7 @@
 ﻿using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.WKT;
 using gis.Domain.ResultPattern;
-using gis.Domain.ResultPattern.Errors;
-using Gis.Infrastructure.Topology_Services;
+
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -14,14 +13,10 @@ public static class CommonGeometryHelpers
     private static readonly GeometryFactory _geometryFactory =
         NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
     private static readonly WKTReader WktReader = new(_geometryFactory);
-
     
-    
-    
-    
-public static Result<string> FromLonLatCoordinatesToWKTString(Latitude latitude, Longitude longitude)
+public static Result<string> FromLonLatCoordinatesToWKTString( Longitude longitude,Latitude latitude)
     {
-        var fromLatLonToCoordinate = CoordinateFactory.FromLonLatToPoint(latitude, longitude);
+        var fromLatLonToCoordinate = CoordinateFactory.FromLonLatToPoint( longitude,latitude);
         return (fromLatLonToCoordinate.IsFailure)
             ? Result<string>.Failure(fromLatLonToCoordinate.Error)
             : Result<string>.Success(WKTWriter.ToPoint(fromLatLonToCoordinate.Value.Coordinate));

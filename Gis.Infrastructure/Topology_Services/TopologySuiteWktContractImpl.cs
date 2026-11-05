@@ -10,7 +10,7 @@ public class TopologySuiteWktContractImpl : ITopologySuiteWKTContract
 {
     public Result<string> CreateWktStringFromLonLat(Latitude latitude, Longitude longitude)
     {
-        var result = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString(latitude, longitude);
+        var result = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString( longitude,latitude);
         return result.IsFailure ? Result<string>.Failure(result.Error) : Result<string>.Success(result.Value);
     }
     public Result<string> CreateWktStringFromCoordList(List<CoordinateValueObject> coords)
