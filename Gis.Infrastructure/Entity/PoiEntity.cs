@@ -29,13 +29,14 @@ public class PoiEntity
 
     public static PoiEntity AggToEntity(POIAggregate agg)
     {
-        var PointFromCoords = new Point(agg.CoordinateValueObject.Latitude.Value,agg.CoordinateValueObject.Longitude.Value);
+        var pointFromCoords = CoordinateFactory.LonLatToPoint(agg.CoordinateValueObject.Longitude,
+            agg.CoordinateValueObject.Latitude);
         var id = agg.Id.Value;
         var pointNameValue = agg.PointName.Value;
         var pointDescValue = agg.PointDesc.Value;
         var wktValue = agg.CoordinateValueObject.WKT.Value;
         var status = (int)agg.Status;
-        return new PoiEntity(id, PointFromCoords, pointNameValue,pointDescValue, wktValue, status);
+        return new PoiEntity(id, pointFromCoords, pointNameValue,pointDescValue, wktValue, status);
     }
 
     internal void SoftDelete()
@@ -52,9 +53,9 @@ public class PoiEntity
         Desc = desc;
     }internal void ChangeCoords(Latitude lat ,Longitude lng)
     {
-        var coord = CoordinateFactory.FromLonLatToPoint(lat,lng); 
+        var coord = CoordinateFactory.FromLonLatToPoint(lng,lat); 
         if (coord.IsFailure) return;
-        var fromLonLatCoordinatesToWktString = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString(lat,lng);
+        var fromLonLatCoordinatesToWktString = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString(lng,lat);
         if (fromLonLatCoordinatesToWktString.IsFailure) return;
         Point = coord.Value;
         Wkt = fromLonLatCoordinatesToWktString.Value; 

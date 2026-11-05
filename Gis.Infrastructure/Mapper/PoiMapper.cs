@@ -49,7 +49,7 @@ public class PoiMapper:IMapperContract<POIAggregate,PoiEntity>
         var pointCoordinates = point.Coordinates[0];
         var lon = Longitude.Create(pointCoordinates.X).Value;
         var lat = Latitude.Create(pointCoordinates.Y).Value;
-        var fromLonLatCoordinatesToWktString = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString(lat,lon);
+        var fromLonLatCoordinatesToWktString = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString(lon,lat);
         var wkt = WellKnownText.Create(fromLonLatCoordinatesToWktString.Value).Value;
         return CoordinateValueObject.FromLonLat(lat, lon, wkt).Value;
     }

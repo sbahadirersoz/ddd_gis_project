@@ -9,9 +9,9 @@ namespace Gis.Infrastructure.HelperMethods;
 public static class CoordinateFactory
 {
     private static readonly  GeometryFactory _geometryFactory =NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
-    public static Result<Point> FromLonLatToPoint(Latitude latitude, Longitude longitude)
+    public static Result<Point> FromLonLatToPoint( Longitude longitude,Latitude latitude)
     {
-        var point = new Point(longitude.Value,latitude.Value);
+        var point = _geometryFactory.CreatePoint(new Coordinate(longitude.Value,latitude.Value));
         return !point.IsValid
             ? Result<Point>.Failure(DomainErrors.POIErrors.Coordinate.BAD_CREDENTIALS_FOR_COORDINATES)
             : Result<Point>.Success(point);
@@ -24,7 +24,7 @@ public static class CoordinateFactory
             : Result<Coordinate>.Success(point);
     }
 
-    public static Point LonLatToPoint(Longitude longitude, Latitude latitude)=> new (longitude.Value,latitude.Value);
+    public static Point LonLatToPoint(Longitude longitude, Latitude latitude)=> _geometryFactory.CreatePoint(new Coordinate(longitude.Value,latitude.Value));
     public static LineString CoordinatesToLineString(List<Coordinate> coords) => new ([.. coords]);
         
     public static List<Coordinate> FromCoordListToCoordinates(List<CoordinateValueObject> coords)

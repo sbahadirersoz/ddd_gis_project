@@ -34,7 +34,7 @@ public class LineMapper:IMapperContract<LineAggregate,LineEntity>
         return line.Coordinates.Select(x =>
             {
                 var Lon = Longitude.Create(x.X).Value;
-                var Lat = Latitude.Create(x.X).Value;
+                var Lat = Latitude.Create(x.Y).Value;
                 return CoordinateValueObject.ForLineCoordCreation(Lat, Lon).Value;
             }
         ).ToList
