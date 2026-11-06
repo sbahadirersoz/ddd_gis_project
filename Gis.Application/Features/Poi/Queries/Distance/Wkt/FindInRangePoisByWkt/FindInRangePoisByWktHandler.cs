@@ -19,13 +19,13 @@ public class FindInRangePoisByWktHandler:IRequestHandler<FindInRangePoisByWktQue
         _wktContract = wktContract;
     }
 
-    public async Task<Result<List<FindInRangePoisByWktResponse>>> Handle(FindInRangePoisByWktQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<FindInRangePoisByWktResponse>>> Handle(FindInRangePoisByWktQuery request, CancellationToken cancellationToken  = default)
     {
         var wkt = _wktContract.ParsePointWkt(request.wkt);
         if (wkt.IsFailure) return  Result<List<FindInRangePoisByWktResponse>>.Failure(wkt.Error);
         
         var findInRangePoisByWktAsync = await _repository.FindInRangePoisByWktAsync(wkt.Value, request.distance, cancellationToken: cancellationToken);
         var result = findInRangePoisByWktAsync.ConvertAll(x=> FindInRangePoisByWktResponse.FromAgg(x.agg,x.distance));
-return Result<List<FindInRangePoisByWktResponse>>.Success(result);
+        return Result<List<FindInRangePoisByWktResponse>>.Success(result);
     }
 }

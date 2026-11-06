@@ -19,7 +19,7 @@ public class FindMostClosesCountPoiByWktQueryHandler:IRequestHandler<FindMostClo
         _wktContract = wktContract;
     }
 
-    public async Task<Result<List<FindMostClosesCountPoiByWktQueryResponse>>> Handle(FindMostClosesCountPoiByWktQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<FindMostClosesCountPoiByWktQueryResponse>>> Handle(FindMostClosesCountPoiByWktQuery request, CancellationToken cancellationToken =default)
     {
         var wkt = _wktContract.ParsePointWkt(request.wkt);
         if (wkt.IsFailure) return Result<List<FindMostClosesCountPoiByWktQueryResponse>>.Failure(wkt.Error);

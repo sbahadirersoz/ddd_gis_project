@@ -7,7 +7,6 @@ using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.WKT;
 using gis.Domain.Repositories;
-using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
 
 using Gis.Infrastructure.Topology_Services;
@@ -55,17 +54,18 @@ public class FindClosestPoiByWktHandlerTests
         _repository.FindClosestPoiByWktAsync(Arg.Any<WellKnownText>()).Returns((mockPoi,55.0));
 
         var mock = new FindClosestPoiByWktQuery("POINT(45 22)");
+        var expectedWKT = WellKnownText.Create("POINT(45 22)");
         var resResponse = FindClosestPoiByWktResponse.CreateFromAgg(mockPoi,55.0);
         var handle = await _handler.Handle(mock);
+        await _repository.Received(1).FindClosestPoiByWktAsync(expectedWKT.Value);
+        
         handle.Value.Should().Be(resResponse);
     }    [Fact]
     public async Task FIND_CLOSEST_POI_BY_WKT_IS_INVALID()
     {
 
         var mockPoi = await PoiHelperTestMethods.MockPoiCreation("mockPoi", "MockDesc", new CoordinateDto(44, 35));
-        _contract.ParsePointWkt(Arg.Any<string>())
-            .Returns(Result<WellKnownText>.Failure((DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT)));
-        var mock = new FindClosestPoiByWktQuery("POINT(45 22}");
+              var mock = new FindClosestPoiByWktQuery("POINT(45 22}");
         var resResponse = FindClosestPoiByWktResponse.CreateFromAgg(mockPoi,55.0);
         var handle = await _handler.Handle(mock);
         handle.Error.Should().Be(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
