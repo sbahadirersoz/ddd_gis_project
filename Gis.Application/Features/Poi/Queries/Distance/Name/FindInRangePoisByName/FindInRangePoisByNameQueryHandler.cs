@@ -19,17 +19,16 @@ public class FindInRangePoisByNameQueryHandler
         _repository = repository;
     }
 
-    public async Task<Result<List<FindInRangePoisByNameQueryResponse>>> Handle(FindInRangePoisByNameQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<FindInRangePoisByNameQueryResponse>>> Handle(FindInRangePoisByNameQuery request, CancellationToken cancellationToken = default)
     {
         var fromString = PointName.FromString(request.name);
         if (fromString.IsFailure) return Result<List<FindInRangePoisByNameQueryResponse>>.Failure(fromString.Error);
         
         var isExist = await _repository.IsPointNameExistsAsync(fromString.Value, cancellationToken);
         if (!isExist) return Result<List<FindInRangePoisByNameQueryResponse>>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+
         var findInRangePoisByNameAsync = await _repository.FindInRangePoisByNameAsync(fromString.Value,request.distance, cancellationToken: cancellationToken);
         _logger.LogInformation($"Found {findInRangePoisByNameAsync.Count} pois information");
-        if (findInRangePoisByNameAsync == null || findInRangePoisByNameAsync.Count == 0)
-            return Result<List<FindInRangePoisByNameQueryResponse>>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
         
         var result = findInRangePoisByNameAsync.Select(x=> FindInRangePoisByNameQueryResponse.FromAgg(x.agg,x.distance)).ToList();
         return Result<List<FindInRangePoisByNameQueryResponse>>.Success(result);
