@@ -5,6 +5,7 @@ using Gis.Application.Features.Poi.Queries.Distance.Id.FindInRangePoisById;
 using Gis.Application.Features.Poi.Queries.FindPoisInGivenRange;
 
 using gis.Domain.Aggregates;
+using gis.Domain.Contracts;
 using gis.Domain.Entities.IDs;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern.Errors;
@@ -26,9 +27,11 @@ public class FindMostClosesCountByIdQueryHandlerTests
     private readonly ILogger<FindMostClosesCountByIdQueryHandler> _logger;
     private readonly FindMostClosesCountByIdQueryHandler _handler;
     private readonly IPointRepository _pointRepository;
+    private readonly ITopologySuiteWKTContract _contract;
 
     public FindMostClosesCountByIdQueryHandlerTests(ITestOutputHelper testOutputHelper)
     {
+        _contract = Substitute.For<ITopologySuiteWKTContract>();
         _testOutputHelper = testOutputHelper;
         _logger = Substitute.For<ILogger<FindMostClosesCountByIdQueryHandler>>();
         _pointRepository = Substitute.For<IPointRepository>();
