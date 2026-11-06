@@ -14,7 +14,7 @@ public class FindClosestPoiByNameQueryHandler(
 {
     private readonly ILogger<FindClosestPoiByNameQueryHandler> _logger = logger;
 
-    public async Task <Result<FindClosestPoiByNameQueryResponse>> Handle(FindClosestPoiByNameQuery request, CancellationToken cancellationToken)
+    public async Task <Result<FindClosestPoiByNameQueryResponse>> Handle(FindClosestPoiByNameQuery request, CancellationToken cancellationToken   = default)
     {
 
         var name = PointName.FromString(request.name);
