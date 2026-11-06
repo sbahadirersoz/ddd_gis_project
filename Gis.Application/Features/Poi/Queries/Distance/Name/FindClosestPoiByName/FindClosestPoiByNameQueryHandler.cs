@@ -19,8 +19,10 @@ public class FindClosestPoiByNameQueryHandler(
 
         var name = PointName.FromString(request.name);
         if (name.IsFailure) return Result<FindClosestPoiByNameQueryResponse>.Failure(name.Error);
+        var source = await repository.FindPointByPointNameAsync(name.Value, cancellationToken: cancellationToken);
+        if (source is null) return Result<FindClosestPoiByNameQueryResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         var entity = await repository.FindClosestPoiByName(name.Value, cancellationToken: cancellationToken);
-         if (entity == null) return Result<FindClosestPoiByNameQueryResponse>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
+         if (entity == null) return Result<FindClosestPoiByNameQueryResponse>.Failure(RepositoryErrors.NO_NEIGHBOR_FOUND);
          var result = FindClosestPoiByNameQueryResponse.FromAgg(entity.Value.agg,entity.Value.distance);
          return Result<FindClosestPoiByNameQueryResponse>.Success(result);
     }
