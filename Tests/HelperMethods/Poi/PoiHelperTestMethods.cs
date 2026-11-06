@@ -23,7 +23,7 @@ public static class PoiHelperTestMethods
     _repository = Substitute.For<IPointRepository>();
     _service = new POIDomainService(_repository,_contract);
     }
-    public static async Task<POIAggregate> MockPrevPoiCreation(string mockName,string mockDesc,CoordinateDto dto)
+    public static async Task<POIAggregate> MockPoiCreation(string mockName,string mockDesc,CoordinateDto dto)
     {
         var mockCommand = new CreatePoiCommand
         (
@@ -43,9 +43,9 @@ public static class PoiHelperTestMethods
     }    
     public static async Task<List<POIAggregate>> mockList()
     {
-        var unit1 =  await PoiHelperTestMethods.MockPrevPoiCreation("unit1","unit1desc",new CoordinateDto(41,42) );
-        var unit2 = await PoiHelperTestMethods.MockPrevPoiCreation("unit2","unit2desc",new CoordinateDto(41,43));
-        var unit3 = await PoiHelperTestMethods.MockPrevPoiCreation("unit3","unit3desc",new CoordinateDto(41,44));
+        var unit1 =  await PoiHelperTestMethods.MockPoiCreation("unit1","unit1desc",new CoordinateDto(41,42) );
+        var unit2 = await PoiHelperTestMethods.MockPoiCreation("unit2","unit2desc",new CoordinateDto(41,43));
+        var unit3 = await PoiHelperTestMethods.MockPoiCreation("unit3","unit3desc",new CoordinateDto(41,44));
         List<POIAggregate> l = new List<POIAggregate>();
         l.Add(unit1);
         l.Add(unit2);

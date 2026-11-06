@@ -31,7 +31,7 @@ public class FindNearestCountPoiByNameHandlerTests
     [Fact]
     public async Task Success_Case()
     {
-        var unit1 =  await PoiHelperTestMethods.MockPrevPoiCreation("unit1","unit1desc",new CoordinateDto(41,42));
+        var unit1 =  await PoiHelperTestMethods.MockPoiCreation("unit1","unit1desc",new CoordinateDto(41,42));
 
         var list = await PoiHelperTestMethods.mockList();
         var mockListWithDistance = new List<(POIAggregate x, double s)>();

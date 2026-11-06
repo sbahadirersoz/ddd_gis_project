@@ -50,7 +50,7 @@ public class UpdatePoiCommandHandlerTests
     [Fact]
     public async Task UpdatePoiCommandHandler_Success_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("TestName","Description" ,  new CoordinateDto(42,42));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("TestName","Description" ,  new CoordinateDto(42,42));
         //     "TestName",
         //     "Description",
         //     42,
@@ -80,7 +80,7 @@ public class UpdatePoiCommandHandlerTests
     [Fact]
     public async Task UpdatePoiCommandHandler_NullName_Failure_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,38));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,38));
         //     "TestName",
         //     "Description",
         //     42,
@@ -116,7 +116,7 @@ public class UpdatePoiCommandHandlerTests
     [Fact]
     public async Task? UpdatePoiCommandHandler_NothingChanged_Failure_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,42));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,42));
         //     "TestName",
         //     "Description",
         //     42,
@@ -153,7 +153,7 @@ public class UpdatePoiCommandHandlerTests
     }  [Fact]
     public async Task? UpdatePoiCommandHandler_PoiNotFound_Failure_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,42));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,42));
         //     "TestName",
         //     "Description",
         //     42,

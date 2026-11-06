@@ -56,7 +56,7 @@ public class FindClosestPoiByNameHandlerTest
     [Fact]
     public async Task POI_NEIGHBOR_NOT_FOUND()
     {  
-         var findPointByPointNameAsyncFoundResultPoi = await  PoiHelperTestMethods.MockPrevPoiCreation("MockName","MockDescCreate",new CoordinateDto(42,45));
+         var findPointByPointNameAsyncFoundResultPoi = await  PoiHelperTestMethods.MockPoiCreation("MockName","MockDescCreate",new CoordinateDto(42,45));
         _pointRepository.FindPointByPointNameAsync(Arg.Any<PointName>()).Returns(findPointByPointNameAsyncFoundResultPoi);
         _pointRepository.FindClosestPoiByName(Arg.Any<PointName>()).ReturnsNull();
         
@@ -69,8 +69,8 @@ public class FindClosestPoiByNameHandlerTest
     [Fact]
        public async Task POI_NEIGHBOR_FOUND_SUCCES()
     {  
-         var findPointByPointNameAsyncResult = await  PoiHelperTestMethods.MockPrevPoiCreation("MockName","MockDescCreate",new CoordinateDto(42,45));
-         var findNearestPointByNameAsyncResult = await  PoiHelperTestMethods.MockPrevPoiCreation("NeighBor","MockDescCreate",new CoordinateDto(42,45));
+         var findPointByPointNameAsyncResult = await  PoiHelperTestMethods.MockPoiCreation("MockName","MockDescCreate",new CoordinateDto(42,45));
+         var findNearestPointByNameAsyncResult = await  PoiHelperTestMethods.MockPoiCreation("NeighBor","MockDescCreate",new CoordinateDto(42,45));
          
         _pointRepository.FindPointByPointNameAsync(Arg.Any<PointName>()).Returns(findPointByPointNameAsyncResult);
         var resultTuple = new ValueTuple<POIAggregate, double>(findNearestPointByNameAsyncResult, 552);
