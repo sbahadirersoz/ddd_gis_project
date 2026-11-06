@@ -251,17 +251,14 @@ public class PointRepository : GenericRepository<POIAggregate, PointID, PoiEntit
     {
         var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
 
-        var targetPoint = (Point)reader.Read(wellKnownText.Value);
+        var targetPoint = ReadWktPoint(wellKnownText);
 
         var nearest = await query
-            .Where(x=> !x.Point.Equals(targetPoint))
-                
-            .Select(x => new 
-            { 
-                Entity = x, 
-                Distance = x.Point.Distance(targetPoint) 
+            .Select(x => new
+            {
+                Entity = x,
+                Distance = x.Point.Distance(targetPoint)
             })
-            .Where(x => x.Distance > 0.000001)
             .OrderBy(x => x.Distance)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -288,22 +285,18 @@ public class PointRepository : GenericRepository<POIAggregate, PointID, PoiEntit
         CancellationToken cancellationToken = default)
     {
         var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        var targetPoint = (Point)reader.Read(wellKnownText.Value);
-        var entity =
-            await query.FirstOrDefaultAsync(x => x.Point.Equals(targetPoint),
-                cancellationToken: cancellationToken);
-        if (entity == null) return new();
-        var poiEntities = query
-            .Where(x => !x.Point.Equals(targetPoint) && x.Point.IsWithinDistance(entity.Point, distance))
+        var targetPoint = ReadWktPoint(wellKnownText);
+        var poiEntities = await query
+            .Where(x => x.Point.IsWithinDistance(targetPoint, distance))
             .Select(x => new
                 {
                     entity = x,
-                    distance = entity.Point.Distance(x.Point)
+                    distance = targetPoint.Distance(x.Point)
 
                 }
             )
-            .OrderBy(x => x.entity.Point.Distance(entity.Point))
-            .ToList();
+            .OrderBy(x => x.distance)
+            .ToListAsync(cancellationToken);
         return poiEntities.Select(x => (ToDomain(x.entity), x.distance)).ToList();
 
     }
@@ -312,13 +305,18 @@ public class PointRepository : GenericRepository<POIAggregate, PointID, PoiEntit
         CancellationToken cancellationToken = default)
     {
         var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        var target = (Point)reader.Read(wellKnownText.Value);
-        var entity = await query.FirstOrDefaultAsync(x => x.Point == target, cancellationToken: cancellationToken);
-        if (entity == null) return new List<(POIAggregate agg, double distance)>();
-        var list = await query.Where(x => x.Id != entity.Id)
-            .Select(x => new { entity = x, distance = entity.Point.Distance(x.Point) }).OrderBy(x => x.distance)
+        var target = ReadWktPoint(wellKnownText);
+        var list = await query
+            .Select(x => new { entity = x, distance = target.Distance(x.Point) }).OrderBy(x => x.distance)
             .Take(count).ToListAsync(cancellationToken: cancellationToken);
         return list.Select(x => (agg: ToDomain(x.entity), distance: x.distance)).ToList();
+    }
+
+    private Point ReadWktPoint(WellKnownText wellKnownText)
+    {
+        var point = (Point)reader.Read(wellKnownText.Value);
+        point.SRID = 4326;
+        return point;
     }
 
 
