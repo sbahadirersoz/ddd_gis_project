@@ -6,5 +6,5 @@ public record FindInRangePoisByWktResponse(string name, string wkt,double distan
 {
 
     public static FindInRangePoisByWktResponse FromAgg(POIAggregate agg,double distanceByMeters) =>
-        new FindInRangePoisByWktResponse(agg.PointName.Value, agg.CoordinateValueObject.WKT.Value,distanceByMeters);
+        new FindInRangePoisByWktResponse(agg.PointName.Value, agg.CoordinateValueObject.WKT.Value,Math.Round(distanceByMeters,2));
 }

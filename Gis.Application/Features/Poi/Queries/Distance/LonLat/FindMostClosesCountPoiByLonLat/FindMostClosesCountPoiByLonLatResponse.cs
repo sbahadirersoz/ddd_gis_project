@@ -2,7 +2,7 @@
 
 namespace Gis.Application.Features.Poi.Queries.Distance.LonLat.FindMostClosesCountPoiByLonLat;
 
-public record FindMostClosesCountPoiByLonLatResponse(string name, string wkt, double distance)
+public record FindMostClosesCountPoiByLonLatResponse(string name, string wkt, double distanceByMeters)
 {
-    public static FindMostClosesCountPoiByLonLatResponse FromAgg(POIAggregate agg , double distance) => new (agg.PointName.Value,agg.CoordinateValueObject.WKT.Value,Math.Round(distance,2));
+    public static FindMostClosesCountPoiByLonLatResponse FromAgg(POIAggregate agg , double distanceByMeters) => new (agg.PointName.Value,agg.CoordinateValueObject.WKT.Value,Math.Round(distanceByMeters,2));
 }

@@ -80,7 +80,7 @@ public class FindClosestPoiByNameHandlerTest
         
         res.IsFailure.Should().Be(false);
         res.Value.name.Should().Be(findNearestPointByNameAsyncResult.PointName.Value);
-        res.Value.distanceBYMeters.Should().Be(resultTuple.Item2);
+        res.Value.distanceByMeters.Should().Be(resultTuple.Item2);
     }
    
 }
