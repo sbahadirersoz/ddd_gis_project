@@ -341,7 +341,6 @@ public class PointRepository : GenericRepository<POIAggregate, PointID, PoiEntit
                 Entity = x,
                 Distance = x.Point.Distance(givenPoint)
             })
-            .Where(x => x.Distance > 0.000001)
             .OrderBy(x => x.Distance)         
             .FirstOrDefaultAsync(cancellationToken);
 
