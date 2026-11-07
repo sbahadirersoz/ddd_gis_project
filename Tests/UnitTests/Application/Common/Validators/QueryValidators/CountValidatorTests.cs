@@ -30,6 +30,7 @@ public class CountValidatorTests
     
     [Theory]
     [InlineData(-1)]
+    [InlineData(0)]
     [InlineData(13)]
     public void Validate_CountOutOfRange_ReturnsSingleInvalidCountError(int count)
     {
