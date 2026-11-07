@@ -20,7 +20,7 @@ public class FindClosestPoiByLonLatHandler:IRequestHandler<FindClosestPoiByLonLa
 
     public async Task<Result<FindClosestPoiByLonLatResponse>> Handle(FindClosestPoiByLonLatQuery request, CancellationToken cancellationToken)
     {
-        var lonLatFromPrimitive = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.Lonlat.Longitude,request.Lonlat.Latitude);
+        var lonLatFromPrimitive = PointAggregateVOMapper.CreateLonLatFromPrimitive(longitude: request.lon, latitude: request.lat);
         if (lonLatFromPrimitive.IsFailure) return  Result<FindClosestPoiByLonLatResponse>.Failure(lonLatFromPrimitive.Error);
         var lon = lonLatFromPrimitive.Value.Item1;
         var lat = lonLatFromPrimitive.Value.Item2;

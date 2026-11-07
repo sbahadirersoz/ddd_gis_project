@@ -24,7 +24,7 @@ public class FindInRangePoisByLonLatHandler:IRequestHandler<FindInRangePoisByLon
 
     public async Task<Result<List<FindInRangePoisByLonLatResponse>>> Handle(FindInRangePoisByLonLatQuery request, CancellationToken cancellationToken = default)
     {
-        var Lonlat = PointAggregateVOMapper.CreateLonLatFromPrimitive(request.lonlat.Longitude,request.lonlat.Latitude);
+        var Lonlat = PointAggregateVOMapper.CreateLonLatFromPrimitive(longitude: request.lon, latitude: request.lat);
         if (Lonlat.IsFailure) return Result<List<FindInRangePoisByLonLatResponse>>.Failure(Lonlat.Error);
         var lon = Lonlat.Value.Item1;
         var lat = Lonlat.Value.Item2;
