@@ -30,21 +30,19 @@ public class POIDomainService
         Longitude? newLongitude,
         PointDescription? newPointDesc, PointName? newPointName, POIStatus? newStatus)
     {
-        bool hasChanges = 
-            (
-            newLatitude is not null && !newLatitude.Equals(poi.CoordinateValueObject.Latitude) ||
-            newLongitude is not null && !newLongitude.Equals(poi.CoordinateValueObject.Longitude) ||
-            newPointDesc is not null && !newPointDesc.Equals(poi.PointDesc) ||
-            newPointName is not null && !newPointName.Equals(poi.PointName) ||
-            newStatus is not null && !newStatus.Equals(poi.Status)
-            );
+        // a field counts as changed only when it is sent and differs from the current value
+        bool latitudeChanged = newLatitude is not null && !newLatitude.Equals(poi.CoordinateValueObject.Latitude);
+        bool longitudeChanged = newLongitude is not null && !newLongitude.Equals(poi.CoordinateValueObject.Longitude);
+        bool descChanged = newPointDesc is not null && !newPointDesc.Equals(poi.PointDesc);
+        bool nameChanged = newPointName is not null && !newPointName.Equals(poi.PointName);
+        bool statusChanged = newStatus is not null && !newStatus.Equals(poi.Status);
 
-        if (!hasChanges)
+        if (!(latitudeChanged || longitudeChanged || descChanged || nameChanged || statusChanged))
         {
             return Result<POIAggregate>.Failure(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
         }
 
-        if (newLatitude != null || newLongitude != null)
+        if (latitudeChanged || longitudeChanged)
         {
             
             var targetLatitude = newLatitude ??  poi.CoordinateValueObject.Latitude  ; 
@@ -53,16 +51,16 @@ public class POIDomainService
             if (changePointCoordinatesAsync.IsFailure)
                 return Result<POIAggregate>.Failure(changePointCoordinatesAsync.Error);
         }
-        if (newPointName != null)
+        if (nameChanged)
         {
             var changePointName = await ChangePointNameAsync(poi, newPointName!);
             if (changePointName.IsFailure)
                 return Result<POIAggregate>.Failure(changePointName.Error);
         }
-        if (newPointDesc != null)
+        if (descChanged)
             poi.ChangePointDesc(newPointDesc!);
-        
-        if (newStatus != null)
+
+        if (statusChanged)
             poi.ChangeStatus(newStatus!.Value);
         return Result<POIAggregate>.Success(poi);
     }

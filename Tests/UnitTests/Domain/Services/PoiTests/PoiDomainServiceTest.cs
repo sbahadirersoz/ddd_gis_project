@@ -186,6 +186,50 @@ public class PoiDomainServiceTest
 
         poi.DomainEvents.Should().ContainSingle(e => e is POISoftDeletedEvent);
     }
+    [Fact]
+    public async Task UpdatePoi_SameNameWithNewDesc_SkipsNameCheckAndSucceeds()
+    {
+        var poi = await CreateActivePoiAsync();
+        // in the real db the poi's own name exists, so the uniqueness check would say "taken"
+        _pointRepository.IsPointNameExistsAsync(poi.PointName).Returns(true);
+        _pointRepository.ClearReceivedCalls();
+
+        var newDesc = PointDescription.FromString("Updated desc").Value;
+        var result = await _poiService.UpdatePoiAggregate(poi, null, null, newDesc, poi.PointName, null);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.PointDesc.Should().Be(newDesc);
+        await _pointRepository.DidNotReceive().IsPointNameExistsAsync(Arg.Any<PointName>());
+    }
+
+    [Fact]
+    public async Task UpdatePoi_SameCoordinatesWithNewDesc_SkipsCoordinateCheckAndSucceeds()
+    {
+        var poi = await CreateActivePoiAsync();
+        var lat = poi.CoordinateValueObject.Latitude;
+        var lon = poi.CoordinateValueObject.Longitude;
+        _pointRepository.IsLonLatCoordinatesExistsAsync(lat, lon).Returns(true);
+        _pointRepository.ClearReceivedCalls();
+
+        var newDesc = PointDescription.FromString("Updated desc").Value;
+        var result = await _poiService.UpdatePoiAggregate(poi, lat, lon, newDesc, null, null);
+
+        result.IsSuccess.Should().BeTrue();
+        await _pointRepository.DidNotReceive().IsLonLatCoordinatesExistsAsync(Arg.Any<Latitude>(), Arg.Any<Longitude>());
+    }
+
+    [Fact]
+    public async Task UpdatePoi_NameTakenByAnotherPoi_ReturnsAlreadyExists()
+    {
+        var poi = await CreateActivePoiAsync();
+        var otherName = PointName.FromString("Galata").Value;
+        _pointRepository.IsPointNameExistsAsync(otherName).Returns(true);
+
+        var result = await _poiService.UpdatePoiAggregate(poi, null, null, null, otherName, null);
+
+        result.Error.Should().Be(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB);
+    }
+
     private async Task<POIAggregate> CreateActivePoiAsync()
     {
         var lat = Latitude.Create(41.0082).Value;
