@@ -1,6 +1,16 @@
-﻿namespace Gis.Application.Features.Poi.Queries.Distance.LonLat.FindInRangePoisByLonLat;
+﻿using FluentValidation;
 
-public class FindInRangePoisByLonLatValidator
+using Gis.Application.Common.Validators;
+using Gis.Application.Common.Validators.QueryValidators;
+
+namespace Gis.Application.Features.Poi.Queries.Distance.LonLat.FindInRangePoisByLonLat;
+
+public class FindInRangePoisByLonLatValidator:AbstractValidator<FindInRangePoisByLonLatQuery>
 {
-    
+    public FindInRangePoisByLonLatValidator()
+    {
+        RuleFor(x => x.distance).SetValidator(new RangeValidator());
+        RuleFor(x => x.lonlat).SetValidator(new CoordinateValidator());
+        
+    }
 }
