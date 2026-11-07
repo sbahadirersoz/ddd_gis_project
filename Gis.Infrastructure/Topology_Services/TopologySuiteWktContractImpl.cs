@@ -48,6 +48,9 @@ public class TopologySuiteWktContractImpl : ITopologySuiteWKTContract
         var latitude = Latitude.Create(point.Y);
         if (latitude.IsFailure) return Result<WellKnownText>.Failure(latitude.Error);
 
-        return created;
+        var moreThan2D = (!double.IsNaN(point.Z) || !double.IsNaN(point.M));
+         return
+        (moreThan2D)? Result<WellKnownText>.Failure(DomainErrors.WKT.ONLY_2D_POINTS_SUPPORTED): 
+        created;
     }
 }

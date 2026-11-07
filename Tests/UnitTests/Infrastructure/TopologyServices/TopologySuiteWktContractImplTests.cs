@@ -44,6 +44,18 @@ public class TopologySuiteWktContractImplTests
         result.IsFailure.Should().BeTrue();
     }
 
+    [Theory]
+    [InlineData("POINT (29 41 100)")]
+    [InlineData("POINT Z (29 41 100)")]
+    [InlineData("POINT M (29 41 5)")]
+    [InlineData("POINT ZM (29 41 100 5)")]
+    public void PARSE_POINT_WKT_WITH_Z_OR_M_RETURNS_ONLY_2D_ERROR(string wkt)
+    {
+        var result = _contract.ParsePointWkt(wkt);
+
+        result.Error.Should().Be(DomainErrors.WKT.ONLY_2D_POINTS_SUPPORTED);
+    }
+
     [Fact]
     public void PARSE_POINT_WKT_LONGITUDE_OUT_OF_RANGE_RETURNS_FAILURE()
     {
