@@ -73,7 +73,7 @@ public class PoiDomainServiceTest
 
         _pointRepository.IsLonLatCoordinatesExistsAsync(lat.Value,lon.Value).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name.Value).Returns(false);
-        _contract.CreateWktStringFromLonLat(lat.Value,lon.Value).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,lat.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {lat.Value})"));
 
         // Act
         var result = await _poiService.CreatePoiAggregate(lat.Value,lon.Value, desc.Value, name.Value);
@@ -117,7 +117,7 @@ public class PoiDomainServiceTest
       
         _pointRepository.IsLonLatCoordinatesExistsAsync(lat.Value,lon.Value).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name.Value).Returns(false);
-        _contract.CreateWktStringFromLonLat(lat.Value,lon.Value).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,lat.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {lat.Value})"));
 
         // Act
         var result = await _poiService.CreatePoiAggregate(lat.Value, lon.Value, desc.Value, name.Value);
@@ -141,7 +141,7 @@ public class PoiDomainServiceTest
         var name =  PointName.FromString("MockLocation").Value;
         _pointRepository.IsLonLatCoordinatesExistsAsync(lat,lon).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name).Returns(false);
-        _contract.CreateWktStringFromLonLat(lat,lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon,lat).Returns(Result<string>.Success($"POINT ({lon.Value} {lat.Value})"));
         
         var result = await _poiService.CreatePoiAggregate(lat,lon, desc, name);
         string toJson = JsonSerializer.Serialize(result);
@@ -195,7 +195,7 @@ public class PoiDomainServiceTest
 
         _pointRepository.IsLonLatCoordinatesExistsAsync(lat, lon).Returns(false);
         _pointRepository.IsPointNameExistsAsync(name).Returns(false);
-        _contract.CreateWktStringFromLonLat(lat, lon)
+        _contract.CreateWktStringFromLonLat( lon,lat)
             .Returns(Result<string>.Success($"POINT ({lon.Value} {lat.Value})"));
 
         return (await _poiService.CreatePoiAggregate(lat, lon, desc, name)).Value;

@@ -149,7 +149,7 @@ public class POIDomainService
 
     private Result<CoordinateValueObject> CreateCoordinateFromLonLat(Latitude latitude, Longitude longitude)
     {
-        var wktString = _contract.CreateWktStringFromLonLat(latitude, longitude);
+        var wktString = _contract.CreateWktStringFromLonLat(longitude,latitude);
         
          if (wktString.IsFailure)return Result<CoordinateValueObject>.Failure(wktString.Error);
         var wktFromContract = WellKnownText.Create(wktString.Value);

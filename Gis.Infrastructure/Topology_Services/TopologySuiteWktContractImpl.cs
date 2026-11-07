@@ -11,7 +11,7 @@ namespace Gis.Infrastructure.Topology_Services;
 
 public class TopologySuiteWktContractImpl : ITopologySuiteWKTContract
 {
-    public Result<string> CreateWktStringFromLonLat(Latitude latitude, Longitude longitude)
+    public Result<string> CreateWktStringFromLonLat( Longitude longitude,Latitude latitude)
     {
         var result = CommonGeometryHelpers.FromLonLatCoordinatesToWKTString( longitude,latitude);
         return result.IsFailure ? Result<string>.Failure(result.Error) : Result<string>.Success(result.Value);
