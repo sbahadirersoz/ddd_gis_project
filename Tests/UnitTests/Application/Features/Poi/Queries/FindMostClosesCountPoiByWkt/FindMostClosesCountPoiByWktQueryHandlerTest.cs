@@ -78,7 +78,6 @@ public class FindMostClosesCountPoiByWktQueryHandlerTest
 
 
         
-        var resResponse = FindMostClosesCountPoiByWktQueryResponse.FromAgg(mockPoi,55.0);
         var handle = await _handler.Handle(mock);
         handle.Error.Should().Be(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
     }

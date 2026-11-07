@@ -66,7 +66,6 @@ public class FindClosestPoiByWktHandlerTests
 
         var mockPoi = await PoiHelperTestMethods.MockPoiCreation("mockPoi", "MockDesc", new CoordinateDto(44, 35));
               var mock = new FindClosestPoiByWktQuery("POINT(45 22}");
-        var resResponse = FindClosestPoiByWktResponse.CreateFromAgg(mockPoi,55.0);
         var handle = await _handler.Handle(mock);
         handle.Error.Should().Be(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
     }

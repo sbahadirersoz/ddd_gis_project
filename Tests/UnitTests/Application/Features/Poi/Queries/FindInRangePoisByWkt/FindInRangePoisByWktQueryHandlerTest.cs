@@ -75,7 +75,6 @@ public class FindInRangePoisByWktQueryHandlerTest
         //     .Returns(Result<WellKnownText>.Failure((DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT)));
         var mock = new FindInRangePoisByWktQuery("POINT(45 22}",800);
 
-        var resResponse = FindInRangePoisByWktResponse.FromAgg(mockPoi,mock.distance);
         var handle = await _handler.Handle(mock);
         handle.Error.Should().Be(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
     }

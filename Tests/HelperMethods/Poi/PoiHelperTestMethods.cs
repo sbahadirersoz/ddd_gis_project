@@ -41,17 +41,6 @@ public static class PoiHelperTestMethods
         var poiAggregate = await _service.CreatePoiAggregate(lat.Value, lon.Value,descFromString, nameFromString);
         return poiAggregate.Value;
     }    
-    public static async Task<List<POIAggregate>> mockList()
-    {
-        var unit1 =  await PoiHelperTestMethods.MockPoiCreation("unit1","unit1desc",new CoordinateDto(41,42) );
-        var unit2 = await PoiHelperTestMethods.MockPoiCreation("unit2","unit2desc",new CoordinateDto(41,43));
-        var unit3 = await PoiHelperTestMethods.MockPoiCreation("unit3","unit3desc",new CoordinateDto(41,44));
-        List<POIAggregate> l = new List<POIAggregate>();
-        l.Add(unit1);
-        l.Add(unit2);
-        l.Add(unit3);
-        return l;
-    }
     public static async Task<List<(POIAggregate, double)>> mockListWithDouble()
     {
         var unit1 = (await PoiHelperTestMethods.MockPoiCreation("unit1", "unit1desc", new CoordinateDto(42, 35)),
