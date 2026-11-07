@@ -8,6 +8,7 @@ using gis.Domain.Aggregates;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
+using gis.Domain.ResultPattern.Errors;
 
 using Microsoft.Extensions.Logging;
 
@@ -56,7 +57,32 @@ public class FindInRangePoisByLonLatHandlerTests
     }
 
 
+    private readonly FindInRangePoisByLonLatValidator _validator = new();
 
+
+    [Theory]
+    [InlineData(null,25d,500d)]
+    [InlineData(30d,null,500d)]
+    
+    public void SHOULD_HAVE_ERROR(double? lon, double? lat, double distance)
+    {
+        var query = new FindInRangePoisByLonLatQuery(lon, lat,distance);
+        var validation = _validator.Validate(query);
+        validation.Errors.Should().ContainSingle()
+            .Which.ErrorCode.Should().Be(BusinessRuleErrors.DistanceQueryRulesErrors.MISSING_COORDINATE.Code);
+        
+    }
+
+    [Theory]
+    [InlineData(20d,25d,150d)]
+    [InlineData(30d,22d,200d)]
+    
+    public void SHOULD_SUCCESS(double? lon, double? lat,double  distance)
+    {
+        var query = new FindInRangePoisByLonLatQuery(lon, lat,distance);
+        var validation = _validator.Validate(query);
+        validation.IsValid.Should().BeTrue();
+    }
 
 
 }

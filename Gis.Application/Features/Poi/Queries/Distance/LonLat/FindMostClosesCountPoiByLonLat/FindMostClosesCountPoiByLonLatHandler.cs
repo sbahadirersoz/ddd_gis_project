@@ -25,7 +25,10 @@ public class FindMostClosesCountPoiByLonLatHandler : IRequestHandler<FindMostClo
     public async Task<Result<List<FindMostClosesCountPoiByLonLatResponse>>> Handle(
         FindMostClosesCountPoiByLonLatQuery request, CancellationToken cancellationToken = default)
     {
-        var lonlat = PointAggregateVOMapper.CreateLonLatFromPrimitive(longitude: request.lon, latitude: request.lat);
+
+        var lonVal = request.lon.Value;
+        var latVal = request.lat.Value;
+        var lonlat = PointAggregateVOMapper.CreateLonLatFromPrimitive(lonVal, latVal);
         if (lonlat.IsFailure) return Result<List<FindMostClosesCountPoiByLonLatResponse>>.Failure(lonlat.Error);
         var lon = lonlat.Value.Item1;
         var lat = lonlat.Value.Item2;

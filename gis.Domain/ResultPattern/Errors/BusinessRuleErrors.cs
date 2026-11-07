@@ -24,7 +24,9 @@ public static class BusinessRuleErrors
     {
         public static readonly Error INVALID_DISTANCE_RANGE = new Error("BusinessRules.DistanceQuery.InvalidDistanceRange", "The provided value is outside the allowed range.");
         public static readonly Error INVALID_QUERY_COUNT = new Error("BusinessRules.DistanceQuery.InvalidQueryCount", "The provided value is outside the allowed range.");
-        
+        public static readonly Error MISSING_COORDINATE =
+            new Error("BusinessRules.DistanceQuery.MissingCoordinate", "Both lon and lat query parameters are required.");
+
     }
 
     public static class PolygonRules
