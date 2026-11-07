@@ -55,11 +55,7 @@ public class CreatePoiCommandHandlerTests
         _repository.IsPointNameExistsAsync(Arg.Any<PointName>()).Returns(false);
         _contract.CreateWktStringFromLonLat(lat, lon).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
         var result = await _handler.Handle(mockCommand, CancellationToken.None);
-        if (result.IsFailure)
-        {
-            _testOutputHelper.WriteLine(result.Error.Code);
-            return;
-        }
+        result.IsSuccess.Should().BeTrue();
         string  json = JsonSerializer.Serialize(result.Value);
         _testOutputHelper.WriteLine(json);
     }

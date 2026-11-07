@@ -7,7 +7,7 @@ namespace Gis.Application.Mapper.PoiAggregate;
 public static class PointAggregateVOMapper
 {
 
-    public static Result<( Longitude,Latitude)> CreateLonLatFromPrimitive(double latitude, double longitude)
+    public static Result<( Longitude,Latitude)> CreateLonLatFromPrimitive(double longitude, double latitude)
     {
         var latResult = Latitude.Create(latitude);
         var lonResult = Longitude.Create(longitude);
