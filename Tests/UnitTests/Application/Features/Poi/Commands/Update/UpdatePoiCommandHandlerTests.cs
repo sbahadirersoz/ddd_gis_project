@@ -186,4 +186,32 @@ public class UpdatePoiCommandHandlerTests
             
         _logger.LogInformation($"Failed Reason {response.Error.Code}");
     }
+
+    [Fact]
+    public async Task UpdatePoiCommandHandler_OnlyDesc_UpdatesDescAndKeepsOthers()
+    {
+        var prev = await PoiHelperTestMethods.MockPoiCreation("PrevName", "PrevDesc", new CoordinateDto(42, 35));
+        _repository.FindPointByIdAsync(Arg.Any<PointID>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(prev);
+
+        var response = await _handler.Handle(new UpdatePoiCommand(prev.Id.Value, PointDesc: "NewDesc"));
+
+        response.IsSuccess.Should().BeTrue();
+        response.Value.NewDesc.Should().Be("NewDesc");
+        response.Value.NewName.Should().Be("PrevName");
+        response.Value.NewWKT.Should().Be("POINT (42 35)");
+    }
+
+    [Fact]
+    public async Task UpdatePoiCommandHandler_OnlyName_UpdatesNameAndKeepsOthers()
+    {
+        var prev = await PoiHelperTestMethods.MockPoiCreation("PrevName", "PrevDesc", new CoordinateDto(42, 35));
+        _repository.FindPointByIdAsync(Arg.Any<PointID>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(prev);
+
+        var response = await _handler.Handle(new UpdatePoiCommand(prev.Id.Value, PoiName: "NewName"));
+
+        response.IsSuccess.Should().BeTrue();
+        response.Value.NewName.Should().Be("NewName");
+        response.Value.NewDesc.Should().Be("PrevDesc");
+        response.Value.NewWKT.Should().Be("POINT (42 35)");
+    }
 }

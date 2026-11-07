@@ -37,7 +37,7 @@ public static class PoiHelperTestMethods
         var lon = Longitude.Create(dto.Longitude);
         var lat = Latitude.Create(dto.Latitude);
         
-        _contract.CreateWktStringFromLonLat(lon.Value,lat.Value ).Returns(Result<string>.Success($"POINT ({lon.Value} {lat.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,lat.Value ).Returns(Result<string>.Success($"POINT ({lon.Value.Value} {lat.Value.Value})"));
         var poiAggregate = await _service.CreatePoiAggregate(lat.Value, lon.Value,descFromString, nameFromString);
         return poiAggregate.Value;
     }    
