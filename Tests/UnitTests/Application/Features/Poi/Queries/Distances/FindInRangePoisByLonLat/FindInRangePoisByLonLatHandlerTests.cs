@@ -46,7 +46,7 @@ public class FindInRangePoisByLonLatHandlerTests
     [Fact]
     public async Task FIND_IN_RANGE_POIS_RETURN_VALUE()
     {
-        var mockList = await this.mockList();
+        var mockList = await PoiHelperTestMethods.mockListWithDouble();
         _repository.FindInRangePoisByLonLatAsync(Arg.Any<Longitude>(), Arg.Any<Latitude>(), Arg.Any<double>())
             .Returns(mockList);
         var mockQuery = new FindInRangePoisByLonLatQuery(34, 32, 555);
@@ -56,20 +56,6 @@ public class FindInRangePoisByLonLatHandlerTests
     }
 
 
-    public async Task<List<(POIAggregate, double)>> mockList()
-    {
-        var unit1 = (await PoiHelperTestMethods.MockPoiCreation("unit1", "unit1desc", new CoordinateDto(42, 35)),
-            4250D);
-        var unit2 = (await PoiHelperTestMethods.MockPoiCreation("unit2", "unit2desc", new CoordinateDto(42, 35)),
-            35D);
-        var unit3 = (await PoiHelperTestMethods.MockPoiCreation("unit3", "unit3desc", new CoordinateDto(42, 35)),
-            1555D);
-        List<(POIAggregate, double)> l = new  ();
-        l.Add(unit1);
-        l.Add(unit2);
-        l.Add(unit3);
-        return l;
-    }
 
 
 

@@ -54,7 +54,7 @@ public class FindMostClosesCountPoiByWktQueryHandlerTest
     [Fact]
     public async Task FIND_MOST_CLOSES_POI_BY_WKT_NEIGHBOR_EXISTS()
     {
-        var list = await mockList();
+        var list = await PoiHelperTestMethods.mockListWithDouble();
         _repository.FindMostClosesCountByWktAsync(Arg.Any<WellKnownText>(),Arg.Any<int>()).Returns(list);
         var mock = new FindMostClosesCountPoiByWktQuery("POINT(45 22)",6);
         var expectedWKT = WellKnownText.Create("POINT(45 22)").Value;
@@ -64,6 +64,7 @@ public class FindMostClosesCountPoiByWktQueryHandlerTest
         
         await _repository.Received(1).FindMostClosesCountByWktAsync(expectedWKT, mock.count);
         handle.Value.Should().BeEquivalentTo(resList, o => o.WithStrictOrdering());
+        handle.Value[0].name.Should().Be("unit1");
 
     }[Fact]
     public async Task FIND_CLOSES_POI_BY_WKT_IS_INVALID()
@@ -77,22 +78,9 @@ public class FindMostClosesCountPoiByWktQueryHandlerTest
 
 
         
-        var resResponse = FindInRangePoisByWktResponse.FromAgg(mockPoi,55.0);
+        var resResponse = FindMostClosesCountPoiByWktQueryResponse.FromAgg(mockPoi,55.0);
         var handle = await _handler.Handle(mock);
         handle.Error.Should().Be(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
     }
-    public async Task<List<(POIAggregate, double)>> mockList()
-    {
-        var unit1 = (await PoiHelperTestMethods.MockPoiCreation("unit1", "unit1desc", new CoordinateDto(42, 35)),
-            4250D);
-        var unit2 = (await PoiHelperTestMethods.MockPoiCreation("unit2", "unit2desc", new CoordinateDto(42, 35)),
-            35D);
-        var unit3 = (await PoiHelperTestMethods.MockPoiCreation("unit3", "unit3desc", new CoordinateDto(42, 35)),
-            1555D);
-        List<(POIAggregate, double)> l = new List<(POIAggregate, double)>();
-        l.Add(unit1);
-        l.Add(unit2);
-        l.Add(unit3);
-        return l;
-    }
+  
 }

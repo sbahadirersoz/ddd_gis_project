@@ -39,20 +39,7 @@ public class FindMostClosesCountByIdQueryHandlerTests
     }
 
 
-    public async Task<List<(POIAggregate, double)>> mockList()
-    {
-        var unit1 = (await PoiHelperTestMethods.MockPoiCreation("unit1", "unit1desc", new CoordinateDto(42, 35)),
-            4250D);
-        var unit2 = (await PoiHelperTestMethods.MockPoiCreation("unit2", "unit2desc", new CoordinateDto(42, 35)),
-            35D);
-        var unit3 = (await PoiHelperTestMethods.MockPoiCreation("unit3", "unit3desc", new CoordinateDto(42, 35)),
-            1555D);
-        List<(POIAggregate, double)> l = new List<(POIAggregate, double)>();
-        l.Add(unit1);
-        l.Add(unit2);
-        l.Add(unit3);
-        return l;
-    }
+
 
     [Fact]
     public async Task FIND_MOST_CLOSES_COUNT_BY_ID_POI_NO_FOUND()
@@ -83,7 +70,7 @@ public class FindMostClosesCountByIdQueryHandlerTests
     [Fact]
     public async Task FIND_MOST_CLOSES_COUNT_BY_ID_SUCCESS()
     {
-        var list = await mockList();
+        var list = await PoiHelperTestMethods.mockListWithDouble();
         var createdPoi =  await PoiHelperTestMethods.MockPoiCreation("MockPoi","Descblabla",new CoordinateDto(45,32));
         
         _pointRepository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(createdPoi);

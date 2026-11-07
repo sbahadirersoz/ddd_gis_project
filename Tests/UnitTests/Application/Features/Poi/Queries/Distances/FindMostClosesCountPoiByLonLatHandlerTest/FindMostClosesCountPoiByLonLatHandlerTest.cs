@@ -46,29 +46,21 @@ public class FindMostClosesCountPoiByLonLatHandlerTest
     [Fact]
     public async Task FIND_MOST_CLOSES_POIS_WITH_COUNT_RETURN_VALUE()
     {
-        var mockList = await this.mockList();
+        var mockList = await PoiHelperTestMethods.mockListWithDouble();
         _repository.FindMostClosesCountByLonLatAsync(Arg.Any<Longitude>(), Arg.Any<Latitude>(), Arg.Any<int>())
             .Returns(mockList);
         var mockQuery = new FindMostClosesCountPoiByLonLatQuery(34, 32, 3);
-        var resultList = mockList.ConvertAll(x => FindInRangePoisByLonLatResponse.FromAgg(x.Item1, x.Item2));
+        var resultList = mockList.ConvertAll(x => new FindMostClosesCountPoiByLonLatResponse(x.Item1.PointName.Value, x.Item1.CoordinateValueObject.WKT.Value,x.Item2));
         var handler = await _handler.Handle(mockQuery);
+        
+        
         handler.Value.Should().BeEquivalentTo(resultList, o => o.WithStrictOrdering());
+        handler.Value[0].name.Should().Be("unit1");
+        handler.Value[1].name.Should().Be("unit2");
+        handler.Value[2].name.Should().Be("unit3");
     }
 
 
-    public async Task<List<(POIAggregate, double)>> mockList()
-    {
-        var unit1 = (await PoiHelperTestMethods.MockPoiCreation("unit1", "unit1desc", new CoordinateDto(42, 35)),
-            4250D);
-        var unit2 = (await PoiHelperTestMethods.MockPoiCreation("unit2", "unit2desc", new CoordinateDto(42, 35)),
-            35D);
-        var unit3 = (await PoiHelperTestMethods.MockPoiCreation("unit3", "unit3desc", new CoordinateDto(42, 35)),
-            1555D);
-        List<(POIAggregate, double)> l = new  ();
-        l.Add(unit1);
-        l.Add(unit2);
-        l.Add(unit3);
-        return l;
-    }
+
 
 }

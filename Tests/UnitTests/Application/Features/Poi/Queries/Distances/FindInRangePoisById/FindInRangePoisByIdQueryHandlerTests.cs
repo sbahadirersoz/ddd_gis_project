@@ -43,21 +43,7 @@ public class FindInRangePoisByIdQueryHandlerTests
         _handler = new FindInRangePoisByIdQueryHandler(_logger, _pointRepository,_unitOfWork);
     }
 
-    public async Task<List<(POIAggregate, double)>> mockList()
-    {
-        var unit1 = (await PoiHelperTestMethods.MockPoiCreation("unit1", "unit1desc", new CoordinateDto(42, 35)),
-            4250D);
-        var unit2 = (await PoiHelperTestMethods.MockPoiCreation("unit2", "unit2desc", new CoordinateDto(42, 35)),
-            35D);
-        var unit3 = (await PoiHelperTestMethods.MockPoiCreation("unit3", "unit3desc", new CoordinateDto(42, 35)),
-            1555D);
-        List<(POIAggregate, double)> l = new List<(POIAggregate, double)>();
-        l.Add(unit1);
-        l.Add(unit2);
-        l.Add(unit3);
-        return l;
-    }
-    
+
     
     [Fact]
     public async Task FIND_INRANGE_BY_ID_POI_NO_FOUND()
@@ -79,7 +65,7 @@ public class FindInRangePoisByIdQueryHandlerTests
         
         var mockQuery = new FindInRangePoisByIdQuery(PointID.New().Value, 3500);
         var result = await _handler.Handle(mockQuery);
-        var list = await mockList();
+        var list = await PoiHelperTestMethods.mockListWithDouble();
         var res = list.ConvertAll(x=>FindInRangePoisByIdQueryResponse.FromAgg(x.Item1,x.Item2));
         result.Value.Should().BeEquivalentTo(new List<FindInRangePoisByIdQueryResponse>());
 
@@ -88,7 +74,7 @@ public class FindInRangePoisByIdQueryHandlerTests
     [Fact]
     public async Task FIND_INRANGE_BY_ID_SUCCESS()
     {
-        var list = await mockList();
+        var list = await PoiHelperTestMethods.mockListWithDouble();
         var mockPoiCreation = await PoiHelperTestMethods.MockPoiCreation("mock","Mockdesc",new CoordinateDto(44,32));
         _pointRepository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPoiCreation);
         _pointRepository.FindInRangePoisByIdAsync(Arg.Any<PointID>(),Arg.Any<double>()).Returns(list);
