@@ -105,7 +105,8 @@ namespace Gis.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"status\" <> 2");
 
                     b.HasIndex("Point");
 

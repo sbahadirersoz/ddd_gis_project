@@ -9,8 +9,8 @@ public class WKTValidator:AbstractValidator<string>
     {
         RuleFor(x => x).NotEmpty().Must(x =>
             (
-                x.StartsWith("POINT", StringComparison.OrdinalIgnoreCase) &&
-                x.StartsWith("LINESTRING ", StringComparison.OrdinalIgnoreCase) &&
+                x.StartsWith("POINT", StringComparison.OrdinalIgnoreCase) ||
+                x.StartsWith("LINESTRING ", StringComparison.OrdinalIgnoreCase) ||
                 x.StartsWith("POLYGON", StringComparison.OrdinalIgnoreCase)
             )
         ).WithErrorCode(DomainErrors.WKT.INVALID_WKT_FORMAT.Code)

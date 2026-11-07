@@ -6,18 +6,18 @@ public record FindMostClosesCountByIdQueryResponse
 {
     public string wkt { get;  }
     public string name { get;  }
-    public double distance { get;  }
+    public double distanceByMeters { get;  }
 
-    private FindMostClosesCountByIdQueryResponse(string wkt, string name,double distance)
+    private FindMostClosesCountByIdQueryResponse(string wkt, string name,double distanceByMeters)
     {
         this.wkt = wkt;
         this.name = name;
-        this.distance = distance;
+        this.distanceByMeters = distanceByMeters;
     }
 
-    public static FindMostClosesCountByIdQueryResponse CreateFromAgg(POIAggregate aggregate,double distance)
+    public static FindMostClosesCountByIdQueryResponse CreateFromAgg(POIAggregate aggregate,double distanceByMeters)
     {
         return new FindMostClosesCountByIdQueryResponse(aggregate.CoordinateValueObject.WKT.Value,
-            aggregate.PointName.Value,distance);
+            aggregate.PointName.Value,Math.Round(distanceByMeters,2));
     }
 }

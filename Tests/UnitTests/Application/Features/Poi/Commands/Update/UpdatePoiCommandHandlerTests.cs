@@ -50,7 +50,7 @@ public class UpdatePoiCommandHandlerTests
     [Fact]
     public async Task UpdatePoiCommandHandler_Success_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("TestName","Description" ,  new CoordinateDto(42,42));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("TestName","Description" ,  new CoordinateDto(42,42));
         //     "TestName",
         //     "Description",
         //     42,
@@ -62,7 +62,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.CoordinateDto.Latitude);
         var lon = Longitude.Create(updatePoiCommand.CoordinateDto.Longitude);
-        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {latitude.Value})"));
         _repository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
@@ -80,7 +80,7 @@ public class UpdatePoiCommandHandlerTests
     [Fact]
     public async Task UpdatePoiCommandHandler_NullName_Failure_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,38));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,38));
         //     "TestName",
         //     "Description",
         //     42,
@@ -92,7 +92,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.CoordinateDto.Latitude);
         var lon = Longitude.Create(updatePoiCommand.CoordinateDto.Longitude);
-        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {latitude.Value})"));
         _repository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         if (response.IsFailure)
@@ -116,7 +116,7 @@ public class UpdatePoiCommandHandlerTests
     [Fact]
     public async Task? UpdatePoiCommandHandler_NothingChanged_Failure_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,42));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,42));
         //     "TestName",
         //     "Description",
         //     42,
@@ -128,7 +128,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.CoordinateDto.Latitude);
         var lon = Longitude.Create(updatePoiCommand.CoordinateDto.Longitude);
-        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {latitude.Value})"));
         
         _repository.FindPointByIdAsync(Arg.Any<PointID>(),Arg.Any<bool>(),Arg.Any<CancellationToken>() ).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
@@ -153,7 +153,7 @@ public class UpdatePoiCommandHandlerTests
     }  [Fact]
     public async Task? UpdatePoiCommandHandler_PoiNotFound_Failure_Case()
     {
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,42));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,42));
         //     "TestName",
         //     "Description",
         //     42,
@@ -165,7 +165,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.CoordinateDto.Latitude);
         var lon = Longitude.Create(updatePoiCommand.CoordinateDto.Longitude);
-        _contract.CreateWktStringFromLonLat(latitude.Value,lon.Value).Returns(Result<string>.Success($"POINT ({latitude.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {latitude.Value})"));
         
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(RepositoryErrors.ENTITY_NOT_FOUND);
@@ -185,5 +185,33 @@ public class UpdatePoiCommandHandlerTests
         }
             
         _logger.LogInformation($"Failed Reason {response.Error.Code}");
+    }
+
+    [Fact]
+    public async Task UpdatePoiCommandHandler_OnlyDesc_UpdatesDescAndKeepsOthers()
+    {
+        var prev = await PoiHelperTestMethods.MockPoiCreation("PrevName", "PrevDesc", new CoordinateDto(42, 35));
+        _repository.FindPointByIdAsync(Arg.Any<PointID>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(prev);
+
+        var response = await _handler.Handle(new UpdatePoiCommand(prev.Id.Value, PointDesc: "NewDesc"));
+
+        response.IsSuccess.Should().BeTrue();
+        response.Value.NewDesc.Should().Be("NewDesc");
+        response.Value.NewName.Should().Be("PrevName");
+        response.Value.NewWKT.Should().Be("POINT (42 35)");
+    }
+
+    [Fact]
+    public async Task UpdatePoiCommandHandler_OnlyName_UpdatesNameAndKeepsOthers()
+    {
+        var prev = await PoiHelperTestMethods.MockPoiCreation("PrevName", "PrevDesc", new CoordinateDto(42, 35));
+        _repository.FindPointByIdAsync(Arg.Any<PointID>(), Arg.Any<bool>(), Arg.Any<CancellationToken>()).Returns(prev);
+
+        var response = await _handler.Handle(new UpdatePoiCommand(prev.Id.Value, PoiName: "NewName"));
+
+        response.IsSuccess.Should().BeTrue();
+        response.Value.NewName.Should().Be("NewName");
+        response.Value.NewDesc.Should().Be("PrevDesc");
+        response.Value.NewWKT.Should().Be("POINT (42 35)");
     }
 }

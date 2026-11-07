@@ -36,7 +36,7 @@ public class DeletePoiCommandHandlerTests
     public async void DeletePoiCommandHandler_SuccessCase()
     {
         
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName","Description",new CoordinateDto(42,42) );
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,42) );
         //     "TestName",
         //     "Description",
         //     42,

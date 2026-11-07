@@ -9,7 +9,6 @@ public class FindMostClosesCountByWKTValidator
 {
     public FindMostClosesCountByWKTValidator()
     {
-        RuleFor(x => x.wkt).SetValidator(new WKTValidator());
         RuleFor(x => x.count).SetValidator(new CountValidator());
     }
 }

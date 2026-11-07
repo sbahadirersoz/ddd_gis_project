@@ -7,6 +7,6 @@ public class FindClosestByWKTValidator:AbstractValidator<FindClosestLineByWKTQue
 {
     public FindClosestByWKTValidator()
     {
-        RuleFor(x => x.wkt).SetValidator(new WKTValidator());
+   
     }
 }

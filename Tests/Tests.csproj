@@ -26,7 +26,6 @@
       <Folder Include="Integration\Setup\" />
       <Folder Include="Integration\Web\" />
       <Folder Include="UnitTests\Application\Features\Line\Queries\" />
-      <Folder Include="UnitTests\Application\Features\Poi\Queries\Distances\" />
       <Folder Include="UnitTests\Application\Features\Poi\Queries\GetAllPois\" />
     </ItemGroup>
 

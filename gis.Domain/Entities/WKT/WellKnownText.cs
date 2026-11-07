@@ -28,6 +28,6 @@ public record WellKnownText
             return Result<WellKnownText>.Failure(DomainErrors.POIErrors.WKT.INVALID_WKT_FORMAT);
         }
 
-        return Result<WellKnownText>.Success(new WellKnownText(value.ToUpper()));
+        return Result<WellKnownText>.Success(new WellKnownText(value.ToUpperInvariant()));
     }
 };

@@ -13,11 +13,11 @@ public class FindMostClosesCountByNameQueryHandler
         Result<List<FindMostClosesCountByNameQueryResponse>>>
 {
     private readonly ILogger<FindMostClosesCountByNameQueryHandler> _logger;
-    private readonly IPointRepository pointRepository;
+    private readonly IPointRepository _repository;
 
-    public FindMostClosesCountByNameQueryHandler(IPointRepository pointRepository, ILogger<FindMostClosesCountByNameQueryHandler> logger)
+    public FindMostClosesCountByNameQueryHandler(IPointRepository repository, ILogger<FindMostClosesCountByNameQueryHandler> logger)
     {
-        this.pointRepository = pointRepository;
+        this._repository = repository;
         _logger = logger;
     }
 
@@ -27,14 +27,14 @@ public class FindMostClosesCountByNameQueryHandler
         
         var name = PointName.FromString(request.name);
         if (name.IsFailure) return Result<List<FindMostClosesCountByNameQueryResponse>>.Failure(name.Error);
-        var entities = await pointRepository.FindMostClosesCountByPoiName(
+
+        var entity = await _repository.FindPointByPointNameAsync(name.Value, cancellationToken: cancellationToken);
+        if (entity == null)
+             return Result<List<FindMostClosesCountByNameQueryResponse>>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+        var entities = await _repository.FindMostClosesCountByPoiName(
             name.Value, 
             request.count, cancellationToken: cancellationToken);
-
-         if (entities is null || entities.Count == 0)
-             return Result<List<FindMostClosesCountByNameQueryResponse>>.Failure(RepositoryErrors
-                 .QUERY_RETURNS_EMPTY);
-
+   
          var result = entities.ConvertAll(x=> FindMostClosesCountByNameQueryResponse.FromAgg(x.agg,x.distance));
          return Result<List<FindMostClosesCountByNameQueryResponse>>.Success(result); }
 }

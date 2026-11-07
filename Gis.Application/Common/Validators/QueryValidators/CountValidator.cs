@@ -8,7 +8,7 @@ public class CountValidator:AbstractValidator<int>
 {
     public CountValidator()
     {
-        RuleFor(x => x).NotEmpty()
+        RuleFor(x => x)
             .InclusiveBetween(HardCodedPropertities.DistanceUnitRestraints.MinCountForMostClosesQuery,
                 HardCodedPropertities.DistanceUnitRestraints.MaxCountForMostClosesQuery)
             .WithErrorCode(BusinessRuleErrors.DistanceQueryRulesErrors.INVALID_QUERY_COUNT.Code)

@@ -35,7 +35,7 @@ public class FindPoiByNameQueryHandlerTests
     public async Task FindPoiByIdQueryHandler_SuccessCase()
     {
 
-        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPrevPoiCreation("PrevName", "Description", new CoordinateDto(42,41));
+        var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName", "Description", new CoordinateDto(42,41));
         var request = new FindPoiByNameQuery(mockPrevPoiCreation.PointName);
         _pointRepository.FindPointByPointNameAsync(Arg.Any<PointName>()).Returns(mockPrevPoiCreation);
         var result = await _handler.Handle(request);

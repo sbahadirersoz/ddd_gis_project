@@ -30,7 +30,7 @@ public class PoiAggregateConfig:IEntityTypeConfiguration<PoiEntity>
             .HasDefaultValue(0)
             .HasColumnType("int");
 
-        builder.HasIndex(x => x.Name).IsUnique();
+        builder.HasIndex(x => x.Name).IsUnique().HasFilter($"\"status\" <> {(int)POIStatus.SOFT_DELETED}");
         builder.HasIndex(x => x.Point).HasMethod("GIST");
         builder.HasQueryFilter(x => x.Status != (int)POIStatus.SOFT_DELETED);
     }

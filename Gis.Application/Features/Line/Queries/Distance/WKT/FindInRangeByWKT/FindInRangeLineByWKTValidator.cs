@@ -8,7 +8,6 @@ public class FindInRangeLineByWKTValidator:AbstractValidator<FindInRangeLineByWK
 {
     public FindInRangeLineByWKTValidator()
     {
-        RuleFor(x => x.wkt).SetValidator(new WKTValidator());
         RuleFor(x => x.distance).SetValidator(new RangeValidator());
     }
 }

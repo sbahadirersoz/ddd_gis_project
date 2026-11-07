@@ -2,8 +2,8 @@
 
 namespace Gis.Application.Features.Poi.Queries.Distance.Wkt.FindMostClosesCountPoiByWkt;
 
-public record FindMostClosesCountPoiByWktQueryResponse(string name, string wkt, double distance)
+public record FindMostClosesCountPoiByWktQueryResponse(string name, string wkt, double DistanceByMeters)
 {
-    public static FindMostClosesCountPoiByWktQueryResponse FromAgg(POIAggregate agg ,double distance)
-    => new (agg.PointName.Value,agg.CoordinateValueObject.WKT.Value ,Math.Round(distance,2));
+    public static FindMostClosesCountPoiByWktQueryResponse FromAgg(POIAggregate agg ,double distanceByMeters)
+    => new (agg.PointName.Value,agg.CoordinateValueObject.WKT.Value ,Math.Round(distanceByMeters,2));
 }

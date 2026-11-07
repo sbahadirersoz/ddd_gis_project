@@ -22,17 +22,17 @@ public class FindInRangePoisByIdQueryHandler:IRequestHandler<FindInRangePoisById
         _repository = repository;
         _unitOfWork = unitOfWork;
     }
-        public async Task<Result<List<FindInRangePoisByIdQueryResponse>>> Handle(FindInRangePoisByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<List<FindInRangePoisByIdQueryResponse>>> Handle(FindInRangePoisByIdQuery request, CancellationToken cancellationToken = default)
         {
             
             var fromGuid = PointID.FromGuid(request.id);
             if (fromGuid.IsFailure) return  Result<List<FindInRangePoisByIdQueryResponse>>.Failure(fromGuid.Error);
-        
-        
+            var source = await _repository.FindPointByIdAsync(fromGuid.Value, cancellationToken: cancellationToken);
+            if (source is null)
+                return Result<List<FindInRangePoisByIdQueryResponse>>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+
             var findInRange = await _repository.FindInRangePoisByIdAsync(fromGuid.Value,request.range, cancellationToken: cancellationToken);
-        
-            if (findInRange.Count is 0)
-                return Result<List<FindInRangePoisByIdQueryResponse>>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
+
             var response = findInRange.Select(item => FindInRangePoisByIdQueryResponse.FromAgg(item.agg,Math.Round(item.distance,2))).ToList();
             return Result<List<FindInRangePoisByIdQueryResponse>>.Success(response);
         }

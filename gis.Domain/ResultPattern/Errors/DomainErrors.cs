@@ -22,6 +22,8 @@ public static class DomainErrors
            
            public static readonly Error INVALID_WKT_FORMAT =
                new Error("WKT.FormatInvalid", "Given WKT Format is invalid.");
+            public static readonly Error ONLY_2D_POINTS_SUPPORTED =
+               new Error("POI.WKT.Only2D", "Only 2D points (lon lat) are supported.");
        }
 
     

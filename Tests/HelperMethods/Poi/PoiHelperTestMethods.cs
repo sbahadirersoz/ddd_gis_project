@@ -23,7 +23,7 @@ public static class PoiHelperTestMethods
     _repository = Substitute.For<IPointRepository>();
     _service = new POIDomainService(_repository,_contract);
     }
-    public static async Task<POIAggregate> MockPrevPoiCreation(string mockName,string mockDesc,CoordinateDto dto)
+    public static async Task<POIAggregate> MockPoiCreation(string mockName,string mockDesc,CoordinateDto dto)
     {
         var mockCommand = new CreatePoiCommand
         (
@@ -37,16 +37,19 @@ public static class PoiHelperTestMethods
         var lon = Longitude.Create(dto.Longitude);
         var lat = Latitude.Create(dto.Latitude);
         
-        _contract.CreateWktStringFromLonLat(lat.Value ,lon.Value).Returns(Result<string>.Success($"POINT ({lat.Value} {lon.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,lat.Value ).Returns(Result<string>.Success($"POINT ({lon.Value.Value} {lat.Value.Value})"));
         var poiAggregate = await _service.CreatePoiAggregate(lat.Value, lon.Value,descFromString, nameFromString);
         return poiAggregate.Value;
     }    
-    public static async Task<List<POIAggregate>> mockList()
+    public static async Task<List<(POIAggregate, double)>> mockListWithDouble()
     {
-        var unit1 =  await PoiHelperTestMethods.MockPrevPoiCreation("unit1","unit1desc",new CoordinateDto(41,42) );
-        var unit2 = await PoiHelperTestMethods.MockPrevPoiCreation("unit2","unit2desc",new CoordinateDto(41,43));
-        var unit3 = await PoiHelperTestMethods.MockPrevPoiCreation("unit3","unit3desc",new CoordinateDto(41,44));
-        List<POIAggregate> l = new List<POIAggregate>();
+        var unit1 = (await PoiHelperTestMethods.MockPoiCreation("unit1", "unit1desc", new CoordinateDto(42, 35)),
+            4250D);
+        var unit2 = (await PoiHelperTestMethods.MockPoiCreation("unit2", "unit2desc", new CoordinateDto(42, 35)),
+            35D);
+        var unit3 = (await PoiHelperTestMethods.MockPoiCreation("unit3", "unit3desc", new CoordinateDto(42, 35)),
+            1555D);
+        List<(POIAggregate, double)> l = new  ();
         l.Add(unit1);
         l.Add(unit2);
         l.Add(unit3);

@@ -1,7 +1,6 @@
-﻿using gis.Domain.Entities.WKT;
+﻿using gis.Domain.Contracts;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
-using gis.Domain.ResultPattern.Errors;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -11,21 +10,21 @@ public class FindMostClosesCountPoiByWktQueryHandler:IRequestHandler<FindMostClo
 {
     private readonly IPointRepository _repository;
     private readonly ILogger<FindMostClosesCountPoiByWktQueryHandler> _logger;
+    private readonly ITopologySuiteWKTContract _wktContract;
 
-    public FindMostClosesCountPoiByWktQueryHandler(IPointRepository repository, ILogger<FindMostClosesCountPoiByWktQueryHandler> logger)
+    public FindMostClosesCountPoiByWktQueryHandler(IPointRepository repository, ILogger<FindMostClosesCountPoiByWktQueryHandler> logger, ITopologySuiteWKTContract wktContract)
     {
         _repository = repository;
         _logger = logger;
+        _wktContract = wktContract;
     }
 
-    public async Task<Result<List<FindMostClosesCountPoiByWktQueryResponse>>> Handle(FindMostClosesCountPoiByWktQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<FindMostClosesCountPoiByWktQueryResponse>>> Handle(FindMostClosesCountPoiByWktQuery request, CancellationToken cancellationToken =default)
     {
-        var wkt = WellKnownText.Create(request.wkt);
+        var wkt = _wktContract.ParsePointWkt(request.wkt);
         if (wkt.IsFailure) return Result<List<FindMostClosesCountPoiByWktQueryResponse>>.Failure(wkt.Error);
         
 
-        var findByWktAsync =  await _repository.FindByWktAsync(wkt.Value, cancellationToken: cancellationToken);
-        if (findByWktAsync == null) return Result<List<FindMostClosesCountPoiByWktQueryResponse>>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
         var result = await _repository.FindMostClosesCountByWktAsync(wkt.Value,request.count, cancellationToken: cancellationToken);
         var response = result.Select(x=> FindMostClosesCountPoiByWktQueryResponse.FromAgg(x.agg,x.distance)).ToList();
         return Result<List<FindMostClosesCountPoiByWktQueryResponse>>.Success(response);
