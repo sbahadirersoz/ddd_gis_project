@@ -56,7 +56,7 @@ public class CreatePoiCommandHandlerTests
         _contract.CreateWktStringFromLonLat(lon,lat).Returns(Result<string>.Success($"POINT ({lon.Value} {lat.Value})"));
         var result = await _handler.Handle(mockCommand, CancellationToken.None);
         result.IsSuccess.Should().BeTrue();
-        result.Value.WKT.Should().Be("POINT (42 35)");
+        result.Value.WKT.Value.Should().Be("POINT (42 35)");
     }
          
       
