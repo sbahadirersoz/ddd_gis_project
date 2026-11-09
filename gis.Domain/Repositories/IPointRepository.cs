@@ -12,7 +12,6 @@ namespace gis.Domain.Repositories;
 public interface IPointRepository:IRepository<POIAggregate,PointID>,IPoiDistanceCalculatorContract
 
 {
-    Task<POIAggregate?>FindByWktAsync(WellKnownText wkt,   bool tracking = true, CancellationToken cancellationToken = default);
 
     Task<bool> IsLonLatCoordinatesExistsAsync(Latitude lat, Longitude lon, CancellationToken cancellationToken = default);
     Task<bool> IsPointNameExistsAsync(PointName pointName, CancellationToken cancellationToken = default);
