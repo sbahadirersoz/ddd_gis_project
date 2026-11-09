@@ -46,7 +46,6 @@ public class UpdatePoiCommandHandlerTests
         );
         
     }
-
     [Fact]
     public async Task UpdatePoiCommandHandler_Success_Case()
     {
@@ -62,7 +61,7 @@ public class UpdatePoiCommandHandlerTests
         );
         var latitude = Latitude.Create(updatePoiCommand.CoordinateDto.Latitude);
         var lon = Longitude.Create(updatePoiCommand.CoordinateDto.Longitude);
-        _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {latitude.Value})"));
+        _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value.Value} {latitude.Value.Value})"));
         _repository.FindPointByIdAsync(Arg.Any<PointID>(),Arg.Is(false),Arg.Any<CancellationToken>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         
@@ -71,7 +70,7 @@ public class UpdatePoiCommandHandlerTests
         response.Value.Should().NotBeNull();
         response.Value.NewName.Should().Be("UpdatedTestName");
         response.Value.NewDesc.Should().Be("UpdatedTestDescription");
-        response.Value.NewWKT.Should().Be("POINT (42,45)");
+        response.Value.NewWKT.Should().Be("POINT (42 45)");
         
     }
     [Fact]

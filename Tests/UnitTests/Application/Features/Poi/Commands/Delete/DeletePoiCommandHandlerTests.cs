@@ -1,10 +1,18 @@
-﻿using Gis.Application.Common;
+﻿using FluentAssertions;
+
+using Gis.Application.Common;
 using Gis.Application.Dtos;
 using Gis.Application.Features.Poi.Commands.Create;
 using Gis.Application.Features.Poi.Commands.Delete;
+
+using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
+using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
 using gis.Domain.Services;
+
+using Gis.Infrastructure.Entity;
+
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Tests.HelperMethods.Poi;
@@ -33,7 +41,7 @@ public class DeletePoiCommandHandlerTests
         _handler = new DeletePoiCommandHandler(_unitOfWork, _repository, _logger, _service);
     }
     [Fact]
-    public async void DeletePoiCommandHandler_SuccessCase()
+    public async Task DeletePoiCommandHandler_SuccessCase()
     {
         
         var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,42) );
@@ -44,14 +52,15 @@ public class DeletePoiCommandHandlerTests
         var request = new DeletePoiCommand(mockPrevPoiCreation.Id);
         _repository.FindPointByIdAsync(request.id).Returns(mockPrevPoiCreation);
         var result = await _handler.Handle(request);
-        if (result.IsFailure)
-        {
-            _testOutputHelper.WriteLine(result.Error.Code);
-            _testOutputHelper.WriteLine(result.Error.Desc);
-            return;
-        }
+        result.IsFailure.Should().BeFalse();
+        result.Value.Status.Should().Be(POIStatus.SOFT_DELETED.ToString());
 
-        _testOutputHelper.WriteLine(result.Value.WKT);
-        _testOutputHelper.WriteLine(result.Value.Status);
+        _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
+        _repository.Received(1).UpdateAsync(Arg.Any<POIAggregate>(), Arg.Any<CancellationToken>());
+        
+        
+        
+        result.Value.Name.Should().Be("PrevName");
+        
     }
 }
