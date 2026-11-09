@@ -18,7 +18,7 @@ public class FindClosestPoiByLonLatHandler:IRequestHandler<FindClosestPoiByLonLa
         _repository = repository;
     }
 
-    public async Task<Result<FindClosestPoiByLonLatResponse>> Handle(FindClosestPoiByLonLatQuery request, CancellationToken cancellationToken)
+    public async Task<Result<FindClosestPoiByLonLatResponse>> Handle(FindClosestPoiByLonLatQuery request, CancellationToken cancellationToken = default)
     {
         double latVal = request.lat.Value;
         double lonVal = request.lon.Value;
