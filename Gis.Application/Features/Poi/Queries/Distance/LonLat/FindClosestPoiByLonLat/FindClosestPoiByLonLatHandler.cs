@@ -27,7 +27,7 @@ public class FindClosestPoiByLonLatHandler:IRequestHandler<FindClosestPoiByLonLa
         var lon = lonLatFromPrimitive.Value.Item1;
         var lat = lonLatFromPrimitive.Value.Item2;
         var entity = await _repository.FindClosestPoiByGivenLonLatAsync(lon,lat, cancellationToken: cancellationToken);
-        if (entity.agg == null ) return Result<FindClosestPoiByLonLatResponse>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
+        if (entity.agg == null ) return Result<FindClosestPoiByLonLatResponse>.Failure(RepositoryErrors.NO_NEIGHBOR_FOUND);
         var response = FindClosestPoiByLonLatResponse.FromAgg(entity.agg,entity.distance);
         return Result<FindClosestPoiByLonLatResponse>.Success(response);
     }
