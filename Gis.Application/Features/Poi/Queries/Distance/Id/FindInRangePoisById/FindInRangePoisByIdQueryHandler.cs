@@ -33,7 +33,7 @@ public class FindInRangePoisByIdQueryHandler:IRequestHandler<FindInRangePoisById
 
             var findInRange = await _repository.FindInRangePoisByIdAsync(fromGuid.Value,request.range, cancellationToken: cancellationToken);
 
-            var response = findInRange.Select(item => FindInRangePoisByIdQueryResponse.FromAgg(item.agg,Math.Round(item.distance,2))).ToList();
+            var response = findInRange.Select(item => FindInRangePoisByIdQueryResponse.FromAgg(item.agg,item.distance)).ToList();
             return Result<List<FindInRangePoisByIdQueryResponse>>.Success(response);
         }
 }
