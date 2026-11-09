@@ -267,15 +267,6 @@ public class PointRepository : GenericRepository<POIAggregate, PointID, PoiEntit
     
         return (ToDomain(nearest.Entity), nearest.Distance);
     }
-    public async Task<POIAggregate?> FindByWktAsync(WellKnownText wkt,bool tracking =true, CancellationToken  cancellationToken = default)
-    {
-        
-        var targetPoint = (Point)reader.Read(wkt.Value);
-        var query = tracking ?  Table.AsQueryable() : Table.AsNoTracking();
-        var entity =  await query.FirstOrDefaultAsync(x => x.Point == targetPoint, cancellationToken: cancellationToken);
-        return (entity == null) ? null : ToDomain(entity);
-    }
-    
 
 
   

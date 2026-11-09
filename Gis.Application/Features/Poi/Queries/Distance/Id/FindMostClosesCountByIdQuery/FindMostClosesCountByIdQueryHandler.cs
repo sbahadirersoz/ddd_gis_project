@@ -30,6 +30,6 @@ public class FindMostClosesCountByIdQueryHandler:IRequestHandler<FindMostClosesC
             return Result<List<FindMostClosesCountByIdQueryResponse>>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         var queryResponse = await _pointRepository.FindMostClosesCountByIdAsync( id.Value,request.count, cancellationToken: cancellationToken);
         return 
-        Result<List<FindMostClosesCountByIdQueryResponse>>.Success(queryResponse.Select(x=>FindMostClosesCountByIdQueryResponse.CreateFromAgg(x.entity,Math.Round(x.distance,2) )).ToList());
+        Result<List<FindMostClosesCountByIdQueryResponse>>.Success(queryResponse.Select(x=>FindMostClosesCountByIdQueryResponse.CreateFromAgg(x.entity,x.distance )).ToList());
     }
 }
