@@ -10,9 +10,6 @@ using gis.Domain.Contracts;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
 using gis.Domain.Services;
-
-using Gis.Infrastructure.Entity;
-
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Tests.HelperMethods.Poi;
