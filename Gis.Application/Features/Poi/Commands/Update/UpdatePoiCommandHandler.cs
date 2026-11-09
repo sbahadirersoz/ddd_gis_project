@@ -21,15 +21,12 @@ public class UpdatePoiCommandHandler : IRequestHandler<UpdatePoiCommand, Result<
     private readonly POIDomainService _service;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPointRepository _pointRepository;
-    private readonly ITopologySuiteWKTContract _contract;
     private readonly ILogger<UpdatePoiCommandHandler> _logger;
 
-    public UpdatePoiCommandHandler(ILogger<UpdatePoiCommandHandler> logger, POIDomainService service,
-        ITopologySuiteWKTContract contract, IUnitOfWork unitOfWork, IPointRepository pointRepository)
+    public UpdatePoiCommandHandler(ILogger<UpdatePoiCommandHandler> logger, POIDomainService service, IUnitOfWork unitOfWork, IPointRepository pointRepository)
     {
         _logger = logger;
         _service = service;
-        _contract = contract;
         _unitOfWork = unitOfWork;
         _pointRepository = pointRepository;
     }

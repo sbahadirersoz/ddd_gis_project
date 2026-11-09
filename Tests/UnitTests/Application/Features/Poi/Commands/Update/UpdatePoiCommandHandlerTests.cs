@@ -42,7 +42,7 @@ public class UpdatePoiCommandHandlerTests
         _contract = Substitute.For<ITopologySuiteWKTContract>();
         _unitOfWork  = Substitute.For<IUnitOfWork>();
         _service = new POIDomainService(_repository,_contract);
-        _handler = new UpdatePoiCommandHandler(_logger,_service,_contract, _unitOfWork,_repository
+        _handler = new UpdatePoiCommandHandler(_logger,_service, _unitOfWork,_repository
         );
         
     }
@@ -63,22 +63,19 @@ public class UpdatePoiCommandHandlerTests
         var latitude = Latitude.Create(updatePoiCommand.CoordinateDto.Latitude);
         var lon = Longitude.Create(updatePoiCommand.CoordinateDto.Longitude);
         _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {latitude.Value})"));
-        _repository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPrevPoiCreation);
+        _repository.FindPointByIdAsync(Arg.Any<PointID>(),Arg.Is(false),Arg.Any<CancellationToken>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
-        if (response.IsFailure)
-        {
-            _testOutputHelper.WriteLine(response.Error.Code);
-            _testOutputHelper.WriteLine(response.Error.Desc);
-            return;
-        }
         
-        _logger.LogInformation("Created Successfully");
-        _testOutputHelper.WriteLine(response.Value.NewDesc);
-        _testOutputHelper.WriteLine(response.Value.NewName);
-        _testOutputHelper.WriteLine(response.Value.NewWKT);
+        
+        response.IsSuccess.Should().BeTrue();
+        response.Value.Should().NotBeNull();
+        response.Value.NewName.Should().Be("UpdatedTestName");
+        response.Value.NewDesc.Should().Be("UpdatedTestDescription");
+        response.Value.NewWKT.Should().Be("POINT (42,45)");
+        
     }
     [Fact]
-    public async Task UpdatePoiCommandHandler_NullName_Failure_Case()
+    public async Task UpdatePoiCommandHandler_EmptyName_Failure_Case()
     {
         var mockPrevPoiCreation = await PoiHelperTestMethods.MockPoiCreation("PrevName","Description",new CoordinateDto(42,38));
         //     "TestName",
@@ -95,22 +92,9 @@ public class UpdatePoiCommandHandlerTests
         _contract.CreateWktStringFromLonLat(lon.Value,latitude.Value).Returns(Result<string>.Success($"POINT ({lon.Value} {latitude.Value})"));
         _repository.FindPointByIdAsync(Arg.Any<PointID>()).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
-        if (response.IsFailure)
-        {
-            _testOutputHelper.WriteLine(response.Error.Code);
-            _testOutputHelper.WriteLine(response.Error.Desc);
-            return;
-        }
-        response.IsSuccess.Should().BeFalse();
-        if (response.IsSuccess)
-        {
-            _logger.LogInformation("Created Successfully");
-            _testOutputHelper.WriteLine(response.Value.NewDesc);
-            _testOutputHelper.WriteLine(response.Value.NewName);
-            _testOutputHelper.WriteLine(response.Value.NewWKT);
-        }
-            
-        _logger.LogInformation($"Failed Reason {response.Error.Code}");
+        response.IsFailure.Should().BeTrue();
+        response.Error.Should().Be(DomainErrors.POIErrors.PointName.BAD_CREDENTIALS_FOR_POINT_NAME);
+        
     }
 
     [Fact]
@@ -133,23 +117,8 @@ public class UpdatePoiCommandHandlerTests
         _repository.FindPointByIdAsync(Arg.Any<PointID>(),Arg.Any<bool>(),Arg.Any<CancellationToken>() ).Returns(mockPrevPoiCreation);
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
-        if (response.IsFailure)
-            
-        {
-            _testOutputHelper.WriteLine(response.Error.Code);
-            _testOutputHelper.WriteLine(response.Error.Desc);
-            return;
-        }
-        response.IsSuccess.Should().BeFalse();
-        if (response.IsSuccess)
-        {
-            _logger.LogInformation("Created Successfully");
-            _testOutputHelper.WriteLine(response.Value.NewDesc);
-            _testOutputHelper.WriteLine(response.Value.NewName);
-            _testOutputHelper.WriteLine(response.Value.NewWKT);
-        }
-            
-        _logger.LogInformation($"Failed Reason {response.Error.Code}");
+        
+        
     }  [Fact]
     public async Task? UpdatePoiCommandHandler_PoiNotFound_Failure_Case()
     {
@@ -169,22 +138,6 @@ public class UpdatePoiCommandHandlerTests
         
         var response = await _handler.Handle(updatePoiCommand);
         response.Error.Should().Be(RepositoryErrors.ENTITY_NOT_FOUND);
-        if (response.IsFailure)
-            
-        {
-            _testOutputHelper.WriteLine(response.Error.Code);
-            _testOutputHelper.WriteLine(response.Error.Desc);
-            return;
-        }
-        response.IsSuccess.Should().BeFalse();
-        if (response.IsSuccess)
-        {
-            _logger.LogInformation("Created Successfully");
-            var json = JsonSerializer.Serialize( response.Value);
-            _testOutputHelper.WriteLine(json);
-        }
-            
-        _logger.LogInformation($"Failed Reason {response.Error.Code}");
     }
 
     [Fact]
