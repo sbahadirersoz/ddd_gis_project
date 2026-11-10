@@ -10,6 +10,9 @@ using gis.Domain.Entities.IDs;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.Services;
+
+using Gis.Infrastructure.Topology_Services;
+
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
@@ -32,7 +35,7 @@ public class DeleteLineByIdCommandHandlerTests
     {
         _repository = Substitute.For<ILineRepository>();
         _logger = Substitute.For<ILogger<DeleteLineByIdCommandHandler>>();
-        _contract = Substitute.For<ITopologySuiteWKTContract>();
+        _contract =new TopologySuiteWktContractImpl();
         _uow = Substitute.For<IUnitOfWork>();
         _service = new LineDomainServiceContract(_repository, _contract);
         _handler = new DeleteLineByIdCommandHandler(_logger, _uow, _repository, _service);
@@ -41,20 +44,9 @@ public class DeleteLineByIdCommandHandlerTests
     [Fact]
     public async Task DeleteLineByIdSuccessCase()
     {
-        var mockCreateLineCommand = new CreateLineCommand(
-            coordinates: new List<CoordinateDto>
-            {
-                new(29.0601, 40.9902), 
-                new(28.9784, 41.0082), 
-                new(29.0122, 41.0428)  
-            },
-            lineName: "Bosphorus",
-            lineDescription: "Main transit corridor connecting shoreline stations."
-        );
 
 
-        _contract.CreateWktStringFromCoordList(Arg.Any<List<CoordinateValueObject>>()).Returns(Result<string>.Success("POLYGON (45,25)"));
-        var mockLine = await LineHelperMethods.CreateMockLine(mockCreateLineCommand);
+        var mockLine = await LineHelperMethods.CreateMockLine(new CoordinateDto(42,35),new CoordinateDto(42,75),"linename","lineDesc");
         _repository.FindByIdAsync(Arg.Any<LineID>()).Returns(mockLine.Value);
         var mockComm = new  DeleteLineByIdCommand(LineID.New());
         var handle = await _handler.Handle(mockComm);

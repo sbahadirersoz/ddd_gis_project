@@ -1,4 +1,5 @@
-﻿using Gis.Application.Features.Line.Commands.Create;
+﻿using Gis.Application.Dtos;
+using Gis.Application.Features.Line.Commands.Create;
 using Gis.Application.Mapper.LineMapper;
 using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
@@ -6,6 +7,9 @@ using gis.Domain.Entities.Coord;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.Services;
+
+using Gis.Infrastructure.Topology_Services;
+
 using NSubstitute;
 
 namespace Tests.HelperMethods.Line;
@@ -19,13 +23,23 @@ public class LineHelperMethods
      static LineHelperMethods()
     {
         _repository = Substitute.For<ILineRepository>();
-        _contract = Substitute.For<ITopologySuiteWKTContract>();
+        _contract = new TopologySuiteWktContractImpl();
         _service = new LineDomainServiceContract(_repository, _contract);
     }
 
-    public static async Task<Result<LineAggregate>> CreateMockLine(CreateLineCommand cmd)
+    public static async Task<Result<LineAggregate>> CreateMockLine(CoordinateDto first,CoordinateDto second,string linename,string  linedesc)
     {
-        _contract.CreateWktStringFromCoordList(Arg.Any<List<CoordinateValueObject>>()).Returns(Result<string>.Success("POLYGON (35,42)"));
+        
+        var cmd = new CreateLineCommand(
+            coordinates: new List<CoordinateDto>
+            {
+                first,
+                second
+            },
+            lineName: linename,
+            lineDescription: linedesc
+        );
+
         
         var list = cmd.coordinates.Select(c => (x: c.Longitude, y: c.Latitude)).ToList();
         var primitiveToCoordinates = LineAggregateVOMapper.PrimitiveListToCoordinatesList(list).Value;
