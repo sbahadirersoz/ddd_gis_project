@@ -105,7 +105,7 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
             .Select(x=> new { entity = x, distance = entity.LineString.Distance(x.LineString) })
             .OrderBy(x=> x.distance)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if (firstOrDefaultAsync == null) return new ValueTuple<LineAggregate, double>();
+        if (firstOrDefaultAsync == null) return null;
         return (ToDomain(firstOrDefaultAsync.entity), firstOrDefaultAsync.distance);
     }
 
