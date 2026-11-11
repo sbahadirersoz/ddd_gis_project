@@ -1,1 +1,61 @@
-@gis.API_HostAddress = http://localhost:5217
+### Line API checks. Run with Docker: docker compose up -d --build
+### Run the two create requests first; the first one saves its id as {{lineId}}.
+
+@host = http://localhost:8080
+@lines = {{host}}/api/v1/lines
+@missingId = 00000000-0000-0000-0000-000000000001
+
+### Create line A (saves lineId)
+POST {{lines}}/create
+Content-Type: application/json
+
+{
+  "coordinates": [
+    { "longitude": 29.0000, "latitude": 41.0000 },
+    { "longitude": 29.0100, "latitude": 41.0100 }
+  ],
+  "lineName": "check-A-{{$timestamp}}",
+  "lineDescription": "api check"
+}
+
+> {% client.global.set("lineId", response.body.id); %}
+
+### Create line B, about 1 km from A
+POST {{lines}}/create
+Content-Type: application/json
+
+{
+  "coordinates": [
+    { "longitude": 29.0000, "latitude": 41.0100 },
+    { "longitude": 29.0100, "latitude": 41.0200 }
+  ],
+  "lineName": "check-B-{{$timestamp}}",
+  "lineDescription": "api check"
+}
+
+### closestById, existing id -> 200
+GET {{lines}}/closestById?id={{lineId}}
+
+### closestById, missing id -> 400 ENTITY_NOT_FOUND
+GET {{lines}}/closestById?id={{missingId}}
+
+### inRange, existing id -> 200
+GET {{lines}}/inRange?id={{lineId}}&distance=5000
+
+### inRange, missing id -> 400 ENTITY_NOT_FOUND
+GET {{lines}}/inRange?id={{missingId}}&distance=5000
+
+### closesByCount, existing id -> 200
+GET {{lines}}/closesByCount?id={{lineId}}&count=2
+
+### closesByCount, missing id -> 400 ENTITY_NOT_FOUND
+GET {{lines}}/closesByCount?id={{missingId}}&count=2
+
+### closesByCount, count=-1 -> 400 INVALID_QUERY_COUNT
+GET {{lines}}/closesByCount?id={{lineId}}&count=-1
+
+### closesByCount, count=0 -> 400 INVALID_QUERY_COUNT
+GET {{lines}}/closesByCount?id={{lineId}}&count=0
+
+### closesByCount, count=13 -> 400 INVALID_QUERY_COUNT
+GET {{lines}}/closesByCount?id={{lineId}}&count=13

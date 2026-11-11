@@ -64,6 +64,7 @@ public class CreateLineCommandHandlerTests
             _testOutputHelper.WriteLine(JsonSerializer.Serialize(handle.Value));
 
             handle.IsSuccess.Should().Be(true);
-            
+            handle.Value.id.Should().NotBe(Guid.Empty);
+
     }
 }
