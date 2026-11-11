@@ -47,7 +47,6 @@ public class FindInRangeLinesByIdHandlerTests
     [Fact]
     public async Task FIND_IN_RANGE_LINES_BY_ID_RETURN_ENTITY_NOT_FOUND()
     {
-        var entity = await LineHelperMethods.CreateMockLine(new CoordinateDto(37,31),new CoordinateDto(44,22),"mockName","mockdesc");
         _repo.FindByIdAsync(Arg.Any<LineID>()).ReturnsNull();
         
         var mockq = new Gis.Application.Features.Line.Queries.Distance.ID.FindInRangeByIdQuery.FindInRangeLinesByIdQuery(Guid.NewGuid(),500);

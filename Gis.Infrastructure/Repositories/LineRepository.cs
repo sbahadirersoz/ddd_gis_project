@@ -76,8 +76,6 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
             query.Where(x=> x.Id!=entity.Id && entity.LineString.IsWithinDistance(x.LineString,distance))
                 .Select(x=>  new { entity = x , distance = entity.LineString.Distance(x.LineString) })
             .OrderBy(x=> x.distance).ToListAsync(cancellationToken: cancellationToken);
-
-        if (list == null) return default;
         return list.Select(x => (ToDomain(x.entity), x.distance)).ToList();
     }
 
