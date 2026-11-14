@@ -43,10 +43,10 @@ GET {{lines}}/closestById?id={{lineId}}
 GET {{lines}}/closestById?id={{missingId}}
 
 ### inRange, existing id -> 200
-GET {{lines}}/inRange?id={{lineId}}&distance=5000
+GET {{lines}}/inRange?id={{lineId}}&DistanceByMeter=5000
 
 ### inRange, missing id -> 400 ENTITY_NOT_FOUND
-GET {{lines}}/inRange?id={{missingId}}&distance=5000
+GET {{lines}}/inRange?id={{missingId}}&DistanceByMeter=5000
 
 ### closesByCount, existing id -> 200
 GET {{lines}}/closesByCount?id={{lineId}}&count=2
@@ -112,3 +112,20 @@ PATCH {{lines}}
 Content-Type: application/json
 
 { "id": "{{missingId}}", "lineDescription": "nobody" }
+
+### GET/DELETE checks. Run after the PATCH checks; DELETE removes line A.
+
+### GET by id, existing -> 200
+GET {{lines}}/{{lineId}}
+
+### GET by id, missing -> 400 ENTITY_NOT_FOUND
+GET {{lines}}/{{missingId}}
+
+### DELETE line A -> 200
+DELETE {{lines}}/{{lineId}}
+
+### GET deleted line A -> 400 ENTITY_NOT_FOUND (soft delete persisted and filtered)
+GET {{lines}}/{{lineId}}
+
+### DELETE line A again -> 400 ENTITY_NOT_FOUND
+DELETE {{lines}}/{{lineId}}
