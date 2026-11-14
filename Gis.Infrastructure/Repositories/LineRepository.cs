@@ -69,7 +69,6 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
             .Select(x=> new{ entity = x,distance = entity.LineString.Distance(x.LineString) })
             .OrderBy(x=> x.distance)
             .Take(count).ToListAsync(cancellationToken);
-        if (listAsync == null) return default;
         return listAsync.Select(x => (ToDomain(x.entity), x.distance)).ToList();
     }
 
