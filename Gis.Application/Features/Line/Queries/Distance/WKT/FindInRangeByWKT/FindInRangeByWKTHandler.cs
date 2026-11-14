@@ -23,7 +23,7 @@ public class FindInRangeByWKTHandler:IRequestHandler<FindInRangeLineByWKTQuery,R
     {
         var wkt = WellKnownText.Create(request.wkt);
         if (wkt.IsFailure) return Result<List<FindInRangeLineByWKTResponse>>.Failure(wkt.Error);
-        var list = await _repository.FindInRangeLinesByWktAsync(wkt.Value,request.distance, cancellationToken: cancellationToken);
+        var list = await _repository.FindInRangeLinesByWktAsync(wkt.Value,request.DistanceByMeter, cancellationToken: cancellationToken);
         if (list.Count == 0) return Result<List<FindInRangeLineByWKTResponse>>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
         
         _logger.Log(LogLevel.Information,"Query Found  Count : {List}",list.Count);

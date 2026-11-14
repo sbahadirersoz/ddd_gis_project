@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Gis.Application.Features.Poi.Queries.Distance.Wkt.FindInRangePoisByWkt;
 
+
 public class FindInRangePoisByWktHandler:IRequestHandler<FindInRangePoisByWktQuery,Result<List<FindInRangePoisByWktResponse>>>
 {
     private readonly IPointRepository _repository;
@@ -24,7 +25,7 @@ public class FindInRangePoisByWktHandler:IRequestHandler<FindInRangePoisByWktQue
         var wkt = _wktContract.ParsePointWkt(request.wkt);
         if (wkt.IsFailure) return  Result<List<FindInRangePoisByWktResponse>>.Failure(wkt.Error);
         
-        var findInRangePoisByWktAsync = await _repository.FindInRangePoisByWktAsync(wkt.Value, request.distance, cancellationToken: cancellationToken);
+        var findInRangePoisByWktAsync = await _repository.FindInRangePoisByWktAsync(wkt.Value, request.DistanceByMeter, cancellationToken: cancellationToken);
         var result = findInRangePoisByWktAsync.ConvertAll(x=> FindInRangePoisByWktResponse.FromAgg(x.agg,x.distance));
         return Result<List<FindInRangePoisByWktResponse>>.Success(result);
     }

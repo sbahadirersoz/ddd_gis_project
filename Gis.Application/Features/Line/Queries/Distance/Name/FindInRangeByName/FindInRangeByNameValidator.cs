@@ -8,7 +8,7 @@ public class FindInRangeByNameValidator:AbstractValidator<FindInRangeByNameQuery
 {
     public FindInRangeByNameValidator()
     {
-        RuleFor(x => x.DistanceInMeter).SetValidator(new RangeValidator());
+        RuleFor(x => x.DistanceByMeter).SetValidator(new RangeValidator());
         RuleFor(x => x.name).SetValidator(new NameValidator());
     }
 }

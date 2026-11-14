@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Gis.Application.Features.Line.Queries.Distance.LonLat.FindInRangeByLonLat;
 
-public record FindInRangeLineByLonLatQuery(CoordinateDto LonLat , double DistanceInMeter):IRequest<Result<List<FindInRangeLineByLonLatResponse>>>;
+public record FindInRangeLineByLonLatQuery(CoordinateDto LonLat , double DistanceByMeter):IRequest<Result<List<FindInRangeLineByLonLatResponse>>>;

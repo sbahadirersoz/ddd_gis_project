@@ -24,7 +24,7 @@ public class FindInRangeByNameHandler:IRequestHandler<FindInRangeByNameQuery,Res
         var name = LineName.FromString(request.name);
         if (name.IsFailure) return Result<List<FindInRangeByNameResponse>>.Failure(name.Error);
 
-        var list = await _lineRepository.FindInRangeLinesByLineNameAsync( name.Value ,request.DistanceInMeter, cancellationToken: cancellationToken);
+        var list = await _lineRepository.FindInRangeLinesByLineNameAsync( name.Value ,request.DistanceByMeter, cancellationToken: cancellationToken);
         if (list.Count  == 0) return Result<List<FindInRangeByNameResponse>>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
         var response = list.ConvertAll(x=>FindInRangeByNameResponse.FromAgg(x.agg,x.distance));
         return Result<List<FindInRangeByNameResponse>>.Success(response);
