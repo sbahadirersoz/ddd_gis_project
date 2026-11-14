@@ -76,7 +76,7 @@ namespace gis.API.Controllers
             var pointId = PointID.FromGuid(id);
             if (!pointId.IsFailure)
             {
-                var comm = new DeletePoiCommand(pointId.Value);
+                var comm = new DeletePoiCommand(pointId.Value.Value);
                 var result  = await _mediator.Send(comm, cancellationToken);
                 if (result.IsFailure) return BadRequest(result.Error);
                 return Ok(result.Value);

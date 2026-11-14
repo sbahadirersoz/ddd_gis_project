@@ -7,6 +7,6 @@ public class DeletePoiCommandValidator:AbstractValidator<DeletePoiCommand>
 {
     public DeletePoiCommandValidator()
     {
-        RuleFor(x => x.id.Value).SetValidator(new IDValidator());
+        RuleFor(x => x.id).SetValidator(new IDValidator());
     }
 }

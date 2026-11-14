@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Gis.Application.Features.Poi.Commands.Delete;
 
-public record DeletePoiCommand(PointID id):IRequest<Result<DeletePoiCommandResponse>>;
+public record DeletePoiCommand(Guid id):IRequest<Result<DeletePoiCommandResponse>>;

@@ -7,8 +7,10 @@ using Gis.Application.Features.Poi.Commands.Delete;
 
 using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
+using gis.Domain.Entities.IDs;
 using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
+using gis.Domain.ResultPattern;
 using gis.Domain.Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -46,8 +48,9 @@ public class DeletePoiCommandHandlerTests
         //     "Description",
         //     42,
         //     42
-        var request = new DeletePoiCommand(mockPrevPoiCreation.Id);
-        _repository.FindPointByIdAsync(request.id).Returns(mockPrevPoiCreation);
+        var fromGuid = PointID.FromGuid(mockPrevPoiCreation.Id.Value);
+        var request = new DeletePoiCommand(fromGuid.Value.Value);
+        _repository.FindPointByIdAsync(Arg.Any<PointID>(),Arg.Any<bool>(),Arg.Any<CancellationToken>()).Returns(mockPrevPoiCreation);
         var result = await _handler.Handle(request);
         result.IsFailure.Should().BeFalse();
         result.Value.Status.Should().Be(POIStatus.SOFT_DELETED.ToString());

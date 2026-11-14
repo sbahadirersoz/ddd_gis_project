@@ -1,5 +1,7 @@
 ﻿using Gis.Application.Common;
 using Gis.Application.Features.Poi.Commands.Create;
+
+using gis.Domain.Entities.IDs;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
@@ -26,7 +28,9 @@ public class DeletePoiCommandHandler:IRequestHandler<DeletePoiCommand,Result<Del
     public async Task<Result<DeletePoiCommandResponse>> Handle(DeletePoiCommand request,
         CancellationToken cancellationToken = default)
     {
-        var findEntityByIdAsync =await _pointRepository.FindPointByIdAsync(request.id, true,cancellationToken: cancellationToken);
+        var id = PointID.FromGuid(request.id);
+        if (id.IsFailure) return Result<DeletePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+        var findEntityByIdAsync =await _pointRepository.FindPointByIdAsync(id.Value, false,cancellationToken: cancellationToken);
         if (findEntityByIdAsync == null)
             return Result<DeletePoiCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         
