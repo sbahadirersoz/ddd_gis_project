@@ -1,5 +1,4 @@
-﻿using Gis.Application.Features.Line.Queries.FindLineByName;
-using gis.Domain.Entities.IDs;
+﻿using gis.Domain.Entities.IDs;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
