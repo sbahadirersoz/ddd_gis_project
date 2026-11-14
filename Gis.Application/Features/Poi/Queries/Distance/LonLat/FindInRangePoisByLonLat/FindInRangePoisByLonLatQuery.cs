@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Gis.Application.Features.Poi.Queries.Distance.LonLat.FindInRangePoisByLonLat;
 
-public record FindInRangePoisByLonLatQuery(double? lon, double? lat,double DistanceByMeter):IRequest<Result<List<FindInRangePoisByLonLatResponse>>>;
+public record FindInRangePoisByLonLatQuery(double? lon, double? lat,double DistanceByMeters):IRequest<Result<List<FindInRangePoisByLonLatResponse>>>;

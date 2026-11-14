@@ -30,7 +30,7 @@ public class FindInRangeLineByLonLatHandler:IRequestHandler<FindInRangeLineByLon
         
         _logger.LogInformation("primitives Passed Successful");
 
-        var list = await _lineRepository.FindInRangeLinesByLonLatAsync( lon,lat,request.DistanceByMeter, cancellationToken: cancellationToken);
+        var list = await _lineRepository.FindInRangeLinesByLonLatAsync( lon,lat,request.DistanceByMeters, cancellationToken: cancellationToken);
         
         var response = list.ConvertAll(x=> FindInRangeLineByLonLatResponse.FromAgg(x.agg,x.distance));
         return Result<List<FindInRangeLineByLonLatResponse>>.Success(response);

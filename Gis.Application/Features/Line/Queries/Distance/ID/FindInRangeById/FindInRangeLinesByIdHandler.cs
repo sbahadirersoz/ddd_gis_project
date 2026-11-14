@@ -24,7 +24,7 @@ public class FindInRangeLinesByIdHandler:IRequestHandler<FindInRangeLinesByIdQue
         if (fromGuid.IsFailure) return Result<List<FindInRangeLinesByIdResponse>>.Failure(fromGuid.Error);
         var entity = await _repo.FindByIdAsync(fromGuid.Value, cancellationToken: cancellationToken);
         if (entity == null) return Result<List<FindInRangeLinesByIdResponse>>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
-        var list = await _repo.FindNearbySameEntityByGivenIdAsync(fromGuid.Value,request.DistanceByMeter, cancellationToken: cancellationToken);
+        var list = await _repo.FindNearbySameEntityByGivenIdAsync(fromGuid.Value,request.DistanceByMeters, cancellationToken: cancellationToken);
         var response = list.ConvertAll(x => FindInRangeLinesByIdResponse.FromAgg(x.entity, x.distance));
         return Result<List<FindInRangeLinesByIdResponse>>.Success(response);
     }

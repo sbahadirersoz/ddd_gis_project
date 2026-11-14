@@ -25,7 +25,7 @@ public class FindInRangePoisByWktHandler:IRequestHandler<FindInRangePoisByWktQue
         var wkt = _wktContract.ParsePointWkt(request.wkt);
         if (wkt.IsFailure) return  Result<List<FindInRangePoisByWktResponse>>.Failure(wkt.Error);
         
-        var findInRangePoisByWktAsync = await _repository.FindInRangePoisByWktAsync(wkt.Value, request.DistanceByMeter, cancellationToken: cancellationToken);
+        var findInRangePoisByWktAsync = await _repository.FindInRangePoisByWktAsync(wkt.Value, request.DistanceByMeters, cancellationToken: cancellationToken);
         var result = findInRangePoisByWktAsync.ConvertAll(x=> FindInRangePoisByWktResponse.FromAgg(x.agg,x.distance));
         return Result<List<FindInRangePoisByWktResponse>>.Success(result);
     }
