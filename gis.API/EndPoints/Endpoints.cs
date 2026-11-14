@@ -38,6 +38,9 @@ public static class Endpoints
         public const string inRange =  "inRange";
         public const string MostClosesByCountID = "closesByCount";                
         public const string FindClosestById = "closestById";                
+        public const string FindClosestByLatLon = "closestByLatLon";                
+        public const string MostClosesByCountLatLon = "closesByLatLon";                
+        public const string inRangeByLatLon = "inRange/byLatLon";                
         
         public const string List = "";                              
         public const string GetById =  "{id:guid}";                 

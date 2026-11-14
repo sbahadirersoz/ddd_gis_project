@@ -4,7 +4,11 @@ using Gis.Application.Features.Line.Commands.Delete;
 using Gis.Application.Features.Line.Commands.Update;
 using Gis.Application.Features.Line.Queries.Distance.ID.FindClosestByIdQuery;
 using Gis.Application.Features.Line.Queries.Distance.ID.FindInRangeByIdQuery;
+using Gis.Application.Features.Line.Queries.Distance.LonLat.FindClosestByLonLat;
+using Gis.Application.Features.Line.Queries.Distance.LonLat.FindInRangeByLonLat;
+using Gis.Application.Features.Line.Queries.Distance.LonLat.FindMostClosesCountByLonLat;
 using Gis.Application.Features.Line.Queries.FindLineByID;
+using Gis.Application.Dtos;
 
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -70,6 +74,35 @@ public class LineController : ControllerBase
         var result = await _mediator.Send(cmd);
         return (result.IsFailure) ? BadRequest(result.Error) : Ok(result.Value);
     }
+    // lon/lat are nullable so a missing one is a 400, not a silent 0 (the equator)
+    private const string LonLatRequired = "longitude and latitude are required";
+
+    [HttpGet(Endpoints.Lines.FindClosestByLatLon)]
+    public async Task<IActionResult> FindClosestByLonLat([FromQuery] double? longitude, [FromQuery] double? latitude)
+    {
+        if (longitude is null || latitude is null) return BadRequest(LonLatRequired);
+        var result = await _mediator.Send(new FindClosestLineByLonLatQuery(new CoordinateDto(longitude.Value, latitude.Value)));
+        return result.IsFailure ? BadRequest(result.Error) : Ok(result.Value);
+    }
+
+    [HttpGet(Endpoints.Lines.inRangeByLatLon)]
+    public async Task<IActionResult> FindInRangeByLonLat([FromQuery] double? longitude, [FromQuery] double? latitude,
+        [FromQuery] double DistanceByMeters)
+    {
+        if (longitude is null || latitude is null) return BadRequest(LonLatRequired);
+        var result = await _mediator.Send(new FindInRangeLineByLonLatQuery(new CoordinateDto(longitude.Value, latitude.Value), DistanceByMeters));
+        return result.IsFailure ? BadRequest(result.Error) : Ok(result.Value);
+    }
+
+    [HttpGet(Endpoints.Lines.MostClosesByCountLatLon)]
+    public async Task<IActionResult> FindMostClosesCountByLonLat([FromQuery] double? longitude, [FromQuery] double? latitude,
+        [FromQuery] int count)
+    {
+        if (longitude is null || latitude is null) return BadRequest(LonLatRequired);
+        var result = await _mediator.Send(new FindMostClosesLineCountByLonLatQuery(new CoordinateDto(longitude.Value, latitude.Value), count));
+        return result.IsFailure ? BadRequest(result.Error) : Ok(result.Value);
+    }
+
     [HttpGet(Endpoints.Lines.GetById)]
     public async Task<IActionResult> GetById([FromRoute] FindLineByIDQuery query)
     {
