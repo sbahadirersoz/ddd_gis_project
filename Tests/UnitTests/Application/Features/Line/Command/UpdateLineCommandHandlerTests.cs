@@ -72,6 +72,48 @@ public class UpdateLineCommandHandlerTests
     }
 
     [Fact]
+    public async Task UpdateLineCommand_SameName_WithNewDesc_Succeeds()
+    {
+        var entity = await LineHelperMethods.CreateMockLine(new CoordinateDto(44, 43), new CoordinateDto(46, 26),
+            linename: "mockLineName", linedesc: "lineDesc");
+        _repository.IsLineNameExistsAsync(Arg.Any<LineName>()).Returns(true);
+        _repository.FindByIdAsync(Arg.Any<LineID>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(entity.Value);
+
+        var mockCmd = new UpdateLineCommand(Guid.NewGuid(),LineDescription:"newLineDesc",LineName:"mockLineName");
+        var handle = await _handler.Handle(mockCmd);
+        handle.IsSuccess.Should().BeTrue();
+        handle.Value.desc.Should().Be("newLineDesc");
+    }
+    [Fact]
+    public async Task UpdateLineCommand_OnlyDescription_ChangesDescription()
+    {
+        var entity = await LineHelperMethods.CreateMockLine(new CoordinateDto(44, 43), new CoordinateDto(46, 26),
+            linename: "mockLineName", linedesc: "lineDesc");
+        _repository.FindByIdAsync(Arg.Any<LineID>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(entity.Value);
+
+        var mockCmd = new UpdateLineCommand(Guid.NewGuid(), LineDescription: "linedescchanged");  
+        var handle = await _handler.Handle(mockCmd);
+        handle.IsSuccess.Should().BeTrue();
+        handle.Value.desc.Should().Be("linedescchanged");
+    } 
+    [Fact]
+    public async Task UpdateLineCommand_SameCoordinates_ReturnsSameCredentials()
+    {
+        var entity = await LineHelperMethods.CreateMockLine(new CoordinateDto(44, 43), new CoordinateDto(46, 26),
+            linename: "mockLineName", linedesc: "lineDesc");
+        _repository.FindByIdAsync(Arg.Any<LineID>(), Arg.Any<bool>(), Arg.Any<CancellationToken>())
+            .Returns(entity.Value);
+        var list = new List<CoordinateDto>();
+        list.Add(new CoordinateDto(44, 43));
+        list.Add(new CoordinateDto(46, 26));
+        var mockCmd = new UpdateLineCommand(Guid.NewGuid(), Coordinates: list);
+        var handle = await _handler.Handle(mockCmd);
+        handle.Error.Should().Be(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
+    }
+
+    [Fact]
     public async Task UpdateLineCommand_LineNotFound_ReturnsEntityNotFound()
     {
         _repository.FindByIdAsync(Arg.Any<LineID>(),Arg.Any<bool>(),Arg.Any<CancellationToken>()).ReturnsNull();

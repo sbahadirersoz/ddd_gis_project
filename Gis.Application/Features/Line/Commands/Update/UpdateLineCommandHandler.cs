@@ -1,7 +1,5 @@
 ﻿using Gis.Application.Common;
-using Gis.Application.Dtos;
 using Gis.Application.Mapper.LineMapper;
-using Gis.Application.Mapper.PoiAggregate;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.IDs;

@@ -37,19 +37,6 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
         return anyAsync;
     }
 
-    public async Task UpdateAsync(LineAggregate entity, CancellationToken cancellationToken = default)
-    {
-        var query = Table.AsQueryable();
-        var tableEntity = await query.FirstOrDefaultAsync(x=> x.Id == entity.Id.Value, cancellationToken: cancellationToken);
-        if (tableEntity == null)
-        
-        if (!tableEntity.Name.Equals(entity.LineName.Value)) tableEntity.ChangeLineName(entity.LineName.Value);
-        if (!tableEntity.Name.Equals(entity.LineDescription.Value)) tableEntity.ChangeLineDesc(entity.LineDescription.Value);
-        if (!tableEntity.Status.Equals((int)entity.LineStatus)) tableEntity.ChangeLineStatus((int)entity.LineStatus);
-        if (!tableEntity.Wkt.Equals(entity.WKT.Value)) tableEntity.ChangeLineString(entity.Coordinates);
-        
-    }
-
     public async Task<LineAggregate> FindByNameAsync(LineName name, bool tracking = true, CancellationToken cancellationToken = default)
     {
         var query = tracking ?  Table.AsQueryable() : Table.AsNoTracking();

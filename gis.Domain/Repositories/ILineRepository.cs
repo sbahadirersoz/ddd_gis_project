@@ -9,7 +9,6 @@ public interface ILineRepository:IRepository<LineAggregate,LineID>,ILineDistance
 {
     Task<LineAggregate?>FindByIdAsync(LineID id,bool tracking = true,  CancellationToken cancellationToken = default);
     Task<bool> IsLineNameExistsAsync(LineName pointName, CancellationToken cancellationToken = default);
-    public Task UpdateAsync(LineAggregate entity ,CancellationToken cancellationToken = default);
     
     Task<LineAggregate> FindByNameAsync(LineName name, bool tracking = true, CancellationToken cancellationToken = default);
 

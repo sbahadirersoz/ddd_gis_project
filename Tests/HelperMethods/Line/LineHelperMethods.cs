@@ -41,7 +41,7 @@ public class LineHelperMethods
         );
 
         
-        var list = cmd.coordinates.Select(c => (x: c.Longitude, y: c.Latitude)).ToList();
+        var list = cmd.coordinates.Select(c => (x: c.Latitude, y: c.Longitude)).ToList();
         var primitiveToCoordinates = LineAggregateVOMapper.PrimitiveListToCoordinatesList(list).Value;
         var primitiveToLineName = LineAggregateVOMapper.PrimitiveToLineName(cmd.lineName).Value;
         var primitiveToLineDesc = LineAggregateVOMapper.PrimitiveToLineDesc(cmd.lineDescription).Value;

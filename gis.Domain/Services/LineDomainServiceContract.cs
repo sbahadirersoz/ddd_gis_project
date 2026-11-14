@@ -47,21 +47,25 @@ public class LineDomainServiceContract : ILineDomainServiceContract
         (
             lineName is not null && !lineName.Equals(agg.LineName) ||
             lineDescription is not null && !lineDescription.Equals(agg.LineDescription) ||
-            coordinates is not null && !coordinates.Equals(agg.Coordinates) ||
+            coordinates is not null && !coordinates.SequenceEqual(agg.Coordinates) ||
             status is not null && !status.Equals(agg.LineStatus)
         );
         
         if (!hasChanges) return Result<LineAggregate>.Failure(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
+        if (lineDescription!=null && !lineDescription.Equals(agg.LineDescription))
+        {
+            agg.ChangeDesc(lineDescription);
+        }
 
-
-        if (lineName != null)
+        if (lineName != null &&  agg.LineName !=lineName)
         {
             var nameValidation = await ValidateLineNameDoesNotExistAsync(lineName);
             if (nameValidation.IsFailure) return Result<LineAggregate>.Failure(nameValidation.Error);
-            agg.ChangeLineName(lineName);
+            var changeLineName = agg.ChangeLineName(lineName);
+            if (changeLineName.IsFailure) return Result<LineAggregate>.Failure(changeLineName.Error);
         }
         
-        if (coordinates != null)
+        if (coordinates != null  && !agg.Coordinates.SequenceEqual(coordinates))
         {
             var executeRule = ExecuteRule(new LineShouldHaveAtLeastTwoCoordinates(coordinates));
             if (executeRule.IsFailure)
@@ -73,9 +77,10 @@ public class LineDomainServiceContract : ILineDomainServiceContract
             agg.ChangeCoordinates(coordinates,wktFromCoordinates.Value);
         }
 
-        if (status != null)
+        if (status != null  && !agg.LineStatus.Equals(status))
         {
-            agg.ChangeStatus(status.Value);
+            var valid = agg.ChangeStatus(status.Value);
+            if (valid.IsFailure) return Result<LineAggregate>.Failure(valid.Error);
         }
         return Result<LineAggregate>.Success(agg);
     }
