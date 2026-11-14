@@ -4,4 +4,4 @@ using MediatR;
 
 namespace Gis.Application.Features.Line.Commands.Delete;
 
-public record DeleteLineByIdCommand(LineID id):IRequest<Result<DeleteLineByIdCommandResponse>>;
+public record DeleteLineByIdCommand(Guid id):IRequest<Result<DeleteLineByIdCommandResponse>>;

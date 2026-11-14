@@ -4,11 +4,14 @@ using Gis.Application.Common;
 using Gis.Application.Dtos;
 using Gis.Application.Features.Line.Commands.Create;
 using Gis.Application.Features.Line.Commands.Delete;
+
+using gis.Domain.Aggregates;
 using gis.Domain.Contracts;
 using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.IDs;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
+using gis.Domain.ResultPattern.Errors;
 using gis.Domain.Services;
 
 using Gis.Infrastructure.Topology_Services;
@@ -16,6 +19,8 @@ using Gis.Infrastructure.Topology_Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
+
 using Tests.HelperMethods.Line;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -47,12 +52,32 @@ public class DeleteLineByIdCommandHandlerTests
 
 
         var mockLine = await LineHelperMethods.CreateMockLine(new CoordinateDto(42,35),new CoordinateDto(42,75),"linename","lineDesc");
-        _repository.FindByIdAsync(Arg.Any<LineID>()).Returns(mockLine.Value);
-        var mockComm = new  DeleteLineByIdCommand(LineID.New());
+        _repository.FindByIdAsync(Arg.Any<LineID>(),Arg.Any<bool>(),Arg.Any<CancellationToken>()).Returns(mockLine.Value);
+        var mockComm = new  DeleteLineByIdCommand(LineID.New().Value);
         var handle = await _handler.Handle(mockComm);
-        if (handle.IsFailure)
-            Console.WriteLine (JsonSerializer.Serialize(handle.Error));
-        Console.WriteLine(JsonSerializer.Serialize(handle.Value));
-        
+        handle.IsSuccess.Should().BeTrue();
     }
+    
+    [Fact]
+    public async Task Delete_Missing_ReturnsEntityNotFound()
+    {
+        var mockComm = new  DeleteLineByIdCommand(LineID.New().Value);
+        var handle = await _handler.Handle(mockComm);
+        handle.IsFailure.Should().BeTrue();
+        handle.Error.Should().Be(RepositoryErrors.ENTITY_NOT_FOUND);
+    }
+    
+    [Fact]
+    public async Task Delete_Existing_CallsUpdate()
+    {
+        var mockLine = await LineHelperMethods.CreateMockLine(new CoordinateDto(42,35),new CoordinateDto(42,75),"linename","lineDesc");
+        _repository.FindByIdAsync(Arg.Any<LineID>(),Arg.Any<bool>(),Arg.Any<CancellationToken>()).Returns(mockLine.Value);
+
+        var mockComm = new  DeleteLineByIdCommand(LineID.New().Value);
+        var handle = await _handler.Handle(mockComm);
+        _repository.Received(1).Update(Arg.Any<LineAggregate>());
+        handle.IsSuccess.Should().BeTrue();
+    }
+    
+    
 }

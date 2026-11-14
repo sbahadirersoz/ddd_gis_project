@@ -1,8 +1,11 @@
 ﻿using gis.API.EndPoints;
 using Gis.Application.Features.Line.Commands.Create;
+using Gis.Application.Features.Line.Commands.Delete;
 using Gis.Application.Features.Line.Commands.Update;
 using Gis.Application.Features.Line.Queries.Distance.ID.FindClosestByIdQuery;
 using Gis.Application.Features.Line.Queries.Distance.ID.FindInRangeByIdQuery;
+using Gis.Application.Features.Line.Queries.FindLineByID;
+
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using FindMostClosesCountByIdQuery =
@@ -60,4 +63,19 @@ public class LineController : ControllerBase
         var result = await _mediator.Send(query);
         return (result.IsFailure) ? BadRequest(result.Error) : Ok(result.Value);
     }
+    [HttpDelete(Endpoints.Lines.Delete)]
+    public async Task<IActionResult> SoftDeleteById([FromRoute] DeleteLineByIdCommand cmd)
+    {
+
+        var result = await _mediator.Send(cmd);
+        return (result.IsFailure) ? BadRequest(result.Error) : Ok(result.Value);
+    }
+    [HttpGet(Endpoints.Lines.GetById)]
+    public async Task<IActionResult> GetById([FromRoute] FindLineByIDQuery query)
+    {
+
+        var result = await _mediator.Send(query);
+        return (result.IsFailure) ? BadRequest(result.Error) : Ok(result.Value);
+    }
+    
 }

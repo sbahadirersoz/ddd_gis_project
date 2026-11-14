@@ -1,5 +1,6 @@
 ﻿using Gis.Application.Common;
 using gis.Domain.Contracts;
+using gis.Domain.Entities.IDs;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
 using gis.Domain.ResultPattern.Errors;
@@ -26,14 +27,18 @@ public class DeleteLineByIdCommandHandler:IRequestHandler<DeleteLineByIdCommand,
 
     public async Task<Result<DeleteLineByIdCommandResponse>> Handle(DeleteLineByIdCommand request, CancellationToken cancellationToken = default)
     {
-        var entity =await _repository.FindByIdAsync(request.id, cancellationToken: cancellationToken);
+        var id = LineID.FromGuid(request.id);
+        if (id.IsFailure) return Result<DeleteLineByIdCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+        var entity =await _repository.FindByIdAsync(id.Value,false ,cancellationToken: cancellationToken);
         if (entity == null)
         {
             _logger.LogInformation($"Null Found {request.id}");
             return Result<DeleteLineByIdCommandResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         }
-        _serviceContract.SoftDelete(entity);
 
+        Result softDelete = _serviceContract.SoftDelete(entity);
+        if (softDelete.IsFailure) return Result<DeleteLineByIdCommandResponse>.Failure(softDelete.Error);
+        _repository.Update(entity);
         await _uow.SaveChangesAsync(cancellationToken);
         _logger.LogInformation($"Deleted Line {request.id}");
         return Result<DeleteLineByIdCommandResponse>.Success(DeleteLineByIdCommandResponse.FromAgg(entity));
