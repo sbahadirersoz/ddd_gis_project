@@ -64,7 +64,8 @@ namespace Gis.Infrastructure.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("LineString"), "GIST");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"status\" <> 2");
 
                     b.ToTable("Line_Table");
                 });

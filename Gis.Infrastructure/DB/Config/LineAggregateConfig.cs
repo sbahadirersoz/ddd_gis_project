@@ -32,8 +32,8 @@ public class LineAggregateConfig:IEntityTypeConfiguration<LineEntity>
             .HasComment("   ACTIVE =0,\n    INACTIVE =1,\n    SOFT_DELETED =2")
             .HasDefaultValue(0)
             .HasColumnType("int");
+        builder.HasIndex(x => x.Name).IsUnique().HasFilter($"\"status\" <> {(int)LineStatus.SOFT_DELETED}");
 
-        builder.HasIndex(x => x.Name).IsUnique();
         builder.HasIndex(x => x.LineString).HasMethod("GIST");
         builder.HasQueryFilter(x => x.Status != (int)LineStatus.SOFT_DELETED);
     }
