@@ -18,7 +18,10 @@ Content-Type: application/json
   "lineDescription": "api check"
 }
 
-> {% client.global.set("lineId", response.body.id); %}
+> {%
+client.global.set("lineId", response.body.id);
+client.global.set("lineName", response.body.name);
+%}
 
 ### Create line B, about 1 km from A
 POST {{lines}}/create
@@ -59,3 +62,53 @@ GET {{lines}}/closesByCount?id={{lineId}}&count=0
 
 ### closesByCount, count=13 -> 400 INVALID_QUERY_COUNT
 GET {{lines}}/closesByCount?id={{lineId}}&count=13
+
+### PATCH checks. Run "Create line A" first; each request below changes line A.
+
+### PATCH description only -> 200, desc = "patched desc"
+PATCH {{lines}}
+Content-Type: application/json
+
+{ "id": "{{lineId}}", "lineDescription": "patched desc" }
+
+### PATCH coordinates only -> 200, new wkt
+PATCH {{lines}}
+Content-Type: application/json
+
+{
+  "id": "{{lineId}}",
+  "coordinates": [
+    { "longitude": 29.0000, "latitude": 41.0000 },
+    { "longitude": 29.0200, "latitude": 41.0200 }
+  ]
+}
+
+### PATCH same coordinates again -> 400 SAME_CREDENTIALS (200 here means the DB-loaded coordinates do not compare equal)
+PATCH {{lines}}
+Content-Type: application/json
+
+{
+  "id": "{{lineId}}",
+  "coordinates": [
+    { "longitude": 29.0000, "latitude": 41.0000 },
+    { "longitude": 29.0200, "latitude": 41.0200 }
+  ]
+}
+
+### PATCH same name + new description -> 200
+PATCH {{lines}}
+Content-Type: application/json
+
+{ "id": "{{lineId}}", "lineName": "{{lineName}}", "lineDescription": "same name check" }
+
+### PATCH same status (0 = ACTIVE) + new description -> 200
+PATCH {{lines}}
+Content-Type: application/json
+
+{ "id": "{{lineId}}", "status": 0, "lineDescription": "same status check" }
+
+### PATCH missing id -> 400 ENTITY_NOT_FOUND
+PATCH {{lines}}
+Content-Type: application/json
+
+{ "id": "{{missingId}}", "lineDescription": "nobody" }
