@@ -31,7 +31,6 @@ public class FindInRangeLineByLonLatHandler:IRequestHandler<FindInRangeLineByLon
         _logger.LogInformation("primitives Passed Successful");
 
         var list = await _lineRepository.FindInRangeLinesByLonLatAsync( lon,lat,request.DistanceByMeter, cancellationToken: cancellationToken);
-        if (list.Count == 0) return Result<List<FindInRangeLineByLonLatResponse>>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
         
         var response = list.ConvertAll(x=> FindInRangeLineByLonLatResponse.FromAgg(x.agg,x.distance));
         return Result<List<FindInRangeLineByLonLatResponse>>.Success(response);
