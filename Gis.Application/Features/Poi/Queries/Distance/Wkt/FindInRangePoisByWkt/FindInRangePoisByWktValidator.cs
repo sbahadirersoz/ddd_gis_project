@@ -9,6 +9,6 @@ public class FindInRangePoisByWktValidator:AbstractValidator<FindInRangePoisByWk
 {
     public FindInRangePoisByWktValidator()
     {
-        RuleFor(x => x.distance).SetValidator(new RangeValidator());
+        RuleFor(x => x.DistanceByMeters).SetValidator(new RangeValidator());
     }
 }

@@ -27,7 +27,7 @@ public class FindInRangePoisByNameQueryHandler
         var isExist = await _repository.IsPointNameExistsAsync(fromString.Value, cancellationToken);
         if (!isExist) return Result<List<FindInRangePoisByNameQueryResponse>>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
 
-        var findInRangePoisByNameAsync = await _repository.FindInRangePoisByNameAsync(fromString.Value,request.distance, cancellationToken: cancellationToken);
+        var findInRangePoisByNameAsync = await _repository.FindInRangePoisByNameAsync(fromString.Value,request.DistanceByMeters, cancellationToken: cancellationToken);
         _logger.LogInformation($"Found {findInRangePoisByNameAsync.Count} pois information");
         
         var result = findInRangePoisByNameAsync.Select(x=> FindInRangePoisByNameQueryResponse.FromAgg(x.agg,x.distance)).ToList();

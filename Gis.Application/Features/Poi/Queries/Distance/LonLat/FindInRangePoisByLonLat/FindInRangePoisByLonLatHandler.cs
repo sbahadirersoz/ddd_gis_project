@@ -30,7 +30,7 @@ public class FindInRangePoisByLonLatHandler:IRequestHandler<FindInRangePoisByLon
         if (Lonlat.IsFailure) return Result<List<FindInRangePoisByLonLatResponse>>.Failure(Lonlat.Error);
         var lon = Lonlat.Value.Item1;
         var lat = Lonlat.Value.Item2;
-        var list = await _repository.FindInRangePoisByLonLatAsync(lon,lat,request.distance, cancellationToken: cancellationToken);
+        var list = await _repository.FindInRangePoisByLonLatAsync(lon,lat,request.DistanceByMeters, cancellationToken: cancellationToken);
         var response = list.ConvertAll(x=> FindInRangePoisByLonLatResponse.FromAgg(x.agg,x.distance));
         return Result<List<FindInRangePoisByLonLatResponse>>.Success(response); 
     }

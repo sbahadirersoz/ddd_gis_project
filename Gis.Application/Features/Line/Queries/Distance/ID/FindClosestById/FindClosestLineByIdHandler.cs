@@ -18,13 +18,15 @@ public class FindClosestLineByIdHandler:IRequestHandler<FindClosestLineByIdQuery
         _repo = repo;
     }
 
-    public async Task<Result<FindClosestLineByIdResponse>> Handle(FindClosestLineByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<FindClosestLineByIdResponse>> Handle(FindClosestLineByIdQuery request, CancellationToken cancellationToken  = default)
     {
         var fromGuid = LineID.FromGuid(request.id);
         if (fromGuid.IsFailure) return Result<FindClosestLineByIdResponse>.Failure(fromGuid.Error);
-        var entity = await _repo.FindClosestEntityByGivenIdAsync(fromGuid.Value, cancellationToken: cancellationToken);
-        if (entity == null) return Result<FindClosestLineByIdResponse>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
-        var response  = FindClosestLineByIdResponse.FromAgg(entity.Value.entity,entity.Value.distance);
+        var entity = await _repo.FindByIdAsync(fromGuid.Value, true, cancellationToken);
+        if (entity == null) return Result<FindClosestLineByIdResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+        var neighbor = await _repo.FindClosestEntityByGivenIdAsync(fromGuid.Value, cancellationToken: cancellationToken);
+        if (neighbor ==  null) return Result<FindClosestLineByIdResponse>.Failure(RepositoryErrors.NO_NEIGHBOR_FOUND);
+        var response  = FindClosestLineByIdResponse.FromAgg(neighbor.Value.entity,neighbor.Value.distance);
         return Result<FindClosestLineByIdResponse>.Success(response);
     }
 }

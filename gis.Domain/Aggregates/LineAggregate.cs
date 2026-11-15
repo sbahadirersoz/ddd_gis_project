@@ -104,10 +104,11 @@ public class LineAggregate:AggregateRoot<LineID>
 
     internal Result ChangeLineName(LineName lineName)
     {
+        var previousLineName = LineName;
+        
         var updateLineName = UpdateLineName(lineName);
         if (updateLineName.IsFailure) return Result.Failure(updateLineName.Error);
         
-        var previousLineName = LineName;
         AddDomainEvent(LineNameChangedEvent.Create(LineName,previousLineName,Id.Value));
         return Result.Success();
     }

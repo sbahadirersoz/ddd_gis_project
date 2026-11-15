@@ -46,7 +46,7 @@ public class FindInRangePoisByWktQueryHandlerTest
         var expectedWKT = WellKnownText.Create("POINT(45 22)").Value;
 
         var handle = await _handler.Handle(mock);
-       await  _repository.Received(1).FindInRangePoisByWktAsync(expectedWKT, mock.distance);
+       await  _repository.Received(1).FindInRangePoisByWktAsync(expectedWKT, mock.DistanceByMeters);
         handle.Value.Should().BeEmpty();
     }
     [Fact]
@@ -62,7 +62,7 @@ public class FindInRangePoisByWktQueryHandlerTest
         var resList = list.ConvertAll(x => FindInRangePoisByWktResponse.FromAgg(x.Item1, x.Item2));
 
         var handle = await _handler.Handle(mock);
-       await  _repository.Received(1).FindInRangePoisByWktAsync(expectedWKT, mock.distance);
+       await  _repository.Received(1).FindInRangePoisByWktAsync(expectedWKT, mock.DistanceByMeters);
         
         handle.Value.Should().BeEquivalentTo(resList, o => o.WithStrictOrdering());
 

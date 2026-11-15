@@ -9,19 +9,6 @@ namespace gis.Domain.Contracts;
 public interface ILineDistanceCalculatorContract:IDistanceCalculatorContract<LineAggregate,LineID>
 {
     
-    Task<(LineAggregate agg, double distance)> FindClosestLineByWktAsync(WellKnownText wellKnownText,
-        bool tracking = true, CancellationToken cancellationToken = default);
-    Task<List<(LineAggregate agg, double distance)>> FindInRangeLinesByWktAsync(WellKnownText wellKnownText,
-        double distance, bool tracking = true, CancellationToken cancellationToken = default);
-    Task<List<(LineAggregate agg, double distance)>> FindMostClosesCountByWktAsync(WellKnownText wellKnownText,
-        int count, bool tracking = true, CancellationToken cancellationToken = default);
-    
-    Task<(LineAggregate agg, double distance)> FindClosestLineByNameAsync(LineName name,
-        bool tracking = true, CancellationToken cancellationToken = default);
-    Task<List<(LineAggregate agg, double distance)>> FindInRangeLinesByLineNameAsync(LineName name,
-        double distance, bool tracking = true, CancellationToken cancellationToken = default);
-    Task<List<(LineAggregate agg, double distance)>> FindMostClosesCountByLineNameAsync(LineName name,
-        int count, bool tracking = true, CancellationToken cancellationToken = default);
     
     
     

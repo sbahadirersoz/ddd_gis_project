@@ -7,6 +7,6 @@ public class DeleteLineByIdCommandValidator:AbstractValidator<DeleteLineByIdComm
 {
     public DeleteLineByIdCommandValidator()
     {
-        RuleFor(x => x.id.Value).SetValidator(new IDValidator());
+        RuleFor(x => x.id).SetValidator(new IDValidator());
     }
 }

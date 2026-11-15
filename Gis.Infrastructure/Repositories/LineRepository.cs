@@ -37,26 +37,6 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
         return anyAsync;
     }
 
-    public async Task UpdateAsync(LineAggregate entity, CancellationToken cancellationToken = default)
-    {
-        var query = Table.AsQueryable();
-        var tableEntity = await query.FirstOrDefaultAsync(x=> x.Id == entity.Id.Value, cancellationToken: cancellationToken);
-        if (tableEntity == null)
-        
-        if (!tableEntity.Name.Equals(entity.LineName.Value)) tableEntity.ChangeLineName(entity.LineName.Value);
-        if (!tableEntity.Name.Equals(entity.LineDescription.Value)) tableEntity.ChangeLineDesc(entity.LineDescription.Value);
-        if (!tableEntity.Status.Equals((int)entity.LineStatus)) tableEntity.ChangeLineStatus((int)entity.LineStatus);
-        if (!tableEntity.Wkt.Equals(entity.WKT.Value)) tableEntity.ChangeLineString(entity.Coordinates);
-        
-    }
-
-    public async Task<LineAggregate> FindByNameAsync(LineName name, bool tracking = true, CancellationToken cancellationToken = default)
-    {
-        var query = tracking ?  Table.AsQueryable() : Table.AsNoTracking();
-        var entity = await query.Where(x=> x.Name.Equals(name.Value)).FirstOrDefaultAsync(cancellationToken: cancellationToken);  
-        return entity == null ? null : ToDomain(entity);
-    }
-
     #endregion
 
  
@@ -76,8 +56,6 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
             query.Where(x=> x.Id!=entity.Id && entity.LineString.IsWithinDistance(x.LineString,distance))
                 .Select(x=>  new { entity = x , distance = entity.LineString.Distance(x.LineString) })
             .OrderBy(x=> x.distance).ToListAsync(cancellationToken: cancellationToken);
-
-        if (list == null) return default;
         return list.Select(x => (ToDomain(x.entity), x.distance)).ToList();
     }
 
@@ -91,7 +69,6 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
             .Select(x=> new{ entity = x,distance = entity.LineString.Distance(x.LineString) })
             .OrderBy(x=> x.distance)
             .Take(count).ToListAsync(cancellationToken);
-        if (listAsync == null) return default;
         return listAsync.Select(x => (ToDomain(x.entity), x.distance)).ToList();
     }
 
@@ -105,144 +82,11 @@ public class LineRepository(AppDbContext context) :GenericRepository<LineAggrega
             .Select(x=> new { entity = x, distance = entity.LineString.Distance(x.LineString) })
             .OrderBy(x=> x.distance)
             .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if (firstOrDefaultAsync == null) return new ValueTuple<LineAggregate, double>();
+        if (firstOrDefaultAsync == null) return null;
         return (ToDomain(firstOrDefaultAsync.entity), firstOrDefaultAsync.distance);
     }
 
     
-    public async Task<(LineAggregate agg, double distance)> FindClosestLineByWktAsync(WellKnownText wellKnownText, bool tracking = true,
-        CancellationToken cancellationToken = default)
-    {
-        
-        
-        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        
-        var targetLine = (LineString)reader.Read(wellKnownText.Value);
-        if (targetLine is not LineString geom)
-        {
-            return new ValueTuple<LineAggregate, double>(); 
-        }
-
-        targetLine.SRID = 4326;
-        var lineEntity = await query.Where(x => x.LineString == targetLine)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if (lineEntity == null) return default;
-
-
-
-        var result = await query.Where(x => x.LineString != targetLine)
-            .Select(x => new { entity = x, distance = targetLine.Distance(x.LineString) })
-            .OrderBy(x => x.distance)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        return result == null ? default : ( ToDomain(result.entity), result.distance );
-    }
-
-    public async Task<List<(LineAggregate agg, double distance)>> FindInRangeLinesByWktAsync(WellKnownText wellKnownText, double distance, bool tracking = true,
-        CancellationToken cancellationToken = default)
-    {
-        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        
-        var targetLine = (LineString)reader.Read(wellKnownText.Value);
-        
-            if (targetLine is not LineString geom)
-            {
-                return new List<(LineAggregate agg, double distance)>();
-            }
-        targetLine.SRID = 4326;
-        var lineEntity = await query.Where(x => x.LineString == targetLine)
-            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if (lineEntity == null) return new List<(LineAggregate agg, double distance)>();
-        var result = await query.Where
-                (x => x.LineString != targetLine && targetLine.IsWithinDistance(x.LineString, distance))
-            
-            .Select (x => new { entity = x, distance = targetLine.Distance(x.LineString) })
-            .OrderBy(x => x.distance)
-            .ToListAsync(cancellationToken: cancellationToken);
-        if (result == null) return new List<(LineAggregate agg, double distance)>();
-        return result.Select(x => (ToDomain(x.entity), x.distance)).ToList();
-    }
-
-    public async Task<List<(LineAggregate agg, double distance)>> FindMostClosesCountByWktAsync(
-        WellKnownText wellKnownText,
-        int count,
-        bool tracking = true,
-        CancellationToken cancellationToken = default)
-    {
-        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-
-        var reader = new WKTReader();
-        var parsedGeom = reader.Read(wellKnownText.Value);
-        if (parsedGeom is not LineString targetLine)
-            return new List<(LineAggregate agg, double distance)>();
-
-        targetLine.SRID = 4326; 
-
-        var lineEntity = await query
-            .FirstOrDefaultAsync(x => x.Wkt == wellKnownText.Value, cancellationToken);
-
-        if (lineEntity == null)
-            return new List<(LineAggregate agg, double distance)>();
-
-        var list = await query
-            .Where(x => x.Id != lineEntity.Id)
-            .Select(x => new {
-                Entity = x,
-                Distance = x.LineString.Distance(targetLine)
-            })
-            .OrderBy(x => x.Distance)
-            .Take(count)
-            .ToListAsync(cancellationToken);
-
-        return list.Select(x => (agg: ToDomain(x.Entity), distance: x.Distance)).ToList();
-    }
-
-    public async Task<(LineAggregate agg, double distance)> FindClosestLineByNameAsync(LineName name, bool tracking = true, CancellationToken cancellationToken = default)
-    {
-        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        var entity = await query.Where(x => x.Name.Equals(name.Value)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if (entity == null) return new ValueTuple<LineAggregate, double>();
-        var closest = query.Where(x=> !x.Name.Equals(name.Value))
-            .Select(x=> new {entity = x , distance = entity.LineString.Distance(x.LineString) })
-            .OrderBy(x=> x.distance)
-            .FirstOrDefault();
-        return closest == null ? new ValueTuple<LineAggregate, double>() : (ToDomain(closest.entity), closest.distance);
-    }
-
-    public async Task<List<(LineAggregate agg, double distance)>> FindInRangeLinesByLineNameAsync(LineName name, double distance, bool tracking = true,
-        CancellationToken cancellationToken = default)
-    {
-        
-        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        var entity = await query.Where(x => x.Name.Equals(name.Value)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if (entity == null) return new List<(LineAggregate agg, double distance)>();
-        var list = query.Where(x=> !entity.Id.Equals(x.Id) && entity.LineString.IsWithinDistance(x.LineString,distance))
-            .Select(x=> new {entity = x , distance = entity.LineString.Distance(x.LineString) })
-            .OrderBy(x=> x.distance)
-            .ToList();
-        return 
-            (list.Select(x => (ToDomain(x.entity), x.distance)).ToList());
-    }
-
-    public async Task<List<(LineAggregate agg, double distance)>> FindMostClosesCountByLineNameAsync(LineName name, int count, bool tracking = true,
-        CancellationToken cancellationToken = default)
-    {
-        var query = tracking ? Table.AsQueryable() : Table.AsNoTracking();
-        var entity = await query.Where(x => x.Name.Equals(name.Value)).FirstOrDefaultAsync(cancellationToken: cancellationToken);
-        if (entity == null) return new List<(LineAggregate agg, double distance)>();
-        var list = query.Where(x => !entity.Id.Equals(x.Id))
-            .Select
-            (x => new
-                {
-                    entity = x,
-                    distance = entity.LineString.Distance(x.LineString)
-                }
-            )
-            .OrderBy(x => x.distance)
-            .Take(count)
-            .ToList();
-        return 
-            (list.Select(x => (ToDomain(x.entity), x.distance)).ToList());
-    }
     
     
     

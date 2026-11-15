@@ -19,7 +19,7 @@ public class FindClosestLineByLonLatHandler:IRequestHandler<FindClosestLineByLon
         _repository = repository;
     }
 
-    public async Task<Result<FindClosestLineByLonLatResponse>> Handle(FindClosestLineByLonLatQuery request, CancellationToken cancellationToken)
+    public async Task<Result<FindClosestLineByLonLatResponse>> Handle(FindClosestLineByLonLatQuery request, CancellationToken cancellationToken = default)
     {
         var primitivesToCordinate = LineAggregateVOMapper.PrimitivesToCordinate(request.LonLat.Latitude,request.LonLat.Longitude);
         if (primitivesToCordinate.IsFailure) return Result<FindClosestLineByLonLatResponse>.Failure(primitivesToCordinate.Error);
@@ -33,7 +33,7 @@ public class FindClosestLineByLonLatHandler:IRequestHandler<FindClosestLineByLon
 
         if (!findClosestByLonLatAsync.HasValue)
         {
-            return Result<FindClosestLineByLonLatResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
+            return Result<FindClosestLineByLonLatResponse>.Failure(RepositoryErrors.NO_NEIGHBOR_FOUND);
         }
         
         

@@ -8,7 +8,7 @@ public class FindInRangeLinesByIdValidator:AbstractValidator<FindInRangeLinesByI
 {
     public FindInRangeLinesByIdValidator()
     {
-        RuleFor(x => x.distance).SetValidator(new RangeValidator());
+        RuleFor(x => x.DistanceByMeters).SetValidator(new RangeValidator());
         RuleFor(x => x.id).SetValidator(new IDValidator());
     }
 }

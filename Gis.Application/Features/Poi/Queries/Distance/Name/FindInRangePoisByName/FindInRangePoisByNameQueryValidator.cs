@@ -9,7 +9,7 @@ public class FindInRangePoisByNameQueryValidator:AbstractValidator<FindInRangePo
 {
     public FindInRangePoisByNameQueryValidator()
     {
-        RuleFor(x => x.distance).SetValidator(new RangeValidator());
+        RuleFor(x => x.DistanceByMeters).SetValidator(new RangeValidator());
         RuleFor(x => x.name).SetValidator(new NameValidator());
     }
 }

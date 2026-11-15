@@ -9,7 +9,7 @@ public class FindInRangeByLonLatValidator:AbstractValidator<FindInRangeLineByLon
     public FindInRangeByLonLatValidator()
     {
         RuleFor(x => x.LonLat).SetValidator(new CoordinateValidator());
-        RuleFor(x => x.DistanceInMeter).SetValidator(new RangeValidator());
+        RuleFor(x => x.DistanceByMeters).SetValidator(new RangeValidator());
         
     }
 }

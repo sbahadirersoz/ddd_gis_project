@@ -2,9 +2,9 @@
 
 namespace Gis.Application.Features.Line.Queries.Distance.LonLat.FindMostClosesCountByLonLat;
 
-public record FindMostClosesLineCountByLonLatResponse(string  wkt  , string name , double DistanceInMeter)
+public record FindMostClosesLineCountByLonLatResponse(string  wkt  , string name , double DistanceByMeters)
 
 {
-    public static FindMostClosesLineCountByLonLatResponse FromAgg(LineAggregate agg, double distance) =>
-        new(agg.WKT.Value, agg.LineName.Value, Math.Round(distance, 2));
+    public static FindMostClosesLineCountByLonLatResponse FromAgg(LineAggregate agg, double DistanceByMeters) =>
+        new(agg.WKT.Value, agg.LineName.Value, Math.Round(DistanceByMeters, 2));
 };

@@ -20,7 +20,7 @@ public class FindInRangeLineByLonLatHandler:IRequestHandler<FindInRangeLineByLon
         _lineRepository = lineRepository;
     }
 
-    public async Task<Result<List<FindInRangeLineByLonLatResponse>>> Handle(FindInRangeLineByLonLatQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<FindInRangeLineByLonLatResponse>>> Handle(FindInRangeLineByLonLatQuery request, CancellationToken cancellationToken = default)
     {
         var primitivesToCordinateResult = LineAggregateVOMapper.PrimitivesToCordinate(request.LonLat.Latitude,request.LonLat.Longitude);
         if (primitivesToCordinateResult.IsFailure)
@@ -30,8 +30,7 @@ public class FindInRangeLineByLonLatHandler:IRequestHandler<FindInRangeLineByLon
         
         _logger.LogInformation("primitives Passed Successful");
 
-        var list = await _lineRepository.FindInRangeLinesByLonLatAsync( lon,lat,request.DistanceInMeter, cancellationToken: cancellationToken);
-        if (list.Count == 0) return Result<List<FindInRangeLineByLonLatResponse>>.Failure(RepositoryErrors.QUERY_RETURNS_EMPTY);
+        var list = await _lineRepository.FindInRangeLinesByLonLatAsync( lon,lat,request.DistanceByMeters, cancellationToken: cancellationToken);
         
         var response = list.ConvertAll(x=> FindInRangeLineByLonLatResponse.FromAgg(x.agg,x.distance));
         return Result<List<FindInRangeLineByLonLatResponse>>.Success(response);
