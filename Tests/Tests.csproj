@@ -32,6 +32,7 @@
       <ProjectReference Include="..\Gis.Application\Gis.Application.csproj" />
       <ProjectReference Include="..\gis.Domain\gis.Domain.csproj" />
       <ProjectReference Include="..\Gis.Infrastructure\Gis.Infrastructure.csproj" />
+      <ProjectReference Include="..\gis.API\gis.API.csproj" />
     </ItemGroup>
 
 </Project>
