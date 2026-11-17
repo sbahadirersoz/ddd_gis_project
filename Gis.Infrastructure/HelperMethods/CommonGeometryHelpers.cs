@@ -36,4 +36,15 @@ public static Result<string> FromLonLatCoordinatesToWKTString( Longitude longitu
         var geometry = WktReader.Read(wkt.Value);
         return (Point)geometry;
     }
+
+    public static LinearRing CoordListToLinearRing(Coordinate[] list)
+    {
+        return _geometryFactory.CreateLinearRing(list);
+    }
+    
+    public static Polygon LinearRingsToPolygon(LinearRing shell ,LinearRing[] holes )
+    {
+        return _geometryFactory.CreatePolygon(shell,holes);
+    }
+    
 }

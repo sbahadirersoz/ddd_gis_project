@@ -1,5 +1,8 @@
-﻿using gis.Domain.Entities.Coord;
+﻿using gis.Domain.Aggregates;
+using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.Coord.Polygon;
+using gis.Domain.Entities.Information.Polygon;
+
 using Gis.Infrastructure.HelperMethods;
 using NetTopologySuite.Geometries;
 
@@ -28,6 +31,13 @@ public class PolygonEntity
         Status = status;
     }
 
+
+    public static PolygonEntity FromAggAndPolygon(PolygonAggregate agg, Polygon poly)
+    {
+        return new PolygonEntity(agg.Id.Value, poly, agg.Name.Value, agg.Description.Value, agg.Shell.wkt.Value,
+            (int)agg.Status);
+    }
+
     public void ChangePolygonName(string name)
     {
         Name = name;
@@ -47,4 +57,6 @@ public class PolygonEntity
     {
         Status = entityStatus;
     }
+    
+    
 }

@@ -11,7 +11,7 @@ using gis.Domain.ResultPattern;
 
 namespace gis.Domain.Aggregates;
 
-public class PolygonAggregate : AggregateRoot<PolygonID>, IEquatable<PolygonAggregate>
+public class PolygonAggregate : AggregateRoot<PolygonID>
 {
     public PolygonShell Shell { get; private set; }
 
@@ -29,9 +29,18 @@ public class PolygonAggregate : AggregateRoot<PolygonID>, IEquatable<PolygonAggr
         Description = description;
         Status = status;
     }
+    
 
     private PolygonAggregate(PolygonID id) : base(id)
     {
+    }
+
+    public static PolygonAggregate Reconstitute(PolygonID id, PolygonShell shell,
+        List<List<CoordinateValueObject>> holes, PolygonName name, PolygonDescription description, PolygonStatus status)
+    {
+        var agg = new PolygonAggregate(id, shell, name, description, status);
+        agg._holesList.AddRange(holes);
+        return agg;
     }
 
     public static Result<PolygonAggregate>Create( PolygonShell shell, PolygonName name, PolygonDescription description)
@@ -95,27 +104,6 @@ public class PolygonAggregate : AggregateRoot<PolygonID>, IEquatable<PolygonAggr
     }
 
     #endregion
-
-    public bool Equals(PolygonAggregate? other)
-    {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-        return _holesList.SequenceEqual(other._holesList) && Shell.Equals(other.Shell) && Name.Equals(other.Name) &&
-               Description.Equals(other.Description) && Status == other.Status;
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is null) return false;
-        if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != GetType()) return false;
-        return Equals((PolygonAggregate)obj);
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(_holesList, Shell, Name, Description, (int)Status);
-    }
 
     private Result CheckRuleSet(IPolygonRule rule)
     {
