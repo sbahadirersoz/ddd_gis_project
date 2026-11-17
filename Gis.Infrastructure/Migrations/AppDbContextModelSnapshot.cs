@@ -115,6 +115,52 @@ namespace Gis.Infrastructure.Migrations
 
                     b.ToTable("Poi_Table");
                 });
+
+            modelBuilder.Entity("Gis.Infrastructure.Entity.PolygonEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("Desc")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Desc");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Polygon>("Polygon")
+                        .IsRequired()
+                        .HasColumnType("geography(Polygon, 4326)")
+                        .HasColumnName("Location");
+
+                    b.Property<int>("Status")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("status")
+                        .HasComment("   ACTIVE =0,\n    INACTIVE =1,\n    SOFT_DELETED =2");
+
+                    b.Property<string>("Wkt")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Wkt");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("\"status\" <> 2");
+
+                    b.HasIndex("Polygon");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Polygon"), "GIST");
+
+                    b.ToTable("Polygon_Table");
+                });
 #pragma warning restore 612, 618
         }
     }

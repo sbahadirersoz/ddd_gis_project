@@ -14,6 +14,20 @@ public class PolygonEntity
     public string Wkt { get; private set;}
     public int Status { get; private set;}
 
+    public PolygonEntity()
+    {
+    }
+
+    internal PolygonEntity(Guid id, Polygon polygon, string name, string desc, string wkt, int status)
+    {
+        Id = id;
+        Polygon = polygon;
+        Name = name;
+        Desc = desc;
+        Wkt = wkt;
+        Status = status;
+    }
+
     public void ChangePolygonName(string name)
     {
         Name = name;
