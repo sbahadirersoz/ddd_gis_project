@@ -39,19 +39,19 @@ Content-Type: application/json
 ### closestById, existing id -> 200
 GET {{lines}}/closestById?id={{lineId}}
 
-### closestById, missing id -> 400 ENTITY_NOT_FOUND
+### closestById, missing id -> 404 ENTITY_NOT_FOUND
 GET {{lines}}/closestById?id={{missingId}}
 
 ### inRange, existing id -> 200
 GET {{lines}}/inRange?id={{lineId}}&DistanceByMeters=5000
 
-### inRange, missing id -> 400 ENTITY_NOT_FOUND
+### inRange, missing id -> 404 ENTITY_NOT_FOUND
 GET {{lines}}/inRange?id={{missingId}}&DistanceByMeters=5000
 
 ### closesByCount, existing id -> 200
 GET {{lines}}/closesByCount?id={{lineId}}&count=2
 
-### closesByCount, missing id -> 400 ENTITY_NOT_FOUND
+### closesByCount, missing id -> 404 ENTITY_NOT_FOUND
 GET {{lines}}/closesByCount?id={{missingId}}&count=2
 
 ### closesByCount, count=-1 -> 400 INVALID_QUERY_COUNT
@@ -107,7 +107,7 @@ Content-Type: application/json
 
 { "id": "{{lineId}}", "status": 0, "lineDescription": "same status check" }
 
-### PATCH missing id -> 400 ENTITY_NOT_FOUND
+### PATCH missing id -> 404 ENTITY_NOT_FOUND
 PATCH {{lines}}
 Content-Type: application/json
 
@@ -118,16 +118,16 @@ Content-Type: application/json
 ### GET by id, existing -> 200
 GET {{lines}}/{{lineId}}
 
-### GET by id, missing -> 400 ENTITY_NOT_FOUND
+### GET by id, missing -> 404 ENTITY_NOT_FOUND
 GET {{lines}}/{{missingId}}
 
 ### DELETE line A -> 200
 DELETE {{lines}}/{{lineId}}
 
-### GET deleted line A -> 400 ENTITY_NOT_FOUND (soft delete persisted and filtered)
+### GET deleted line A -> 404 ENTITY_NOT_FOUND (soft delete persisted and filtered)
 GET {{lines}}/{{lineId}}
 
-### DELETE line A again -> 400 ENTITY_NOT_FOUND
+### DELETE line A again -> 404 ENTITY_NOT_FOUND
 DELETE {{lines}}/{{lineId}}
 
 ### LonLat checks. Run "Create line A" and "Create line B" first (DELETE above removes A, so re-run create A).
@@ -135,7 +135,7 @@ DELETE {{lines}}/{{lineId}}
 ### closestByLatLon -> 200, nearest line
 GET {{lines}}/closestByLatLon?longitude=29.005&latitude=41.005
 
-### closestByLatLon, latitude missing -> 400 "longitude and latitude are required"
+### closestByLatLon, latitude missing -> 400 MISSING_COORDINATE
 GET {{lines}}/closestByLatLon?longitude=29.005
 
 ### closestByLatLon, latitude out of range -> 400 LATITUDE range error
@@ -189,7 +189,7 @@ Content-Type: application/json
   "lineDescription": "re-created"
 }
 
-### Same name while the new line is active -> 400 VALUE_ALREADY_EXIST_IN_DB
+### Same name while the new line is active -> 409 VALUE_ALREADY_EXIST_IN_DB
 POST {{lines}}/create
 Content-Type: application/json
 

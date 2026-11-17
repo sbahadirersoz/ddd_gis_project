@@ -17,6 +17,8 @@ using Gis.Application.Features.Poi.Queries.FindPoiById;
 using Gis.Application.Features.Poi.Queries.FindPoisInGivenRange;
 using Gis.Application.Features.Poi.Queries.GetAllPois;
 using gis.Domain.Entities.IDs;
+using gis.API.Common;
+using gis.Domain.ResultPattern.Errors;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +49,7 @@ namespace gis.API.Controllers
 
             if (!result.IsSuccess)
             {
-                return BadRequest(result.Error);
+                return result.Error.ToProblem();
             }
 
             return CreatedAtAction(
@@ -66,7 +68,7 @@ namespace gis.API.Controllers
             var fromGuid = PointID.FromGuid(id);
             var command = new FindPoiByIdQuery(fromGuid.Value);
             var result = await _mediator.Send(command, cancellationToken);
-            if (result.IsFailure) return BadRequest(result.Error);
+            if (result.IsFailure) return result.Error.ToProblem();
             return Ok(result.Value);
         }
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -78,18 +80,18 @@ namespace gis.API.Controllers
             {
                 var comm = new DeletePoiCommand(pointId.Value.Value);
                 var result  = await _mediator.Send(comm, cancellationToken);
-                if (result.IsFailure) return BadRequest(result.Error);
+                if (result.IsFailure) return result.Error.ToProblem();
                 return Ok(result.Value);
             }
 
-            return BadRequest(pointId.Error);
+            return pointId.Error.ToProblem();
         }
 
         [HttpPatch(Endpoints.Pois.Update)]
         public async Task<IActionResult> Update( [FromBody] UpdatePoiCommand command)
         {
             var result = await _mediator.Send(command);
-            if (result.IsFailure)return BadRequest(result.Error);
+            if (result.IsFailure)return result.Error.ToProblem();
             return Ok(result.Value);
             }
             
@@ -98,7 +100,7 @@ namespace gis.API.Controllers
             {
                 var query = new GetAllPoisQuery();
                 var result = await _mediator.Send(query);
-                return (result.IsFailure) ? BadRequest(result.Error) : Ok(result.Value);
+                return (result.IsFailure) ? result.Error.ToProblem() : Ok(result.Value);
             }
             
             
@@ -118,7 +120,7 @@ namespace gis.API.Controllers
             
             
             var result = await _mediator.Send(query);
-            if (result.IsFailure) return BadRequest(result.Error);
+            if (result.IsFailure) return result.Error.ToProblem();
             return Ok(result.Value);
         }
         [HttpGet(Endpoints.Pois.MostClosesByCountID)]
@@ -126,15 +128,15 @@ namespace gis.API.Controllers
         {
             
             var result = await _mediator.Send(query);
-            if (result.IsFailure) return BadRequest(result.Error);
+            if (result.IsFailure) return result.Error.ToProblem();
             return Ok(result.Value);
         }
         [HttpGet(Endpoints.Pois.FindClosestById)]
         public async Task<IActionResult> FindClosestById([FromQuery] FindClosestByIdQuery query)
         {
-            if (query.id  == Guid.Empty) return BadRequest("Invalid ID");
+            if (query.id  == Guid.Empty) return DomainErrors.EMPTY_ID_FORMAT.ToProblem();
             var result = await _mediator.Send(query);
-            return (result.IsFailure)?  BadRequest(result.Error):Ok(result.Value);
+            return (result.IsFailure)?  result.Error.ToProblem():Ok(result.Value);
         }
         
 
@@ -147,19 +149,19 @@ namespace gis.API.Controllers
         public async Task<IActionResult> FindInRangeByName([FromQuery] FindInRangePoisByNameQuery query)
         {
             var result = await _mediator.Send(query);
-            return (result.IsFailure) ?  BadRequest(result.Error) : Ok(result.Value);
+            return (result.IsFailure) ?  result.Error.ToProblem() : Ok(result.Value);
         }
         [HttpGet(Endpoints.Pois.MostClosesByCountName)]
         public async Task<IActionResult> FindMostClosesByName([FromQuery] FindMostClosesCountByNameQuery query)
         {
             var result = await _mediator.Send(query);
-            return (result.IsFailure) ?  BadRequest(result.Error) : Ok(result.Value);
+            return (result.IsFailure) ?  result.Error.ToProblem() : Ok(result.Value);
         }
         [HttpGet(Endpoints.Pois.FindClosestByName)]
         public async Task<IActionResult> FindClosest([FromQuery] FindClosestPoiByNameQuery query)
         {
             var result = await _mediator.Send(query);
-            return (result.IsFailure) ?  BadRequest(result.Error) : Ok(result.Value);
+            return (result.IsFailure) ?  result.Error.ToProblem() : Ok(result.Value);
         }
         #endregion
 
@@ -169,20 +171,20 @@ namespace gis.API.Controllers
             public async Task<IActionResult> FindClosestByWkt([FromBody] FindClosestPoiByWktQuery query)
             {
                 var result = await _mediator.Send(query);
-                return (result.IsFailure)?  BadRequest(result.Error):Ok(result.Value);
+                return (result.IsFailure)?  result.Error.ToProblem():Ok(result.Value);
             }
             [HttpPost(Endpoints.Pois.MostClosesByCountWkt)]
             public async Task<IActionResult> FindMostClosesCountByWkt([FromBody] FindMostClosesCountPoiByWktQuery query)
             {
                 var result = await _mediator.Send(query);
-                return (result.IsFailure)?  BadRequest(result.Error):Ok(result.Value);
+                return (result.IsFailure)?  result.Error.ToProblem():Ok(result.Value);
             }
 
             [HttpPost(Endpoints.Pois.inRangeByWkt)]
             public async Task<IActionResult> FindInRangeByWkt([FromBody] FindInRangePoisByWktQuery query)
             {
                 var result = await _mediator.Send(query);
-                return (result.IsFailure)?  BadRequest(result.Error):Ok(result.Value);
+                return (result.IsFailure)?  result.Error.ToProblem():Ok(result.Value);
             }
 
             
@@ -196,20 +198,20 @@ namespace gis.API.Controllers
         public async Task<IActionResult> FindClosestByLonLat([FromQuery] FindClosestPoiByLonLatQuery query)
         {
             var result = await _mediator.Send(query);
-            return (result.IsFailure)?  BadRequest(result.Error):Ok(result.Value);
+            return (result.IsFailure)?  result.Error.ToProblem():Ok(result.Value);
         }
         [HttpGet(Endpoints.Pois.MostClosesByCountLatLon)]
         public async Task<IActionResult> FindMostClosesCountByLonLat([FromQuery] FindMostClosesCountPoiByLonLatQuery query)
         {
             var result = await _mediator.Send(query);
-            return (result.IsFailure)?  BadRequest(result.Error):Ok(result.Value);
+            return (result.IsFailure)?  result.Error.ToProblem():Ok(result.Value);
         }
 
         [HttpGet(Endpoints.Pois.inRangeByLatLon)]
         public async Task<IActionResult> FindInRangeByLonLat([FromQuery] FindInRangePoisByLonLatQuery query)
         {
             var result = await _mediator.Send(query);
-            return (result.IsFailure)?  BadRequest(result.Error):Ok(result.Value);
+            return (result.IsFailure)?  result.Error.ToProblem():Ok(result.Value);
         }
 
 
