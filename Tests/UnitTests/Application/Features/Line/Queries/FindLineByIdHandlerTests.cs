@@ -6,6 +6,7 @@ using Gis.Application.Dtos;
 using Gis.Application.Features.Line.Queries.FindLineByID;
 
 using gis.Domain.Entities.IDs;
+using gis.Domain.Entities.Information;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern.Errors;
 
@@ -43,6 +44,9 @@ public class FindLineByIdHandlerTests
         var mockq = new FindLineByIDQuery(Guid.NewGuid());
         var handle = await _handler.Handle(mockq);
         handle.Value.name.Should().Be("lineName");
+        handle.Value.status.Should().Be(LineStatus.ACTIVE);
+        handle.Value.desc.Should().Be("lineDesc");
+        handle.Value.id.Should().Be(entity.Value.Id.Value);
     }
     [Fact]
     public async Task FindLineById_Missing_ReturnsENF()
