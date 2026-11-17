@@ -37,26 +37,4 @@ public class PolygonEntity
         return new PolygonEntity(agg.Id.Value, poly, agg.Name.Value, agg.Description.Value, agg.Shell.wkt.Value,
             (int)agg.Status);
     }
-
-    public void ChangePolygonName(string name)
-    {
-        Name = name;
-    }
-
-    public void ChangePolygonShell(List<CoordinateValueObject> shell)
-    {
-        Polygon = CoordinateFactory.CoordinatesToPolygon(shell);
-    }
-
-    public void ChangePolygonDesc(string descriptionValue)
-    {
-        Desc = descriptionValue;
-    }
-
-    public void ChangePolygonStatus(int entityStatus)
-    {
-        Status = entityStatus;
-    }
-    
-    
 }
