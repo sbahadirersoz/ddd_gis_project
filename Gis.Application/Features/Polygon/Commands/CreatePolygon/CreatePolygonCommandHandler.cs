@@ -1,9 +1,10 @@
 ﻿using Gis.Application.Common;
 using Gis.Application.Mapper.PolygonMapper;
+
 using gis.Domain.Contracts;
-using gis.Domain.Entities.WKT;
 using gis.Domain.Repositories;
 using gis.Domain.ResultPattern;
+
 using MediatR;
 
 namespace Gis.Application.Features.Polygon.Commands;
@@ -29,29 +30,23 @@ public class CreatePolygonCommandHandler:IRequestHandler<CreatePolygonCommand,Re
 
         var list = PolygonAggregateVOMapper.DtoToValueObjects(request.coords);
         if (list.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(list.Error);
-        
-        var wktStr = _wktContract.CreateWktStringFromCoordList(list.Value);
-        if (wktStr.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(wktStr.Error);
-        
-        var wkt = WellKnownText.Create(wktStr.Value);
-        if (wkt.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(wkt.Error);
-        
-        var shell = PolygonAggregateVOMapper.CoordinateDtoListToPolygonShell(request.coords,wkt.Value);
+
         
         var name = PolygonAggregateVOMapper.CreatePolyNameFromString(request.Name) ;
-        var desc = PolygonAggregateVOMapper.CreatePolyDescFromString(request.desc) ;
-        if (shell.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(shell.Error);
         if (name.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(name.Error);
+        
+        var desc = PolygonAggregateVOMapper.CreatePolyDescFromString(request.desc) ;
         if (desc.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(desc.Error);
-        var polygonAggregate = await _service.CreatePolygonAggregate(shell.Value,name.Value,desc.Value);
+        
+        var polygonAggregate = await _service.CreatePolygonAggregate(list.Value!,name.Value!,desc.Value);
         
         if (polygonAggregate.IsFailure)
         {
             return Result<CreatePolygonCommandResponse>.Failure(polygonAggregate.Error);
         }
-        await _repository.AddAsync(polygonAggregate.Value, cancellationToken);
+        await _repository.AddAsync(polygonAggregate.Value!, cancellationToken);
         await UOW.SaveChangesAsync(cancellationToken);
 
-        return Result<CreatePolygonCommandResponse>.Success(CreatePolygonCommandResponse.Create(polygonAggregate.Value));
+        return Result<CreatePolygonCommandResponse>.Success(CreatePolygonCommandResponse.Create(polygonAggregate.Value!));
     }
 }

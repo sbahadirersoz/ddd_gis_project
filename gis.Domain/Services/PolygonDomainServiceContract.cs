@@ -25,17 +25,28 @@ public class PolygonDomainServiceContract : IPolygonDomainServiceContract
         _validationFactory = validationFactory;
     }
 
-    public async Task<Result<PolygonAggregate>> CreatePolygonAggregate(PolygonShell shell, PolygonName polygonName, PolygonDescription? polygonDescription)
+
+    public async Task<Result<PolygonAggregate>> CreatePolygonAggregate(List<CoordinateValueObject> coords, PolygonName polygonName, PolygonDescription? polygonDescription)
     {
+        var minPointReqValidation = new PolygonShouldMeetMinPointRequirements(coords).Execute();
+        if (minPointReqValidation.IsFailure)  return Result<PolygonAggregate>.Failure(minPointReqValidation.Error);
+
+        var polygonMustBeClosedValidation = new PolygonMustBeClosed(coords).Execute();
+        if (polygonMustBeClosedValidation.IsFailure)  return Result<PolygonAggregate>.Failure(polygonMustBeClosedValidation.Error);
+        
         var checkName = await IsPolygonNameNotExist(polygonName);
         if (checkName.IsFailure) return Result<PolygonAggregate>.Failure(checkName.Error);
 
-        var wktResult = await CreateWKTFromCoordinates(shell.Coordinates);
+        var wktResult = await CreateWKTFromCoordinates(coords);
         if (wktResult.IsFailure) return Result<PolygonAggregate>.Failure(wktResult.Error);
-
+        
+        var shell = PolygonShell.Create(coords, wktResult.Value);
         var desc = polygonDescription ?? PolygonDescription.CreateFromString(null).Value;
-        var createResult = PolygonAggregate.Create(shell, polygonName, desc);
+
+        var createResult = PolygonAggregate.Create(shell.Value, polygonName, desc);
         return createResult;
+
+
     }
 
     public async Task<Result<PolygonAggregate>> UpdatePolygonAggregate(PolygonAggregate poly, PolygonName? polygonName, PolygonDescription? polygonDescription,
@@ -115,7 +126,7 @@ public class PolygonDomainServiceContract : IPolygonDomainServiceContract
 
     private async Task<Result<WellKnownText>> CreateWKTFromCoordinates(List<CoordinateValueObject> coordinates)
     {
-        var wktStringFromCoordList = _wktContract.CreateWktStringFromCoordList(coordinates);
+        var wktStringFromCoordList = _wktContract.CreatePolygonWktFromCoordList(coordinates);
         if (wktStringFromCoordList.IsFailure) return Result<WellKnownText>.Failure(wktStringFromCoordList.Error);
         var wkt = WellKnownText.Create(wktStringFromCoordList.Value);
         return wkt;

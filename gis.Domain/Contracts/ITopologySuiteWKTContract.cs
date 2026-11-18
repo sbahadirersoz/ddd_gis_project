@@ -8,5 +8,6 @@ public interface ITopologySuiteWKTContract
 {
     Result<string> CreateWktStringFromLonLat( Longitude longitude,Latitude latitude);
     Result<string> CreateWktStringFromCoordList(List<CoordinateValueObject> coords);
+    Result<string> CreatePolygonWktFromCoordList(List<CoordinateValueObject> coords);
     Result<WellKnownText> ParsePointWkt(string wkt);
 }

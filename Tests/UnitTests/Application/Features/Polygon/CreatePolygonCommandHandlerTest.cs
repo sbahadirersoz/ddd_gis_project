@@ -101,8 +101,12 @@ public class CreatePolygonCommandHandlerTest
             Command(ClosedSquare));
         result.Error.Should().Be(RepositoryErrors.VALUE_ALREADY_EXIST_IN_DB);
         await NothingSaved();
-
-
-
+    }   [Fact]
+    public async Task ThreePoints_NotCloses()
+    {
+        var result = await _handler.Handle(
+            Command((22,42),(34,42),(35,47)));
+        result.Error.Should().Be(BusinessRuleErrors.PolygonRules.INSUFFICENT_POINTS);
+        await NothingSaved();
     }
 }

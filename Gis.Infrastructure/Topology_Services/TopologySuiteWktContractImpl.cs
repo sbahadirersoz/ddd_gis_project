@@ -23,6 +23,15 @@ public class TopologySuiteWktContractImpl : ITopologySuiteWKTContract
             ? Result<string>.Success(fromCoordinateVoListToLineStringWkt)
             : Result<string>.Failure(DomainErrors.LineErrors.WKT.INVALID_WKT_FORMAT);
     }
+// assumes a closed ring with >= 4 points; the domain service checks this first.
+    public Result<string> CreatePolygonWktFromCoordList(List<CoordinateValueObject> coords)
+    {
+        var list = CoordinateFactory.FromCoordListToCoordinates(coords).ToArray();
+        var shellRing = CommonGeometryHelpers.CoordListToLinearRing(list);
+        var polygon = CommonGeometryHelpers.LinearRingsToPolygon(shellRing, []);
+        return Result<string>.Success(polygon.AsText());
+        
+    }
 
     public Result<WellKnownText> ParsePointWkt(string wkt)
     {

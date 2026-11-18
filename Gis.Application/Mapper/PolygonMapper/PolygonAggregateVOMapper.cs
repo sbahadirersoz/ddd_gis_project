@@ -14,12 +14,7 @@ public static class PolygonAggregateVOMapper
     public static Result<PolygonDescription> CreatePolyDescFromString(string polygonDesc)
     => PolygonDescription.CreateFromString(polygonDesc);
 
-    public static Result<PolygonShell> CoordinateDtoListToPolygonShell(List<CoordinateDto> coords, WellKnownText wkt)
-    {
-        var list = DtoToValueObjects(coords);
-        if (list.IsFailure) return Result<PolygonShell>.Failure(list.Error);
-        return PolygonShell.Create(list.Value,wkt);
-    }
+
 
     private  static Result<CoordinateValueObject> primitivesToCoordinates(double latitude, double longitude)
     {
