@@ -15,10 +15,10 @@ public record FindPolygonByIdResponse(
 {
     public  static FindPolygonByIdResponse  CreateFromAgg(PolygonAggregate agg)
     {
-        var CoordVOToDto = agg.Holes
+        var coordVoToDto = agg.Holes
             .Select(ring => ring.Select(x => new CoordinateDto(x.Longitude.Value, x.Latitude.Value)).ToList()).ToList();
         return new FindPolygonByIdResponse(agg.Shell.wkt.Value, agg.Name.Value, agg.Id.Value, agg.Status,
             agg.Description.Value!
-            , CoordVOToDto);
+            , coordVoToDto);
     }
 };

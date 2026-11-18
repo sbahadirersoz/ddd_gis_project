@@ -25,8 +25,5 @@ public class FindPolygonByIdHandler : IRequestHandler<FindPolygonByIdQuery, Resu
         var agg = await _repository.FindByIdAsync(polyId.Value!,false,cancellationToken: cancellationToken);
         if (agg == null) return Result<FindPolygonByIdResponse>.Failure(RepositoryErrors.ENTITY_NOT_FOUND);
         return Result<FindPolygonByIdResponse>.Success(FindPolygonByIdResponse.CreateFromAgg(agg));
-
-
-
     }
 }

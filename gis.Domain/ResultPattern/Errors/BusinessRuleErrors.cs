@@ -33,6 +33,7 @@ public static class BusinessRuleErrors
     {
         public static readonly Error POLYGON_NOT_CLOSED = new Error("BusinessRules.Polygon.NotClosed", "The provided value doesnt comply with PolygonRules .");
         public static readonly Error INSUFFICENT_POINTS = new Error("BusinessRules.Polygon.InsufficientPoints", "A polygon needs at least 4 points");
+        public static readonly Error HOLE_NOT_INSIDE_SHELL = new Error("BusinessRules.Polygon.HoleNotInsideShell", "The hole must be inside the polygon shell");
 
     }
     
