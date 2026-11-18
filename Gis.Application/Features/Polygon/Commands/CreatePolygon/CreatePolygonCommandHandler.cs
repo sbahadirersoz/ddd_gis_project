@@ -28,8 +28,9 @@ public class CreatePolygonCommandHandler:IRequestHandler<CreatePolygonCommand,Re
     {
 
         var list = PolygonAggregateVOMapper.DtoToValueObjects(request.coords);
+        if (list.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(list.Error);
         
-        var wktStr = _wktContract.CreateWktStringFromCoordList(list);
+        var wktStr = _wktContract.CreateWktStringFromCoordList(list.Value);
         if (wktStr.IsFailure) return Result<CreatePolygonCommandResponse>.Failure(wktStr.Error);
         
         var wkt = WellKnownText.Create(wktStr.Value);

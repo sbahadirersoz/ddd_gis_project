@@ -2,12 +2,14 @@
 using gis.Domain.Entities.IDs;
 using gis.Domain.Entities.Information.Polygon;
 using gis.Domain.Repositories;
+
 using Gis.Infrastructure.DB.Context;
 using Gis.Infrastructure.Entity;
 using Gis.Infrastructure.Mapper;
+
 using Microsoft.EntityFrameworkCore;
 
-namespace Gis.Infrastructure.Repositories;
+namespace Gis.Infrastructure.Repositories.Polygon;
 
 public class PolygonRepository(AppDbContext context) :GenericRepository<PolygonAggregate,PolygonID,PolygonEntity,PolygonMapper>(context),IPolygonRepository
 {
