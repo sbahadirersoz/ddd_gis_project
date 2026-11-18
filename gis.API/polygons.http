@@ -1,0 +1,93 @@
+### Polygon API checks. Run with Docker: docker compose up -d --build
+### Needs the AddPolygonTable migration applied. Run "Create polygon P" first; it saves polygonId and polygonName.
+
+@host = http://localhost:8080
+@polygons = {{host}}/api/v1/polygons
+
+### Create polygon P (square, saves polygonId and polygonName) -> 200, POLYGON wkt
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "check-P-{{$timestamp}}",
+  "desc": "api check"
+}
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status));
+client.test("wkt is a POLYGON", () => client.assert(String(response.body.wkt).startsWith("POLYGON"), "got " + response.body.wkt));
+client.global.set("polygonId", response.body.id);
+client.global.set("polygonName", response.body.name);
+%}
+
+### Same name while P is active -> 409 VALUE_ALREADY_EXIST_IN_DB
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "{{polygonName}}"
+}
+
+> {% client.test("status 409", () => client.assert(response.status === 409, "got " + response.status)); %}
+
+### Ring not closed -> 400 POLYGON_NOT_CLOSED
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 }
+  ],
+  "name": "check-open-{{$timestamp}}"
+}
+
+> {% client.test("status 400 NotClosed", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.NotClosed", "got " + response.status + " " + response.body.title)); %}
+
+### Closed but 3 points -> 400 INSUFFICENT_POINTS
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "check-few-{{$timestamp}}"
+}
+
+> {% client.test("status 400 InsufficientPoints", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.InsufficientPoints", "got " + response.status + " " + response.body.title)); %}
+
+### Latitude 95 -> 400 latitude error (was a 500 before)
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 95.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "check-lat-{{$timestamp}}"
+}
+
+> {% client.test("status 400", () => client.assert(response.status === 400, "got " + response.status)); %}
