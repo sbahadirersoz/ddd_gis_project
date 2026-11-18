@@ -91,3 +91,85 @@ Content-Type: application/json
 }
 
 > {% client.test("status 400", () => client.assert(response.status === 400, "got " + response.status)); %}
+
+### ---------- Holes (run "Create polygon P" first) ----------
+
+### Hole inside P -> 200, id is P, one hole
+POST {{polygons}}/{{polygonId}}/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 29.02, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.04 },
+    { "longitude": 29.02, "latitude": 41.04 },
+    { "longitude": 29.02, "latitude": 41.02 }
+  ]
+}
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status + " " + response.body.title));
+client.test("id is P", () => client.assert(response.body.id === client.global.get("polygonId"), "got " + response.body.id));
+client.test("one hole", () => client.assert(response.body.holes.length === 1, "got " + JSON.stringify(response.body.holes)));
+%}
+
+### GET P -> 200, the hole was persisted
+GET {{polygons}}/{{polygonId}}
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status));
+client.test("hole persisted", () => client.assert(response.body.holes.length === 1 && response.body.holes[0][0].longitude === 29.02, "got " + JSON.stringify(response.body.holes)));
+%}
+
+### Hole outside P -> 400 HoleNotInsideShell
+POST {{polygons}}/{{polygonId}}/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 30.02, "latitude": 42.02 },
+    { "longitude": 30.04, "latitude": 42.02 },
+    { "longitude": 30.04, "latitude": 42.04 },
+    { "longitude": 30.02, "latitude": 42.04 },
+    { "longitude": 30.02, "latitude": 42.02 }
+  ]
+}
+
+> {% client.test("status 400 HoleNotInsideShell", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.HoleNotInsideShell", "got " + response.status + " " + response.body.title)); %}
+
+### Hole crossing P's east edge -> 400 HoleNotInsideShell
+POST {{polygons}}/{{polygonId}}/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 29.08, "latitude": 41.02 },
+    { "longitude": 29.12, "latitude": 41.02 },
+    { "longitude": 29.12, "latitude": 41.04 },
+    { "longitude": 29.08, "latitude": 41.04 },
+    { "longitude": 29.08, "latitude": 41.02 }
+  ]
+}
+
+> {% client.test("status 400 HoleNotInsideShell", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.HoleNotInsideShell", "got " + response.status + " " + response.body.title)); %}
+
+### Hole on a missing polygon -> 404
+POST {{polygons}}/00000000-0000-0000-0000-000000000001/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 29.02, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.04 },
+    { "longitude": 29.02, "latitude": 41.02 }
+  ]
+}
+
+> {% client.test("status 404", () => client.assert(response.status === 404, "got " + response.status)); %}
+
+### GET missing polygon -> 404
+GET {{polygons}}/00000000-0000-0000-0000-000000000001
+
+> {% client.test("status 404", () => client.assert(response.status === 404, "got " + response.status)); %}
