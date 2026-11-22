@@ -59,5 +59,6 @@ public static class Endpoints
         public const string Create = "create";
         public const string GetById = "{id:guid}";
         public const string AddHole = "{id:guid}/holes";
+        public const string Update = "{id:guid}";
     }
 }

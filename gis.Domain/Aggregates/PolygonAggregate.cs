@@ -53,10 +53,9 @@ public class PolygonAggregate : AggregateRoot<PolygonID>
 
     #region Update Helpers
 
-    internal Result UpdateName(PolygonName newName)
+    internal Result ChangeName(PolygonName newName)
     {
         Name = newName;
-        
         AddDomainEvent(PolygonNameUpdatedEvent.Create(this));
         return Result.Success();
     }

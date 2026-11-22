@@ -50,43 +50,31 @@ public class PolygonDomainServiceContract : IPolygonDomainServiceContract
     }
 
     public async Task<Result<PolygonAggregate>> UpdatePolygonAggregate(PolygonAggregate poly, PolygonName? polygonName, PolygonDescription? polygonDescription,
-        PolygonStatus? status, List<CoordinateValueObject> newHoles)
+        PolygonStatus? status)
     {
             bool hasChanges =
             (
                 polygonName is not null && !polygonName.Equals(poly.Name) ||
                 polygonDescription is not null && !polygonDescription.Equals(poly.Description) ||
-                status is not null && !status.Equals(poly.Status) ||
-                newHoles is not null && !poly.Holes.Contains(newHoles)
+                status is not null && !status.Equals(poly.Status) 
             );
 
             if (!hasChanges) return Result<PolygonAggregate>.Failure(DomainServiceErrors.SAME_CREDENTIALS_FOR_UPDATING);
 
-            if (polygonName != null)
+            if (polygonName != null  &&   poly.Name!=polygonName)
             {
                 var nameValidation = await IsPolygonNameNotExist(polygonName);
                 if (nameValidation.IsFailure) return Result<PolygonAggregate>.Failure(nameValidation.Error);
-                var updateName = poly.UpdateName(polygonName);
+                var updateName = poly.ChangeName(polygonName);
                 if (updateName.IsFailure) return Result<PolygonAggregate>.Failure(updateName.Error);
             }
 
-            if (polygonDescription != null)
+            if (polygonDescription != null&&  !polygonDescription.Equals(poly.Description))
             {
                 poly.UpdateDescription(polygonDescription);
             }
 
-            if (newHoles != null)
-            {
-                var validateIsHoleInsideTheShell = _validationFactory.ValidateIsHoleInsideTheShell(newHoles,poly);
-                var rule =  new PolygonMustBeClosed(newHoles);
-                
-                var isClosed = rule.Execute();
-                if (isClosed.IsFailure) newHoles.Add(newHoles.First());
-                if (validateIsHoleInsideTheShell.IsFailure) return Result<PolygonAggregate>.Failure(validateIsHoleInsideTheShell.Error);
-                poly.UpdateHoles(newHoles);
-            }
-
-            if (status != null)
+            if (status != null && !poly.Status.Equals(status))
             {
                 var updateStatus = poly.UpdateStatus(status.Value);
                 if (updateStatus.IsFailure) return Result<PolygonAggregate>.Failure(updateStatus.Error);

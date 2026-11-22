@@ -3,6 +3,7 @@ using gis.API.EndPoints;
 
 using Gis.Application.Features.Polygon.Commands;
 using Gis.Application.Features.Polygon.Commands.AddHoleToPolygon;
+using Gis.Application.Features.Polygon.Commands.UpdatePolygon;
 using Gis.Application.Features.Polygon.Queries.FindPolygonById;
 
 using MediatR;
@@ -38,6 +39,13 @@ public class PolygonController : ControllerBase
 
     [HttpPost(Endpoints.Polygons.AddHole)]
     public async Task<IActionResult> AddHole([FromRoute] Guid id, [FromBody] AddHoleToPolygonCommand command)
+    {
+        var result = await _mediator.Send(command with { id = id });
+        return (result.IsFailure) ? result.Error.ToProblem() : Ok(result.Value);
+    }
+
+    [HttpPatch(Endpoints.Polygons.Update)]
+    public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdatePolygonCommand command)
     {
         var result = await _mediator.Send(command with { id = id });
         return (result.IsFailure) ? result.Error.ToProblem() : Ok(result.Value);
