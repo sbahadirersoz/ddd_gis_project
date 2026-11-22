@@ -15,6 +15,7 @@ public class AppDbContext:DbContext
     }
     public DbSet<LineEntity> Line_Table { get; set; }
     public DbSet<PoiEntity> Poi_Table { get; set; }
+    public DbSet<PolygonEntity> Polygon_Table { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

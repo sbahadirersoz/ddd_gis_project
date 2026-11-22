@@ -33,14 +33,12 @@ public class TopologySuitePolygonValidationContractImpl:ITopologySuitePolygonVal
             if (!shellRing.IsValid || !holeRing.IsValid)
                 return Result.Failure(BusinessRuleErrors.PolygonRules.POLYGON_NOT_CLOSED);
 
-            var polygon = gf.CreatePolygon(shellRing, new LinearRing[] { holeRing });
+            var shellPolygon = gf.CreatePolygon(shellRing);
             var holePolygon = gf.CreatePolygon(holeRing);
 
-            // strict containment: hole must be fully inside shell (not touching boundary)
-            if (polygon.Contains(holePolygon))
-                return Result.Success();
-
-            return Result.Failure(BusinessRuleErrors.PolygonRules.POLYGON_NOT_CLOSED);
+            return !shellPolygon.Covers(holePolygon)
+                ? Result.Failure(BusinessRuleErrors.PolygonRules.HOLE_NOT_INSIDE_SHELL)
+                : Result.Success();
         }
         catch (Exception)
         {

@@ -1,5 +1,8 @@
-﻿using gis.Domain.Entities.Coord;
+﻿using gis.Domain.Aggregates;
+using gis.Domain.Entities.Coord;
 using gis.Domain.Entities.Coord.Polygon;
+using gis.Domain.Entities.Information.Polygon;
+
 using Gis.Infrastructure.HelperMethods;
 using NetTopologySuite.Geometries;
 
@@ -14,23 +17,24 @@ public class PolygonEntity
     public string Wkt { get; private set;}
     public int Status { get; private set;}
 
-    public void ChangePolygonName(string name)
+    public PolygonEntity()
     {
+    }
+
+    internal PolygonEntity(Guid id, Polygon polygon, string name, string desc, string wkt, int status)
+    {
+        Id = id;
+        Polygon = polygon;
         Name = name;
+        Desc = desc;
+        Wkt = wkt;
+        Status = status;
     }
 
-    public void ChangePolygonShell(List<CoordinateValueObject> shell)
-    {
-        Polygon = CoordinateFactory.CoordinatesToPolygon(shell);
-    }
 
-    public void ChangePolygonDesc(string descriptionValue)
+    public static PolygonEntity FromAggAndPolygon(PolygonAggregate agg, Polygon poly)
     {
-        Desc = descriptionValue;
-    }
-
-    public void ChangePolygonStatus(int entityStatus)
-    {
-        Status = entityStatus;
+        return new PolygonEntity(agg.Id.Value, poly, agg.Name.Value, agg.Description.Value, agg.Shell.wkt.Value,
+            (int)agg.Status);
     }
 }

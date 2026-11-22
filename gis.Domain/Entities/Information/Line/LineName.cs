@@ -48,9 +48,9 @@ public record LineName
         return value.Length switch
         {
             >= HardCodedPropertities.NameMaxLength
-                => Result.Failure(DomainErrors.POIErrors.PointName.LENGTH_REACHED_MAX_VALUE),
+                => Result.Failure(DomainErrors.LineErrors.Name.LENGTH_REACHED_MAX_VALUE),
             <= HardCodedPropertities.NameMinLength
-                => Result.Failure(DomainErrors.POIErrors.PointName.LENGTH_UNDER_MIN_VALUE),
+                => Result.Failure(DomainErrors.LineErrors.Name.LENGTH_UNDER_MIN_VALUE),
             _ => Result.Success()
         };
     }

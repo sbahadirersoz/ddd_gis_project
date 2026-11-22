@@ -1,0 +1,335 @@
+### Polygon API checks. Run with Docker: docker compose up -d --build
+### Needs the AddPolygonTable migration applied. Run "Create polygon P" first; it saves polygonId and polygonName.
+
+@host = http://localhost:8080
+@polygons = {{host}}/api/v1/polygons
+
+### Create polygon P (square, saves polygonId and polygonName) -> 200, POLYGON wkt
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "check-P-{{$timestamp}}",
+  "desc": "api check"
+}
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status));
+client.test("wkt is a POLYGON", () => client.assert(String(response.body.wkt).startsWith("POLYGON"), "got " + response.body.wkt));
+client.global.set("polygonId", response.body.id);
+client.global.set("polygonName", response.body.name);
+%}
+
+### Same name while P is active -> 409 VALUE_ALREADY_EXIST_IN_DB
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "{{polygonName}}"
+}
+
+> {% client.test("status 409", () => client.assert(response.status === 409, "got " + response.status)); %}
+
+### Ring not closed -> 400 POLYGON_NOT_CLOSED
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 }
+  ],
+  "name": "chk-open-{{$timestamp}}"
+}
+
+> {% client.test("status 400 NotClosed", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.NotClosed", "got " + response.status + " " + response.body.title)); %}
+
+### Closed but 3 points -> 400 INSUFFICENT_POINTS
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 41.00 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "check-few-{{$timestamp}}"
+}
+
+> {% client.test("status 400 InsufficientPoints", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.InsufficientPoints", "got " + response.status + " " + response.body.title)); %}
+
+### Latitude 95 -> 400 latitude error (was a 500 before)
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 29.00, "latitude": 41.00 },
+    { "longitude": 29.10, "latitude": 95.00 },
+    { "longitude": 29.10, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.10 },
+    { "longitude": 29.00, "latitude": 41.00 }
+  ],
+  "name": "check-lat-{{$timestamp}}"
+}
+
+> {% client.test("status 400", () => client.assert(response.status === 400, "got " + response.status)); %}
+
+### ---------- Holes (run "Create polygon P" first) ----------
+
+### Hole inside P -> 200, id is P, one hole
+POST {{polygons}}/{{polygonId}}/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 29.02, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.04 },
+    { "longitude": 29.02, "latitude": 41.04 },
+    { "longitude": 29.02, "latitude": 41.02 }
+  ]
+}
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status + " " + response.body.title));
+client.test("id is P", () => client.assert(response.body.id === client.global.get("polygonId"), "got " + response.body.id));
+client.test("one hole", () => client.assert(response.body.holes.length === 1, "got " + JSON.stringify(response.body.holes)));
+%}
+
+### GET P -> 200, the hole was persisted
+GET {{polygons}}/{{polygonId}}
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status));
+client.test("hole persisted", () => client.assert(response.body.holes.length === 1 && response.body.holes[0][0].longitude === 29.02, "got " + JSON.stringify(response.body.holes)));
+%}
+
+### Hole outside P -> 400 HoleNotInsideShell
+POST {{polygons}}/{{polygonId}}/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 30.02, "latitude": 42.02 },
+    { "longitude": 30.04, "latitude": 42.02 },
+    { "longitude": 30.04, "latitude": 42.04 },
+    { "longitude": 30.02, "latitude": 42.04 },
+    { "longitude": 30.02, "latitude": 42.02 }
+  ]
+}
+
+> {% client.test("status 400 HoleNotInsideShell", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.HoleNotInsideShell", "got " + response.status + " " + response.body.title)); %}
+
+### Hole crossing P's east edge -> 400 HoleNotInsideShell
+POST {{polygons}}/{{polygonId}}/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 29.08, "latitude": 41.02 },
+    { "longitude": 29.12, "latitude": 41.02 },
+    { "longitude": 29.12, "latitude": 41.04 },
+    { "longitude": 29.08, "latitude": 41.04 },
+    { "longitude": 29.08, "latitude": 41.02 }
+  ]
+}
+
+> {% client.test("status 400 HoleNotInsideShell", () => client.assert(response.status === 400 && response.body.title === "BusinessRules.Polygon.HoleNotInsideShell", "got " + response.status + " " + response.body.title)); %}
+
+### Hole on a missing polygon -> 404
+POST {{polygons}}/00000000-0000-0000-0000-000000000001/holes
+Content-Type: application/json
+
+{
+  "hole": [
+    { "longitude": 29.02, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.02 },
+    { "longitude": 29.04, "latitude": 41.04 },
+    { "longitude": 29.02, "latitude": 41.02 }
+  ]
+}
+
+> {% client.test("status 404", () => client.assert(response.status === 404, "got " + response.status)); %}
+
+### GET missing polygon -> 404
+GET {{polygons}}/00000000-0000-0000-0000-000000000001
+
+> {% client.test("status 404", () => client.assert(response.status === 404, "got " + response.status)); %}
+
+### Create with empty body -> 400 (was a 500)
+POST {{polygons}}/create
+Content-Type: application/json
+
+{}
+
+> {% client.test("status 400", () => client.assert(response.status === 400, "got " + response.status)); %}
+
+### Hole with empty body -> 400 (was a 500)
+POST {{polygons}}/{{polygonId}}/holes
+Content-Type: application/json
+
+{}
+
+> {% client.test("status 400", () => client.assert(response.status === 400, "got " + response.status)); %}
+
+### ---------- Update (PATCH) — run "Create polygon P" first ----------
+
+### Create polygon Q (saves polygonQName, used for the name clash check) -> 200
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 30.00, "latitude": 40.00 },
+    { "longitude": 30.10, "latitude": 40.00 },
+    { "longitude": 30.10, "latitude": 40.10 },
+    { "longitude": 30.00, "latitude": 40.10 },
+    { "longitude": 30.00, "latitude": 40.00 }
+  ],
+  "name": "check-Q-{{$timestamp}}"
+}
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status + " " + response.body.title));
+client.global.set("polygonQName", response.body.name);
+%}
+
+### PATCH P description only -> 200, name kept
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "desc": "patched desc" }
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status + " " + response.body.title));
+client.test("desc changed", () => client.assert(response.body.desc === "patched desc", "got " + response.body.desc));
+client.test("name kept", () => client.assert(response.body.name === client.global.get("polygonName"), "got " + response.body.name));
+%}
+
+### PATCH P with its own name and a new description -> 200 (own name is not "already exists")
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "name": "{{polygonName}}", "desc": "own name check" }
+
+> {% client.test("status 200", () => client.assert(response.status === 200, "got " + response.status + " " + response.body.title)); %}
+
+### PATCH P with the same values -> 400 POI.Updating.SameValues
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "name": "{{polygonName}}", "desc": "own name check", "status": 0 }
+
+> {% client.test("status 400 SameValues", () => client.assert(response.status === 400 && response.body.title === "POI.Updating.SameValues", "got " + response.status + " " + response.body.title)); %}
+
+### PATCH P with Q's name -> 409
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "name": "{{polygonQName}}" }
+
+> {% client.test("status 409", () => client.assert(response.status === 409, "got " + response.status + " " + response.body.title)); %}
+
+### PATCH P status to INACTIVE (1) -> 200
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "status": 1 }
+
+> {% client.test("status 200 INACTIVE", () => client.assert(response.status === 200 && response.body.status === 1, "got " + response.status + " " + response.body.status)); %}
+
+### PATCH P new name -> 200 (saves the new polygonName)
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "name": "renamed-{{$timestamp}}" }
+
+> {%
+client.test("status 200", () => client.assert(response.status === 200, "got " + response.status + " " + response.body.title));
+client.global.set("polygonName", response.body.name);
+%}
+
+### GET P -> the PATCHes were persisted
+GET {{polygons}}/{{polygonId}}
+
+> {%
+client.test("name persisted", () => client.assert(response.body.name === client.global.get("polygonName"), "got " + response.body.name));
+client.test("desc persisted", () => client.assert(response.body.desc === "own name check", "got " + response.body.desc));
+client.test("status persisted", () => client.assert(response.body.status === 1, "got " + response.body.status));
+%}
+
+### PATCH missing polygon -> 404
+PATCH {{polygons}}/00000000-0000-0000-0000-000000000001
+Content-Type: application/json
+
+{ "desc": "nobody" }
+
+> {% client.test("status 404", () => client.assert(response.status === 404, "got " + response.status)); %}
+
+### ---------- Name validation ----------
+
+### PATCH P name with a space -> 400 POLYGON.Name.BadCredentials
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "name": "two words" }
+
+> {% client.test("status 400 BadCredentials", () => client.assert(response.status === 400 && response.body.title === "POLYGON.Name.BadCredentials", "got " + response.status + " " + response.body.title)); %}
+
+### PATCH P name blank -> 400 POLYGON.Name.BadCredentials
+PATCH {{polygons}}/{{polygonId}}
+Content-Type: application/json
+
+{ "name": "   " }
+
+> {% client.test("status 400 BadCredentials", () => client.assert(response.status === 400 && response.body.title === "POLYGON.Name.BadCredentials", "got " + response.status + " " + response.body.title)); %}
+
+### Create with a 3-letter name -> 400 POLYGON.Name.MinLengthRequired
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 31.00, "latitude": 40.00 },
+    { "longitude": 31.10, "latitude": 40.00 },
+    { "longitude": 31.10, "latitude": 40.10 },
+    { "longitude": 31.00, "latitude": 40.00 }
+  ],
+  "name": "abc"
+}
+
+> {% client.test("status 400 MinLength", () => client.assert(response.status === 400 && response.body.title === "POLYGON.Name.MinLengthRequired", "got " + response.status + " " + response.body.title)); %}
+
+### Create with a 21-letter name -> 400 POLYGON.Name.MaxLengthExceeded
+POST {{polygons}}/create
+Content-Type: application/json
+
+{
+  "coords": [
+    { "longitude": 31.00, "latitude": 40.00 },
+    { "longitude": 31.10, "latitude": 40.00 },
+    { "longitude": 31.10, "latitude": 40.10 },
+    { "longitude": 31.00, "latitude": 40.00 }
+  ],
+  "name": "abcdefghijklmnopqrstu"
+}
+
+> {% client.test("status 400 MaxLength", () => client.assert(response.status === 400 && response.body.title === "POLYGON.Name.MaxLengthExceeded", "got " + response.status + " " + response.body.title)); %}

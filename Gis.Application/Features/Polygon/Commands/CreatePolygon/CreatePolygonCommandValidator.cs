@@ -5,8 +5,9 @@ namespace Gis.Application.Features.Polygon.Commands;
 
 public class CreatePolygonCommandValidator:AbstractValidator<CreatePolygonCommand>
 {
-
-    public CreatePolygonCommandValidator(ITopologySuitePolygonValidationContract contract)
+    public CreatePolygonCommandValidator()
     {
+        RuleFor(x => x.coords).NotEmpty();
     }
+
 }

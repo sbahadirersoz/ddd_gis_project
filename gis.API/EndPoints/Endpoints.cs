@@ -47,9 +47,18 @@ public static class Endpoints
         public const string Create = "create";                              
         public const string Update = "";
         public const string PartialUpdate = "/{id:guid}";           
-        public const string Delete =  "{id:guid}";          
+        public const string Delete =  "{id:guid}";
 
-        
-        
+
+
+    }
+
+    public static class Polygons
+    {
+        public const string Root = Base + "/polygons";
+        public const string Create = "create";
+        public const string GetById = "{id:guid}";
+        public const string AddHole = "{id:guid}/holes";
+        public const string Update = "{id:guid}";
     }
 }

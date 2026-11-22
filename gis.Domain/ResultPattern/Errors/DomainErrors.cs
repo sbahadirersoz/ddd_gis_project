@@ -145,4 +145,19 @@ public static class DomainErrors
         }
     
     }
+
+    public static class Polygons
+    {
+        public static readonly Error BAD_CREDENTIALS_FOR_NAME =
+            new Error("POLYGON.Name.BadCredentials", "Invalid polygon name credentials provided.");
+        
+        public static readonly Error LENGTH_REACHED_MAX_VALUE =
+            new Error("POLYGON.Name.MaxLengthExceeded", "POLYGON name length reached the maximum allowed limit.");
+
+        public static readonly Error LENGTH_UNDER_MIN_VALUE =
+            new Error("POLYGON.Name.MinLengthRequired", "POLYGON name length is under the minimum required limit.");
+
+
+
+    }
     }

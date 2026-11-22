@@ -35,13 +35,6 @@ public static class CoordinateFactory
     
     
 
-    public static Polygon CoordinatesToPolygon(List<CoordinateValueObject> list)
-    {
-        var fromCoordListToCoordinates = FromCoordListToCoordinates(list);
-        var linearRing = _geometryFactory.CreateLinearRing(fromCoordListToCoordinates.ToArray());
-        var poly = _geometryFactory.CreatePolygon(linearRing);
-        return poly;
-    }
 
     
     
