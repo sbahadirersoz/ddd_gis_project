@@ -135,4 +135,27 @@ public class AddHoleToPolygonCommandHandlerTests
         result.IsFailure.Should().BeTrue();
         await NothingSaved();
     }
+
+    [Fact]
+    public async Task ClosedHoleWithThreePoints_ReturnsInsufficientPoints_AndSavesNothing()
+    {
+        var agg = RepoHasPolygon();
+        (double, double)[] line = [(29.02, 41.02), (29.04, 41.02), (29.02, 41.02)];
+
+        var result = await _handler.Handle(Command(agg.Id.Value, line), CancellationToken.None);
+
+        result.Error.Should().Be(BusinessRuleErrors.PolygonRules.INSUFFICENT_POINTS);
+        await NothingSaved();
+    }
+
+    [Fact]
+    public async Task OpenHole_ReturnsNotClosed_AndSavesNothing()
+    {
+        var agg = RepoHasPolygon();
+
+        var result = await _handler.Handle(Command(agg.Id.Value, InsideHole[..^1]), CancellationToken.None);
+
+        result.Error.Should().Be(BusinessRuleErrors.PolygonRules.POLYGON_NOT_CLOSED);
+        await NothingSaved();
+    }
 }

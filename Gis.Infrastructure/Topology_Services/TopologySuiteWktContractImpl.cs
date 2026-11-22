@@ -29,8 +29,7 @@ public class TopologySuiteWktContractImpl : ITopologySuiteWKTContract
         var list = CoordinateFactory.FromCoordListToCoordinates(coords).ToArray();
         var shellRing = CommonGeometryHelpers.CoordListToLinearRing(list);
         var polygon = CommonGeometryHelpers.LinearRingsToPolygon(shellRing, []);
-        return Result<string>.Success(polygon.AsText());
-        
+        return !polygon.IsValid ? Result<string>.Failure(BusinessRuleErrors.PolygonRules.SELF_INTERSECTING) : Result<string>.Success(polygon.AsText());
     }
 
     public Result<WellKnownText> ParsePointWkt(string wkt)

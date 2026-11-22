@@ -109,4 +109,15 @@ public class CreatePolygonCommandHandlerTest
         result.Error.Should().Be(BusinessRuleErrors.PolygonRules.INSUFFICENT_POINTS);
         await NothingSaved();
     }
+
+    [Fact]
+    public async Task SelfIntersectingShell_ReturnsSelfIntersecting()
+    {
+        // bowtie: the edges (29 41)-(29.1 41.1) and (29.1 41)-(29 41.1) cross
+        var result = await _handler.Handle(
+            Command((29.00, 41.00), (29.10, 41.10), (29.10, 41.00), (29.00, 41.10), (29.00, 41.00)), CancellationToken.None);
+
+        result.Error.Should().Be(BusinessRuleErrors.PolygonRules.SELF_INTERSECTING);
+        await NothingSaved();
+    }
 }

@@ -97,10 +97,10 @@ public class PolygonDomainServiceContract : IPolygonDomainServiceContract
 
     public async Task<Result<PolygonAggregate>> AddHoleToPolygon(PolygonAggregate poly, List<CoordinateValueObject> newHole)
     {
-        var rule = new PolygonMustBeClosed(newHole);
-        
-        var isClosed  = rule.Execute();
-        if (isClosed.IsFailure) newHole.Add(newHole.First());
+        var minPointResult = new PolygonShouldMeetMinPointRequirements(newHole).Execute();
+        if (minPointResult.IsFailure) return Result<PolygonAggregate>.Failure(minPointResult.Error);
+        var mustBeClosedResult = new PolygonMustBeClosed(newHole).Execute();
+        if (mustBeClosedResult.IsFailure) return Result<PolygonAggregate>.Failure(mustBeClosedResult.Error);
 
         var validateIsHoleInsideTheShell = _validationFactory.ValidateIsHoleInsideTheShell(newHole,poly);
         if (validateIsHoleInsideTheShell.IsFailure) return Result<PolygonAggregate>.Failure(validateIsHoleInsideTheShell.Error);
