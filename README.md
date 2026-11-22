@@ -1,8 +1,6 @@
 # GIS API (DDD / Clean Architecture)
 
-A .NET 9 REST API for managing geospatial data (points of interest and polygons), built to practice Domain-Driven Design, Clean Architecture and containerized development.
-
-> **Status:** work in progress. See the [roadmap](#roadmap).
+A .NET 9 REST API for geospatial data (points of interest, lines and polygons), built to practice Domain-Driven Design, Clean Architecture and test-driven development.
 
 ## Tech stack
 
@@ -53,10 +51,12 @@ ddd_gis_project/
 
 ### Features
 
-- **Points of interest (POI):** list and manage points on the map
-- **Polygons:** create polygons and add holes, validated by domain business rules (rules factory) and NetTopologySuite geometry checks
-- Request validation and logging through MediatR pipeline behaviors
-- Generic repository for common data access
+- **Points of interest:** create, read, update, delete, plus nearest, N closest and in-range queries by id, name, WKT or lon/lat
+- **Lines:** create, read, update, soft delete, plus nearest, N closest and in-range queries by id or lon/lat
+- **Polygons:** create, read, rename / change status, and add holes; the shell must be closed and not self-intersecting, and every hole must lie inside the shell
+- Distances in meters, computed by PostGIS on `geography` columns with GIST indexes
+- Errors as RFC 7807 `ProblemDetails` (400 validation, 404 not found, 409 conflict) through a Result pattern (expected errors are values, not exceptions)
+- Unique names that ignore soft-deleted rows (filtered unique index)
 
 ## Getting started
 
@@ -116,13 +116,51 @@ dotnet run --project gis.API
 
 ## API
 
+All routes start with `/api/v1`. Example requests with status assertions live in `gis.API/lines.http` and `gis.API/polygons.http` (JetBrains / VS Code REST client).
+
+### Polygons
+
 | Method | Route | Description |
 |---|---|---|
-| GET | `/api/pois` | List points of interest |
-| POST | `/api/polygons` | Create a polygon |
-| POST | `/api/polygons/{id}/holes` | Add a hole to a polygon |
+| POST | `/polygons/create` | Create a polygon from a closed coordinate ring |
+| GET | `/polygons/{id}` | Shell WKT, holes, name, description, status |
+| POST | `/polygons/{id}/holes` | Add a hole (must be inside the shell) |
+| PATCH | `/polygons/{id}` | Change name, description or status |
 
-> Adjust the routes above to match your controllers. In Development, the OpenAPI document is served at `/openapi/v1.json`.
+### Lines
+
+| Method | Route | Description |
+|---|---|---|
+| POST | `/lines/create` | Create a line |
+| GET | `/lines/{id}` | Get a line |
+| PATCH | `/lines` | Update name, description, coordinates or status |
+| DELETE | `/lines/{id}` | Soft delete |
+| GET | `/lines/closestById`, `/lines/closestByLatLon` | Nearest line |
+| GET | `/lines/closesByCount`, `/lines/closesByLatLon` | N closest lines |
+| GET | `/lines/inRange`, `/lines/inRange/byLatLon` | Lines within a distance in meters |
+
+### Points of interest
+
+| Method | Route | Description |
+|---|---|---|
+| GET | `/pois` | List points of interest |
+| POST | `/pois/create` | Create a point |
+| GET | `/pois/{id}` | Get a point |
+| PATCH | `/pois` | Update a point |
+| DELETE | `/pois/{id}` | Delete a point |
+| GET / POST | `/pois/closestBy{Id,Name,LatLon,Wkt}` | Nearest point |
+| GET / POST | `/pois/closesBy{Count,NameCount,LatLon,WktCount}` | N closest points |
+| GET / POST | `/pois/inRange`, `/pois/inRange/by{Name,LatLon,Wkt}` | Points within a distance in meters |
+
+WKT variants are POST (the WKT goes in the body). In Development, the OpenAPI document is served at `/openapi/v1.json`.
+
+## Testing
+
+```bash
+dotnet test Tests
+```
+
+177 unit tests (xUnit, NSubstitute, FluentAssertions) cover domain rules, handlers with the real NetTopologySuite services, validators, mappers and error-to-HTTP mapping. GitHub Actions builds and runs them on every pull request.
 
 ## Development notes
 
@@ -134,16 +172,15 @@ dotnet run --project gis.API
 ## Roadmap
 
 - [x] Layered solution with DDD structure
-- [x] Dockerfile and Docker Compose with PostGIS
+- [x] Docker Compose with PostGIS
 - [x] MediatR pipeline with validation and logging
-- [ ] Initial EF Core migration and automatic migration in Development
-- [ ] Seed data
-- [ ] Unit tests (Domain, Application)
+- [x] Unit tests (Domain, Application, Infrastructure)
+- [x] Spatial queries (nearest, N closest, within a radius)
+- [x] `ProblemDetails` errors and a global exception handler
+- [x] GitHub Actions CI
 - [ ] Integration tests with Testcontainers
-- [ ] Spatial queries (features within a radius, intersection)
-- [ ] Global exception handling with `ProblemDetails`
+- [ ] Polygon delete and spatial queries
 - [ ] Authentication (JWT)
-- [ ] GitHub Actions CI (build and test)
 
 ## What I learned
 
@@ -152,7 +189,5 @@ dotnet run --project gis.API
 - Dependency injection troubleshooting (missing registrations, base type vs derived type)
 - Docker networking (service names vs `localhost`) and Postgres initialization behavior
 - EF Core migrations with spatial types
-
-## License
-
-Add a license file (for example MIT) before publishing.
+- Test-first bug fixing: a red test before every fix, then checks against the real API
+- Geometry rules with NetTopologySuite (closed rings, self-intersection, holes inside a shell)
